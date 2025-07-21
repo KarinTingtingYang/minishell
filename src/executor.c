@@ -1,18 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/21 11:18:16 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/07/21 14:18:52 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../src/includes/minishell.h"
 
 extern char **environ;
+extern volatile sig_atomic_t g_child_running; // Declare extern for global flag
 
 static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
 {
@@ -37,6 +38,9 @@ static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
 
 static void execute_cmd(char *cmd_path, char **args, char **path_dirs)
 {
+	
+    // Reset signal handlers to default for the child process
+    reset_child_signal_handlers(); //
 	if (cmd_path == NULL)
 	{
 		free_split(path_dirs);
@@ -56,7 +60,9 @@ int execute_command(char *line, char **envp)
 	char	**path_dirs;
 	char	*cmd_path;
 	pid_t	pid;
-	int		status;
+	// int		status; --> moved to helper function wait_for_child_and_handle_status() in signal.c
+	int		exit_code; // new variable to hold exit code returned from helper function 
+					   // wait_for_child_and_handle_status()
 
 	args = ft_split(line, ' ');
 	path_dirs = find_path_dirs(environ);
@@ -83,19 +89,12 @@ int execute_command(char *line, char **envp)
 	}
 	else
 	{
-		if (waitpid(pid, &status, 0) == -1)
-		{
-			perror("waitpid");
-			free_split(path_dirs);
-			free_split(args);
-			free(cmd_path);
-			return (-1);
-		}
+		// moved wpid and exit code check to helper function wait_for_child_and_handle_status()
+		exit_code = wait_for_child_and_handle_status(pid);
 		free_split(path_dirs);
 		free_split(args);
 		free(cmd_path);
-		if (WIFEXITED(status))
-			return WEXITSTATUS(status);
+		return (exit_code);
 	}
 	return 0;
 }

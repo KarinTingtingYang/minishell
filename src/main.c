@@ -1,16 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/21 11:23:49 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   main.c                                             :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:09:59 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/07/21 12:43:18 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../src/includes/minishell.h"
+
+// Global flag definition
+volatile sig_atomic_t g_child_running = 0;
 
 // static int	wait_for_children(pid_t first_pid, pid_t last_pid)
 // {
@@ -63,7 +66,7 @@
 // 		error_exit("fork first");
 // 	last_pid = last_child(pipe_fd, args + 2, envp);
 // 	if (last_pid < 0)
-// 	{
+// 	{(pid, &status, 0)
 // 		waitpid(first_pid, NULL, 0);
 // 		error_exit("fork second");
 // 	}
@@ -79,8 +82,10 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argc;
 	(void)argv;
+	setup_signal_handlers(); // set up the handlers for the parent process
 	while (1)
 	{
+		g_child_running = 0; // No child running while waiting for input
 		input = readline("minishell> ");
 		if (input == NULL)
 		{

@@ -1,17 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/21 11:15:42 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   minishell.h                                        :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:10:15 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/07/21 14:17:00 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
+
+# define _POSIX_C_SOURCE 200809L   // Added for signal handling
+# define _GNU_SOURCE               // Added for signal handling
 
 # include <fcntl.h>
 # include <fcntl.h>
@@ -21,11 +24,22 @@
 # include <stdlib.h>
 # include <string.h>
 # include <sys/wait.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include <signal.h>                // Added for signal handling
 
 #include "../libft/libft.h"
 #include "../src/includes/executor.h"
+
+// Global flag to indicate if a child process is currently running.
+// volatile sig_atomic_t is used for variables modified by signal handlers.
+extern volatile sig_atomic_t g_child_running; // Declare global flag
+
+// Signal handling function prototypes (in signal.c)
+void setup_signal_handlers(void);
+void reset_child_signal_handlers(void);
+void handle_parent_sigint(int signum);
+int wait_for_child_and_handle_status(pid_t pid);
 
 void error_exit(const char *msg);
 void error_msg_exit(const char *msg);
