@@ -6,12 +6,12 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/07 11:00:29 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/21 10:45:03 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft/libft.h"
-#include "../src/pipex.h"
+#include "../src/includes/pipex.h"
 
 static void	handle_execve_error(char *cmd_path, char **args, char **path_dirs)
 {

@@ -56,10 +56,10 @@ INCLUDES   = -I$(LIBFT_DIR) -I$(INC_DIR) -I.
 # === Source Files ===
 SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/pipex_helper.c \
-             $(SRC_DIR)/utils.c
+             $(SRC_DIR)/utils.c \
+             $(SRC_DIR)/executor.c
 
 # === Object Files ===
-
 OBJS       = $(SRCS:$(SRC_DIR)/%.c=$(OBJDIR)/%.o)
 
 # === Commands ===

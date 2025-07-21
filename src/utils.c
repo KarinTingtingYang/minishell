@@ -6,12 +6,12 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/07 10:56:07 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/21 10:46:24 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft/libft.h"
-#include "../src/pipex.h"
+#include "../src/includes/pipex.h"
 
 void	error_exit(const char *msg)
 {

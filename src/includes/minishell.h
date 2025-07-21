@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/07 10:45:58 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/21 10:02:30 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+#ifndef MINISHELL_H
+# define MINISHELL_H
 
 # include <fcntl.h>
 # include <fcntl.h>
@@ -21,6 +21,11 @@
 # include <stdlib.h>
 # include <string.h>
 # include <sys/wait.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+#include "../libft/libft.h"
+#include "../src/includes/executor.h"
 
 void	free_split(char **array);
 void	error_exit(const char *msg);
