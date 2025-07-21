@@ -1,18 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   executor.h                                         :+:      :+:    :+:   */
+/*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/21 11:17:31 by makhudon         ###   ########.fr       */
+/*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
+/*   Updated: 2025/07/21 11:13:49 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef EXECUTOR_H
-#define EXECUTOR_H
+#include "../src/includes/minishell.h"
 
-int		execute_command(char *line, char **envp);
-
-#endif
+char **parse_line(char *line)
+{
+	if (line == NULL || *line == '\0')
+		return (NULL);
+	return (ft_split(line, ' '));
+}

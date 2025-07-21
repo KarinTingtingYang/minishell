@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/21 10:36:19 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/21 11:23:49 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,14 +89,14 @@ int	main(int argc, char **argv, char **envp)
 		}
 		if (*input)
 			add_history(input);
-		if (strcmp(input, "exit") == 0)
+		if (ft_strncmp(input, "exit", ft_strlen("exit") + 1) == 0)
 		{
 			printf("exit\n");
 			free(input);
 			break ;
 		}
-
-		execute_command(input, envp);
+		if (execute_command(input, envp) == -1)
+			ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
 
 		free(input);
 	}

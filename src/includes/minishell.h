@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/21 10:02:30 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/21 11:15:42 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,11 @@
 #include "../libft/libft.h"
 #include "../src/includes/executor.h"
 
-void	free_split(char **array);
-void	error_exit(const char *msg);
-void	error_msg_exit(const char *msg);
-char	*find_full_cmd_path(char *cmd, char **path_dirs);
-void	run_last_child(int pipe_fd[2], char **argv, char **envp);
-void	run_first_child(int pipe_fd[2], char **argv, char **envp);
+void error_exit(const char *msg);
+void error_msg_exit(const char *msg);
+void free_split(char **array);
+char *find_full_cmd_path(char *cmd, char **path_dirs);
+char **find_path_dirs(char **envp);
+char **parse_line(char *line);
 
 #endif

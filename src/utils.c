@@ -6,12 +6,11 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/21 10:46:24 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/21 11:13:58 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../libft/libft.h"
-#include "../src/includes/pipex.h"
+#include "../src/includes/minishell.h"
 
 void	error_exit(const char *msg)
 {
@@ -21,7 +20,7 @@ void	error_exit(const char *msg)
 
 void	error_msg_exit(const char *msg)
 {
-	ft_putstr_fd("pipex: ", STDERR_FILENO);
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
 	ft_putstr_fd((char *)msg, STDERR_FILENO);
 	ft_putstr_fd("\n", STDERR_FILENO);
 	exit(EXIT_FAILURE);
