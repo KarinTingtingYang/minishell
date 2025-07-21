@@ -5,87 +5,112 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/16 15:02:17 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/05 12:16:12 by makhudon         ###   ########.fr       */
+/*   Created: 2025/05/01 11:29:35 by makhudon          #+#    #+#             */
+/*   Updated: 2025/05/04 12:47:23 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include <stdlib.h>
 
-static char	*ft_strdu(const char *src, int length)
+// What ft_split must do:
+// It takes:
+// 	•	A string s
+// 	•	A character c (delimiter)
+// And returns:
+// 	•	An array of strings (i.e. char **) that are substrings
+// 		from s, split wherever c appears.
+// 	•	The array ends with a NULL pointer.
+// 	•	Uses only malloc() and free().
+
+static void	free_all(char **array, int count)
 {
-	char	*copy;
-	int		i;
+	int	i;
 
-	copy = (char *)malloc(length + 1);
-	if (copy == NULL)
-		return (NULL);
-	i = 0;
-	while (i < length)
+	i = count - 1;
+	while (i >= 0)
 	{
-		copy[i] = src[i];
-		i++;
+		free(array[i]);
+		i--;
 	}
-	copy[i] = '\0';
-	return (copy);
+	free(array);
 }
 
-static char	**write_words(const char *str, char c, char **result)
+static int	count_words(const char *s, char delim)
 {
-	const char	*start;
-	int			i;
-	int			length;
+	int	i;
+	int	count;
 
 	i = 0;
-	while (*str != '\0')
+	count = 0;
+	while (s[i] != '\0')
 	{
-		if (*str != c)
+		if (s[i] != delim)
 		{
-			start = str;
-			length = 0;
-			while (*str != '\0' && *str != c)
-			{
-				str++;
-				length++;
-			}
-			result[i++] = ft_strdu(start, length);
+			count++;
+			while (s[i] != '\0' && s[i] != delim)
+				i++;
 		}
 		else
-			str++;
-	}
-	result[i] = NULL;
-	return (result);
-}
-
-static int	count_words(const char *str, char c)
-{
-	int	count;
-	int	word_started;
-
-	count = 0;
-	word_started = 0;
-	while (*str != '\0')
-	{
-		if (*str != c && word_started == 0)
-		{
-			word_started = 1;
-			count++;
-		}
-		else if (*str == c)
-			word_started = 0;
-		str++;
+			i++;
 	}
 	return (count);
 }
 
-char	**ft_split(const char *str, char c)
+static char	*copy_word(const char *start, int length)
 {
-	char	**result;
+	char	*word;
+	int		i;
 
-	if (str == NULL)
+	i = 0;
+	word = malloc(length + 1);
+	if (word == NULL)
 		return (NULL);
-	result = malloc(sizeof(char *) * (count_words(str, c) + 1));
+	while (i < length)
+	{
+		word[i] = start[i];
+		i++;
+	}
+	word[i] = '\0';
+	return (word);
+}
+
+static char	**split_words(const char *s, char delim, int word_count)
+{
+	char		**result;
+	int			word_index;
+	const char	*word_start;
+
+	result = malloc((word_count + 1) * sizeof(char *));
 	if (result == NULL)
 		return (NULL);
-	return (write_words(str, c, result));
+	word_index = 0;
+	while (*s && word_index < word_count)
+	{
+		while (*s == delim)
+			s++;
+		word_start = s;
+		while (*s && *s != delim)
+			s++;
+		result[word_index] = copy_word(word_start, (s - word_start));
+		if (result[word_index] == NULL)
+		{
+			free_all(result, word_index);
+			return (NULL);
+		}
+		word_index++;
+	}
+	result[word_index] = NULL;
+	return (result);
+}
+
+char	**ft_split(const char *s, char c)
+{
+	int		word_count;
+	char	**result;
+
+	if (s == NULL)
+		return (NULL);
+	word_count = count_words(s, c);
+	result = split_words(s, c, word_count);
+	return (result);
 }

@@ -1,25 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   ft_putchar_fd.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/24 15:04:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/04/30 16:13:15 by makhudon         ###   ########.fr       */
+/*   Created: 2025/05/01 13:27:00 by makhudon          #+#    #+#             */
+/*   Updated: 2025/05/04 13:11:46 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-size_t	ft_strlen(const char *str)
-{
-	size_t	i;
+// What ft_putchar_fd must do
+// 	•	write one character c to the file descriptor fd
+//      (e.g. 1 for stdout, 2 for stderr, or a file)
+// 	•	use the write() system call
+// 	•	No return value
 
-	i = 0;
-	while (str[i] != '\0')
-	{
-		i++;
-	}
-	return (i);
+void	ft_putchar_fd(char c, int fd)
+{
+	write(fd, &c, 1);
 }
