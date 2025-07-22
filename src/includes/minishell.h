@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   minishell.h                                        :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:10:15 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/21 14:17:00 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
+/*   Updated: 2025/07/22 11:03:54 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,5 +47,8 @@ void free_split(char **array);
 char *find_full_cmd_path(char *cmd, char **path_dirs);
 char **find_path_dirs(char **envp);
 char **parse_line(char *line);
+int		run_pipex(char *cmd1_line, char *cmd2_line, char **envp);
+void handle_execve_error(char *cmd_path, char **args, char **path_dirs);
+void execute_cmd(char *cmd_path, char **args, char **path_dirs);
 
 #endif

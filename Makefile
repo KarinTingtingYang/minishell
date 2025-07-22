@@ -59,6 +59,7 @@ SRCS       = $(SRC_DIR)/main.c \
 			 $(SRC_DIR)/path.c \
              $(SRC_DIR)/utils.c \
              $(SRC_DIR)/executor.c \
+			 $(SRC_DIR)/pipex_utils.c \
 			 $(SRC_DIR)/signal.c			# added signal handling file
 
 # === Object Files ===

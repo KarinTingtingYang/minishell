@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   signal.c                                           :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/21 12:41:05 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/07/21 14:11:30 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   signal.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/21 12:41:05 by tiyang            #+#    #+#             */
+/*   Updated: 2025/07/22 11:09:29 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void setup_signal_handlers(void) { //
     // rl_catch_signals = 0; // <--- This is the crucial line
 	// without setting the variable to 0, the '^C' is echoed in terminal
 	
-
+	rl_catch_signals = 0; // Disable readline's own signal handlers!
     // --- Configure SIGINT handler ---
     sa_int.sa_handler = handle_parent_sigint; // Set our custom handler
     sigemptyset(&sa_int.sa_mask);           // Clear the mask of signals to be blocked during handler execution
@@ -127,8 +127,6 @@ int wait_for_child_and_handle_status(pid_t pid)
     int status;
     pid_t wpid;
 
-    // Set global flag to indicate a child process is running.
-    // This tells the parent's SIGINT handler to not print a new prompt.
     g_child_running = 1;
 
     // Wait for the child process to terminate.

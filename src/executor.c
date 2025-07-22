@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor.c                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/21 14:18:52 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
+/*   Updated: 2025/07/22 11:04:54 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 extern char **environ;
 extern volatile sig_atomic_t g_child_running; // Declare extern for global flag
 
-static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
+void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
 {
 	int exit_status;
 
@@ -36,7 +36,7 @@ static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
 	exit(exit_status);
 }
 
-static void execute_cmd(char *cmd_path, char **args, char **path_dirs)
+void execute_cmd(char *cmd_path, char **args, char **path_dirs)
 {
 	
     // Reset signal handlers to default for the child process
@@ -53,7 +53,7 @@ static void execute_cmd(char *cmd_path, char **args, char **path_dirs)
 	handle_execve_error(cmd_path, args, path_dirs);
 }
 
-int execute_command(char *line, char **envp)
+static int execute_single_command(char *line, char **envp)
 {
 	(void)envp; // envp is not used in this function, but can be used for future enhancements
 	char	**args;
@@ -64,17 +64,19 @@ int execute_command(char *line, char **envp)
 	int		exit_code; // new variable to hold exit code returned from helper function 
 					   // wait_for_child_and_handle_status()
 
-	args = ft_split(line, ' ');
-	path_dirs = find_path_dirs(environ);
-	cmd_path = find_full_cmd_path(args[0], path_dirs);
-	pid = fork();
 	if (line == NULL || *line == '\0')
 		return 0;
-	if (args == NULL || args[0] == NULL) 
+
+	args = ft_split(line, ' ');
+	if (args == NULL || args[0] == NULL)
 	{
 		free_split(args);
 		return (0);
 	}
+	path_dirs = find_path_dirs(environ);
+	cmd_path = find_full_cmd_path(args[0], path_dirs);
+
+	pid = fork();
 	if (pid < 0)
 	{
 		perror("fork");
@@ -98,3 +100,24 @@ int execute_command(char *line, char **envp)
 	}
 	return 0;
 }
+
+int execute_command(char *line, char **envp)
+{
+	if (ft_strchr(line, '|'))
+	{
+		char **parts = ft_split(line, '|');
+		if (!parts || !parts[0] || !parts[1])
+		{
+			ft_putstr_fd("Error: invalid pipe syntax\n", STDERR_FILENO);
+			if (parts)
+				free_split(parts);
+			return 1;
+		}
+		int status = run_pipex(parts[0], parts[1], envp);
+		free_split(parts);
+		return status;
+	}
+	else
+		return execute_single_command(line, envp);
+}
+
