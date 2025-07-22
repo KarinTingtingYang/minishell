@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/22 11:03:54 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/22 11:31:14 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@
 
 #include "../libft/libft.h"
 #include "../src/includes/executor.h"
+#include "../src/includes/pipex_utils.h"
 
 // Global flag to indicate if a child process is currently running.
 // volatile sig_atomic_t is used for variables modified by signal handlers.
