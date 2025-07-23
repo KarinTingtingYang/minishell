@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/22 12:45:56 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/23 08:10:26 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs)
 
 static int execute_single_command(char *line, char **envp)
 {
-	(void)envp; // envp is not used in this function, but can be used for future enhancements
+	// (void)envp; // envp is not used in this function, but can be used for future enhancements
 	char	**args;
 	char	**path_dirs;
 	char	*cmd_path;
@@ -77,7 +77,7 @@ static int execute_single_command(char *line, char **envp)
 		free_split(args);
 		return (0);
 	}
-	path_dirs = find_path_dirs(environ);
+	path_dirs = find_path_dirs(envp);
 	
 	if (!path_dirs)
     	printf("Error: PATH variable not found\n");
@@ -146,14 +146,29 @@ static int count_commands(char **parts)
 
 static int create_commands_recursive(t_command **cmds, char **parts, int index, int count, char **envp)
 {
-    if (index >= count)
-        return 1; // success base case
+    if (index == 0)
+    {
+        char **path_dirs = find_path_dirs(envp);
+        if (!path_dirs)
+        {
+            ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO);
+            return 0;
+        }
 
-    cmds[index] = create_command(parts[index], envp);
-    if (!cmds[index])
-        return 0; // failure
-
-    return create_commands_recursive(cmds, parts, index + 1, count, envp);
+        while (index < count)
+        {
+            cmds[index] = create_command(parts[index], path_dirs);
+            if (!cmds[index])
+            {
+                free_split(path_dirs);
+                return 0;
+            }
+            index++;
+        }
+        free_split(path_dirs);
+        return 1;
+    }
+    return 1;
 }
 
 static void free_commands_recursive(t_command **cmds, int index, int count)

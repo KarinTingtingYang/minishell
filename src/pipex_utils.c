@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/22 11:45:19 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/22 12:59:03 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,8 +100,6 @@
 
 
 // pipex_utils.c
-
-#include "minishell.h"  // or your correct minishell header
 
 // 1. Create pipes recursively
 static int create_pipe_recursive(int **pipes, int idx, int max)

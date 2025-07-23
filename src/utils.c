@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/22 12:49:13 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/23 08:01:23 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,16 @@ void	free_split(char **array)
 	free(array);
 }
 
+ void free_command(t_command *cmd)
+{
+    if (!cmd)
+        return;
+    free_split(cmd->args);
+    if (cmd->cmd_path)
+        free(cmd->cmd_path);
+    free(cmd);
+}
+
 t_command *create_command(char *line, char **path_dirs)
 {
     t_command *cmd;
@@ -102,12 +112,7 @@ t_command *create_command(char *line, char **path_dirs)
         return NULL;
 
     args = ft_split(line, ' ');
-    if (!args)
-    {
-        free(cmd);
-        return NULL;
-    }
-    if (args[0] == NULL)
+    if (!args || !args[0])
     {
         free_split(args);
         free(cmd);
@@ -124,12 +129,3 @@ t_command *create_command(char *line, char **path_dirs)
     return cmd;
 }
 
- void free_command(t_command *cmd)
-{
-    if (!cmd)
-        return;
-    free_split(cmd->args);
-    if (cmd->cmd_path)
-        free(cmd->cmd_path);
-    free(cmd);
-}
