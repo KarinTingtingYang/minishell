@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 13:49:12 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/24 13:52:22 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,4 +27,6 @@ char **parse_line(char *line)
 		return (NULL);
 	return (ft_split(line, ' '));
 }
+
+
 
