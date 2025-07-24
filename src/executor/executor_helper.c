@@ -6,11 +6,11 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 09:59:05 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/24 10:13:17 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../src/includes/minishell.h"
+#include "../includes/minishell.h"
 
 /**
  * @brief Executes a previously prepared command in a child process.

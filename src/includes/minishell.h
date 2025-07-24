@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 09:48:26 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/24 12:46:15 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 
 #include "../libft/libft.h"
 #include "../src/includes/executor.h"
-#include "../src/includes/pipex_utils.h"
+#include "../src/includes/pipes.h"
 
 // Global flag to indicate if a child process is currently running.
 // volatile sig_atomic_t is used for variables modified by signal handlers.
@@ -51,6 +51,7 @@ void error_exit(const char *msg);
 void error_msg_exit(const char *msg);
 void free_split(char **array);
 char **parse_line(char *line);
-int		run_pipex(char *cmd1_line, char *cmd2_line, char **envp);
+t_command *create_command(char *line, char **envp);
+void free_command(t_command *cmd);
 
 #endif

@@ -6,11 +6,11 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 08:58:09 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 09:40:12 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/24 10:13:14 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../src/includes/minishell.h"
+#include "../includes/minishell.h"
 
 void free_execute_data(t_execute_data *data)
 {

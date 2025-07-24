@@ -6,11 +6,11 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:34:52 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 09:46:59 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/24 10:13:09 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../src/includes/minishell.h"
+#include "../includes/minishell.h"
 
 static char	*combine_cmd_path(const char *path_dir, const char *cmd)
 {

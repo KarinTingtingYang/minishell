@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 09:45:00 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/24 10:17:07 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,18 @@
 // Global flag definition
 volatile sig_atomic_t g_child_running = 0;
 
+/**
+ * @brief  Main loop for the minishell program, handling user input and
+ *         command execution.
+ * Sets up signal handlers for the shell, then repeatedly prompts the user for
+ * input. Reads commands from the standard input, adds non-empty commands to
+ * history, processes built-in "exit" command to quit, and executes other commands
+ * via execute_command(). Handles graceful exit on EOF or "exit" command.
+ * @param argc  Argument count from the command line (ignored).
+ * @param argv  Argument vector from the command line (ignored).
+ * @param envp  Environment variables array passed to commands.
+ * @return Returns 0 on normal shell exit.
+ */
 int	main(int argc, char **argv, char **envp)
 {
 	char	*input;

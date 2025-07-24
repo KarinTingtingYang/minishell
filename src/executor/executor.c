@@ -6,11 +6,11 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 09:55:42 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/24 10:13:01 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../src/includes/minishell.h"
+#include "../includes/minishell.h"
 
 extern char **environ;
 extern volatile sig_atomic_t g_child_running; // Declare extern for global flag
