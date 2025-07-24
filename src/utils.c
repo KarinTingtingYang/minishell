@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/23 08:01:23 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/24 09:20:24 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,57 +26,6 @@ void	error_msg_exit(const char *msg)
 	exit(EXIT_FAILURE);
 }
 
-static char	*combine_cmd_path(const char *path_dir, const char *cmd)
-{
-	size_t	length;
-	char	*full_cmd_path;
-
-	length = ft_strlen(path_dir) + 1 + ft_strlen(cmd) + 1;
-	full_cmd_path = malloc(length);
-	if (full_cmd_path == NULL)
-		return (NULL);
-	ft_strlcpy(full_cmd_path, path_dir, length);
-	ft_strlcat(full_cmd_path, "/", length);
-	ft_strlcat(full_cmd_path, cmd, length);
-	return (full_cmd_path);
-}
-
-char	*find_full_cmd_path(char *cmd, char **path_dirs)
-{
-	char	*full_cmd_path;
-	int		i;
-
-	i = 0;
-	while (path_dirs != NULL && path_dirs[i] != NULL)
-	{
-		full_cmd_path = combine_cmd_path(path_dirs[i], cmd);
-		if (full_cmd_path == NULL)
-			error_exit("malloc");
-		if (access(full_cmd_path, X_OK) == 0)
-			return (full_cmd_path);
-		free(full_cmd_path);
-		i++;
-	}
-	return (ft_strdup(cmd));
-
-	// char *full_cmd_path = NULL;
-	// int i = 0;
-	// while (path_dirs != NULL && path_dirs[i] != NULL)
-	// {
-	// 	full_cmd_path = combine_cmd_path(path_dirs[i], cmd);
-	// 	if (full_cmd_path == NULL)
-	// 		error_exit("malloc");
-	// 	printf("Trying: %s\n", full_cmd_path);
-	// 	if (access(full_cmd_path, X_OK) == 0)
-	// 		return (full_cmd_path);
-	// 	free(full_cmd_path);
-	// 	i++;
-	// }
-	// printf("No executable found for %s in PATH, using command as-is\n", cmd);
-	// return (ft_strdup(cmd));
-
-}
-
 void	free_split(char **array)
 {
 	int	i;
@@ -87,39 +36,87 @@ void	free_split(char **array)
 	while (array[i])
 	{
 		free(array[i]);
+		array[i] = NULL; // added safeguard to avoid double free issues
 		i++;
 	}
 	free(array);
+	array = NULL;  // added safeguard to avoid double free issues
 }
 
- void free_command(t_command *cmd)
+// REDIRECTION: Modified free_command to also free redirection file strings.
+void free_command(t_command *cmd)
 {
     if (!cmd)
         return;
     free_split(cmd->args);
-    if (cmd->cmd_path)
+	if (cmd->cmd_path)
         free(cmd->cmd_path);
-    free(cmd);
+
+	if (cmd->input_file) // Free the memory for input/output files.
+		free(cmd->input_file);
+	if (cmd->output_file) // Free the memory for input/output files.
+		free(cmd->output_file);
+	free(cmd);
 }
 
+// REDIRECTION: Modified create_command to parse for IO redirection.
 t_command *create_command(char *line, char **path_dirs)
 {
     t_command *cmd;
-    char **args;
+    // char **args;
+	char **original_args; // REDIRECTION: remaning "args" to "original_args" for clarity
+	char **clean_args; // REDIRECTION: new variable to hold args without redirection signs
 
     cmd = malloc(sizeof(t_command));
     if (!cmd)
         return NULL;
 
-    args = ft_split(line, ' ');
-    if (!args || !args[0])
+		    // Initialize struct fields to NULL
+    cmd->args = NULL;
+    cmd->cmd_path = NULL;
+    cmd->input_file = NULL;
+    cmd->output_file = NULL;
+	
+    original_args = ft_split(line, ' ');
+    if (!original_args || !original_args[0])
     {
-        free_split(args);
+        free_split(original_args);
         free(cmd);
         return NULL;
     }
-    cmd->args = args;
-    cmd->cmd_path = find_full_cmd_path(args[0], path_dirs);
+
+	/* MAIN REDIRECTION LOGIC STARTS */
+	
+	// REDIRECTION: Call handle_redirection to parse for '<' and '>'.
+    // It returns a new array of "clean" arguments.
+	clean_args = handle_redirection(original_args, &cmd->input_file, &cmd->output_file);
+	// REDIRECTION: The original split is no longer needed after parsing.
+    free_split(original_args);
+    if (clean_args == NULL) // Indicates a syntax error
+    {
+       // free_split(original_args);
+        free(cmd);
+        return (NULL);
+    }
+	// REDIRECTION: Handle cases like "> out" where no command is left.
+    if (clean_args[0] == NULL)
+    {
+        cmd->args = clean_args;
+        cmd->cmd_path = NULL;
+        cmd->input_file = NULL;
+        cmd->output_file = NULL;
+     //   free_split(original_args);
+        return (cmd);
+    }
+    //cmd->args = args;
+	cmd->args = clean_args; // REDIRECTION: proceed with cleaned up args
+
+	/* MAIN REDIRECTION LOGIC ENDS */
+
+	// REDIRECTION: Find command path using the first of the *clean* arguments.
+    cmd->cmd_path = find_full_cmd_path(cmd->args[0], path_dirs);
+	
+
     if (!cmd->cmd_path)
     {
         // free_command should free args and cmd
