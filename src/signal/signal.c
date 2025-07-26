@@ -6,40 +6,12 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 12:41:05 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/24 08:25:58 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/26 10:40:26 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../src/includes/minishell.h"
 
-/**
- * @brief Signal handler for SIGINT (Ctrl+C) in the parent process.
- *
- * This handler is designed to behave differently based on whether a child process
- * is currently executing.
- * - If no child is running (g_child_running == 0), it prints a new prompt.
- * - If a child is running (g_child_running == 1), it does nothing. This allows
- * the SIGINT to terminate the child, and the parent's waitpid will be
- * interrupted, leading it back to the prompt after the child exits.
- *
- * @param signum The signal number (expected to be SIGINT).
- */
-void handle_parent_sigint(int signum)
-{ //
-    (void)signum; // Cast to void to suppress unused parameter warning
-
-    // If no child is running, print a new prompt on SIGINT
-    if (g_child_running == 0) { //
-        ft_putstr_fd("\n", STDOUT_FILENO); // Move to a new line
-        rl_on_new_line(); // Tell readline that we're on a new line
-        rl_replace_line("", 0); // Clear the current input buffer
-        rl_redisplay(); // Redraw the prompt
-    }
-    // If a child is running, do nothing.
-    // The child will receive SIGINT and terminate, and the parent's waitpid
-    // will be interrupted, returning control to the main loop.
-}
-
+#include "../includes/minishell.h"
 /**
  * @brief Sets up signal handlers for the minishell (parent process).
  *
@@ -111,6 +83,28 @@ void reset_child_signal_handlers(void) { //
     }
 }
 
+// helper function to get wpid
+static int	wait_for_child(pid_t pid, int *status)
+{
+    pid_t wpid;
+	wpid = waitpid(pid, status, 0); // Call waitpid once
+    while (wpid == -1 && errno == EINTR) {
+        // If waitpid returns -1 and errno is EINTR, it means it was interrupted
+        // by a signal. We simply continue waiting.
+        wpid = waitpid(pid, status, 0); // Call waitpid again inside the loop
+    }
+    return wpid;
+}
+
+static int	get_exit_status(int status)
+{
+    if (WIFEXITED(status))
+        return WEXITSTATUS(status);
+    else if (WIFSIGNALED(status))
+        return (128 + WTERMSIG(status));
+    return 0;
+}
+
 /**
  * @brief Waits for a child process to terminate and handles its exit status,
  * including signal-related messages like "Quit (core dumped)".
@@ -128,45 +122,16 @@ int wait_for_child_and_handle_status(pid_t pid)
     pid_t wpid;
 
     g_child_running = 1;
-
-    // Wait for the child process to terminate.
-    // The do-while loop handles cases where waitpid is interrupted by a signal (EINTR),
-    // ensuring the parent continues to wait until the child actually exits.
-    wpid = waitpid(pid, &status, 0); // Call waitpid once
-    while (wpid == -1 && errno == EINTR) {
-        // If waitpid returns -1 and errno is EINTR, it means it was interrupted
-        // by a signal. We simply continue waiting.
-        wpid = waitpid(pid, &status, 0); // Call waitpid again inside the loop
-    }
-
-    // After the child has terminated (or waitpid encountered a non-EINTR error),
-    // reset the global flag.
+    wpid = wait_for_child(pid, &status);
     g_child_running = 0;
 
-    // Check if the child was terminated by a signal
-    if (wpid != -1 && WIFSIGNALED(status)) {
-        if (WTERMSIG(status) == SIGQUIT) {
-            ft_putstr_fd("Quit", STDOUT_FILENO); // Print "Quit"
-            if (WCOREDUMP(status)) {
-                ft_putstr_fd(" (core dumped)", STDOUT_FILENO); // Print "(core dumped)" if applicable
-            }
-            ft_putstr_fd("\n", STDOUT_FILENO); // Always end with a newline
-        } else if (WTERMSIG(status) == SIGINT) {
-            // For SIGINT, just print a newline for clean prompt redraw
-            // The ^C echo is handled by the terminal/readline by default (if rl_catch_signals is not 0)
-            ft_putstr_fd("\n", STDOUT_FILENO);
-        }
-    }
-    // Handle other waitpid errors (non-EINTR)
-    else if (wpid == -1) {
+    if (wpid != -1 && WIFSIGNALED(status))
+        print_signal_message(status);
+    else if (wpid == -1)
+    {
         perror("waitpid");
-        return (-1); // Indicate an error in waiting
+        return -1;
     }
-
-    // Return appropriate exit status based on how the child exited
-    if (WIFEXITED(status))
-        return WEXITSTATUS(status);
-    else if (WIFSIGNALED(status))
-        return (128 + WTERMSIG(status)); // Shell convention for signal termination
-    return 0; // Should ideally be covered by WIFEXITED/WIFSIGNALED, but a safe default
+    return get_exit_status(status);
 }
+

@@ -6,11 +6,11 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 13:52:22 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/26 10:59:14 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../src/includes/minishell.h"
+#include "../includes/minishell.h"
 
 /**
  * @brief Parses a command line string into an array of arguments.

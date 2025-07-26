@@ -12,15 +12,19 @@ INCLUDES   = -I$(LIBFT_DIR) -I$(INC_DIR) -I.
 # === Source Files ===
 SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/executor/executor.c \
-			 $(SRC_DIR)/executor/executor_helper.c \
-			 $(SRC_DIR)/executor/executor_utils.c \
-			 $(SRC_DIR)/executor/path.c \
+             $(SRC_DIR)/executor/executor_helper.c \
+             $(SRC_DIR)/executor/executor_utils.c \
+             $(SRC_DIR)/executor/path.c \
              $(SRC_DIR)/pipes/pipes.c \
-			 $(SRC_DIR)/pipes/pipes_helper.c \
-             $(SRC_DIR)/parser.c \
+             $(SRC_DIR)/pipes/pipes_helper.c \
+             $(SRC_DIR)/parser/parse_line.c \
+             $(SRC_DIR)/parser/command_create.c \
+             $(SRC_DIR)/parser/command_free.c \
              $(SRC_DIR)/utils.c \
-			 $(SRC_DIR)/signal.c \
-			 $(SRC_DIR)/redirection.c
+             $(SRC_DIR)/signal/signal.c \
+             $(SRC_DIR)/signal/signal_utils.c \
+             $(SRC_DIR)/redirection/redirection.c \
+             $(SRC_DIR)/redirection/redirection_utils.c
 
 # === Object Files ===
 OBJS       = $(SRCS:$(SRC_DIR)/%.c=$(OBJDIR)/%.o)

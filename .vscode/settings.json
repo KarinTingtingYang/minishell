@@ -1,7 +1,5 @@
 {
 	"files.associations": {
-		"libft.h": "c",
-		"minishell.h": "c",
-		"cerrno": "c"
+		"minishell.h": "c"
 	}
 }

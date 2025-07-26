@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 10:17:07 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/26 11:16:11 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int	main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		g_child_running = 0; // No child running while waiting for input
-		input = readline("\033[1;32mminishell>\033[0m ");
+		input = readline("\001\033[1;32m\002minishell>\001\033[0m\002 ");
 		if (input == NULL)
 		{
 			printf("exit\n");

@@ -6,9 +6,10 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 12:46:15 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/26 11:56:28 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -16,7 +17,9 @@
 # define _POSIX_C_SOURCE 200809L   // Added for signal handling
 # define _GNU_SOURCE               // Added for signal handling
 
-# include <fcntl.h>
+# include <signal.h>				// Added for signal handling
+# include <stdint.h>                // Added for signal handling
+# include <sys/types.h>				// Added for signal handling
 # include <fcntl.h>
 # include <stdio.h>
 # include <errno.h>
@@ -24,34 +27,22 @@
 # include <stdlib.h>
 # include <string.h>
 # include <sys/wait.h>
-# include <readline/readline.h>
 # include <readline/history.h>
-# include <signal.h>                // Added for signal handling
+# include <readline/readline.h>
 
-#include "../libft/libft.h"
-#include "../src/includes/executor.h"
-#include "../src/includes/pipes.h"
+#include "./libft.h"
+#include "./pipes.h"
+#include "./parse.h"
+#include "./executor.h"
+#include "./redirection.h"
+#include "./signal_handling.h"
 
 // Global flag to indicate if a child process is currently running.
 // volatile sig_atomic_t is used for variables modified by signal handlers.
-extern volatile sig_atomic_t g_child_running; // Declare global flag
+extern volatile sig_atomic_t g_child_running;
 
-// Signal handling function prototypes (in signal.c)
-void setup_signal_handlers(void);
-void reset_child_signal_handlers(void);
-void handle_parent_sigint(int signum);
-int wait_for_child_and_handle_status(pid_t pid);
-
-// REDIRECTION: Add prototypes for redirection functions (from redirection.c)
-void	redirect_io(char *input_file, char *output_file);
-char	**handle_redirection(char **args, char **input_file, char **output_file);
-
-
-void error_exit(const char *msg);
-void error_msg_exit(const char *msg);
-void free_split(char **array);
-char **parse_line(char *line);
-t_command *create_command(char *line, char **envp);
-void free_command(t_command *cmd);
+void		free_split(char **array);
+void		error_exit(const char *msg);
+void		error_msg_exit(const char *msg);
 
 #endif
