@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 11:10:49 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/28 09:48:56 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/28 12:38:30 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,26 +14,26 @@
 
 /**
  * @brief Processes an output file by creating/truncating it.
- * This mimics shell behavior where all output files in a command are created.
+ * This mimics shell behavior where output files are processed during parsing.
+ * It opens the file to ensure it's accessible and to truncate it, then
+ * immediately closes it without changing the shell's standard output.
  */
-// Helper function to handle the creation/truncation of ALL
-// specified output files, not just the last one.
 int	process_output_file(char *output_file)
 {
 	int	fd_out;
 
+	// Open the file with flags to create it if it doesn't exist
+	// and truncate it if it does.
 	fd_out = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd_out < 0)
 	{
-		perror("open output_file");
-		exit(1);
+		// Use perror to print a descriptive error message to STDERR
+		perror(output_file);
+		// Return -1 to signal an error to the caller
+		return (-1);
 	}
-	if (dup2(fd_out, STDOUT_FILENO) < 0)
-	{
-		perror("dup2");
-		close(fd_out);
-		exit(1);
-	}
+	// Immediately close the file descriptor. We're done with it for now.
+	close(fd_out);
 	return (0);
 }
 

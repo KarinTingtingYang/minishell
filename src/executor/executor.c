@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/28 09:30:51 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/28 12:58:01 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,20 +104,33 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs)
  */
 static int execute_single_command(char *line, char **envp)
 {
-    t_execute_data data;
-    int prepare_status;
+    t_execute_data	data;
+    int				prepare_status;
+	int				original_stdin;
+	int				original_stdout;
+	int				exit_status;
 
     prepare_status = prepare_command_execution(line, envp, &data);
-    if (prepare_status <= 0)
+    if (prepare_status != 1) // DEBUG Change it to prepare_status != 1 for clear control flow.
 	{
+		free_execute_data(&data); // added to ensure cleanup
         return (prepare_status); // 0 means empty, errors propagated
 	}
-	if (run_builtin(data.clean_args))
-    {
-        free_execute_data(&data);
-        return (0); // builtin executed in parent, no fork needed
-    }
-    return (execute_prepared_command(&data));
+	if (!is_builtin(data.clean_args[0]))
+		return (execute_prepared_command(&data));
+	original_stdin = dup(STDIN_FILENO);
+	original_stdout = dup(STDOUT_FILENO);
+	if (apply_builtin_redirection(data.input_file, data.output_file) == -1)
+		exit_status = 1;
+	else
+		exit_status = run_builtin(data.clean_args);
+	// Restore STDIN and STDOUT
+	dup2(original_stdin, STDIN_FILENO);
+	dup2(original_stdout, STDOUT_FILENO);
+	close(original_stdin);
+	close(original_stdout);
+	free_execute_data(&data);
+	return (exit_status);
 }
 
 /**

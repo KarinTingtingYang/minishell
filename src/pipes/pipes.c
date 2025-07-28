@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 13:05:11 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/28 12:38:14 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,14 @@ static int fork_all_processes_recursive(t_process_data *data, int i)
         if (i < data->cmd_count - 1)
             dup2(data->pipes[i][1], STDOUT_FILENO);
         close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
-        execute_cmd(data->cmds[i]->cmd_path, data->cmds[i]->args, data->path_dirs);
+        if (is_builtin(data->cmds[i]->args[0]))
+        {
+            exit(run_builtin(data->cmds[i]->args));
+        }
+        else
+        {
+            execute_cmd(data->cmds[i]->cmd_path, data->cmds[i]->args, data->path_dirs);
+        }
         perror("execve");
         exit(EXIT_FAILURE);
     }

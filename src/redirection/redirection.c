@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 08:25:34 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/26 11:06:50 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/28 12:38:46 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ static int	process_redirection_token(char **args, int i, char **final_input_file
     }
     else if (ft_strncmp(args[i], ">", 2) == 0)
     {
-        if (process_output_file(args[i + 1]) != 0)
+		if (process_output_file(args[i + 1]) == -1)
             return (-1);
         free(*final_output_file);
         *final_output_file = ft_strdup(args[i + 1]);
