@@ -1,9 +1,0 @@
-"Test line"
-[?2004h[1;32mminishell>[0m gfgfg
-[?2004l[?2004h[1;32mminishell>[0m 
-[1;32mminishell>[0m 
-[?2004l[?2004h[1;32mminishell>[0m 
-[?2004l[?2004h[1;32mminishell>[0m 
-[?2004l[?2004h[1;32mminishell>[0m ^C
-[1;32mminishell>[0m 
-[1;32mminishell>[0m 

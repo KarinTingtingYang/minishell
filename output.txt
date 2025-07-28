@@ -1,0 +1,3 @@
+Hello
+[?2004h[1;32mminishell>[0m 
+[1;32mminishell>[0m 

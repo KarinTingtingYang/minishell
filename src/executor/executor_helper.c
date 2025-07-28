@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/28 09:18:33 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/28 10:10:57 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,34 +29,38 @@
  */
 int execute_prepared_command(t_execute_data *data)
 {
-    pid_t pid;
-    int exit_code;
+	pid_t pid;
+	int exit_code;
+	int has_redirection = (data->input_file || data->output_file);
 
-	if (is_builtin(data->clean_args[0]))
-    {
-        redirect_io(data->input_file, data->output_file);
-        run_builtin(data->clean_args);
-        free_execute_data(data);
-        return (0);
-    }
-    pid = fork();
-    if (pid < 0)
-    {
+	if (is_builtin(data->clean_args[0]) && !has_redirection)
+	{
+		run_builtin(data->clean_args);
 		free_execute_data(data);
-        return (-1);
-    }
-    else if (pid == 0)
-    {
-        redirect_io(data->input_file, data->output_file);
-        execute_cmd(data->cmd_path, data->clean_args, data->path_dirs);
-        exit(127);
-    }
-    else
-    {
-        exit_code = wait_for_child_and_handle_status(pid);
-        free_execute_data(data);
-        return (exit_code);
-    }
+		return (0);
+	}
+	pid = fork();
+	if (pid < 0)
+	{
+		perror("fork");
+		free_execute_data(data);
+		return (-1);
+	}
+	else if (pid == 0)
+	{
+		redirect_io(data->input_file, data->output_file);
+		if (is_builtin(data->clean_args[0]))
+			run_builtin(data->clean_args);
+		else
+			execute_cmd(data->cmd_path, data->clean_args, data->path_dirs);
+		exit(0);
+	}
+	else
+	{
+		exit_code = wait_for_child_and_handle_status(pid);
+		free_execute_data(data);
+		return (exit_code);
+	}
 }
 
 /**

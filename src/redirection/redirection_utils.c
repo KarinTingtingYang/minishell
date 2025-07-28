@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 11:10:49 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/26 10:31:02 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/28 09:48:56 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,20 @@
 // specified output files, not just the last one.
 int	process_output_file(char *output_file)
 {
-	int	fd;
+	int	fd_out;
 
-	fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd == -1)
+	fd_out = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd_out < 0)
 	{
-		perror(output_file);
-		return (-1);
+		perror("open output_file");
+		exit(1);
 	}
-	close(fd);
+	if (dup2(fd_out, STDOUT_FILENO) < 0)
+	{
+		perror("dup2");
+		close(fd_out);
+		exit(1);
+	}
 	return (0);
 }
 
