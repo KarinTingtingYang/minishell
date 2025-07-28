@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 10:13:01 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/28 09:30:51 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,14 @@ static int execute_single_command(char *line, char **envp)
 
     prepare_status = prepare_command_execution(line, envp, &data);
     if (prepare_status <= 0)
+	{
         return (prepare_status); // 0 means empty, errors propagated
+	}
+	if (run_builtin(data.clean_args))
+    {
+        free_execute_data(&data);
+        return (0); // builtin executed in parent, no fork needed
+    }
     return (execute_prepared_command(&data));
 }
 

@@ -15,6 +15,7 @@ SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/executor/executor_helper.c \
              $(SRC_DIR)/executor/executor_utils.c \
              $(SRC_DIR)/executor/path.c \
+			 $(SRC_DIR)/executor/builtins.c \
              $(SRC_DIR)/pipes/pipes.c \
              $(SRC_DIR)/pipes/pipes_helper.c \
              $(SRC_DIR)/parser/parse_line.c \

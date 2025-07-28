@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 10:13:17 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/28 09:18:33 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,13 @@ int execute_prepared_command(t_execute_data *data)
     pid_t pid;
     int exit_code;
 
+	if (is_builtin(data->clean_args[0]))
+    {
+        redirect_io(data->input_file, data->output_file);
+        run_builtin(data->clean_args);
+        free_execute_data(data);
+        return (0);
+    }
     pid = fork();
     if (pid < 0)
     {

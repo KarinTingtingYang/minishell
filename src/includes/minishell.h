@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/26 11:56:28 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/28 09:11:56 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 #include "./pipes.h"
 #include "./parse.h"
 #include "./executor.h"
+#include "./builtins.h"
 #include "./redirection.h"
 #include "./signal_handling.h"
 
