@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 11:06:48 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 13:35:49 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int execute_prepared_command(t_execute_data *data)
 
 	if (is_builtin(data->clean_args[0]) && !has_redirection)
 	{
-		run_builtin(data->clean_args);
+		run_builtin(data->clean_args, data->env_list);
 		free_execute_data(data);
 		return (0);
 	}
@@ -50,7 +50,7 @@ int execute_prepared_command(t_execute_data *data)
 	{
 		redirect_io(data->input_file, data->output_file, data->output_mode);
 		if (is_builtin(data->clean_args[0]))
-			run_builtin(data->clean_args);
+			run_builtin(data->clean_args, data->env_list);
 		else
 			execute_cmd(data->cmd_path, data->clean_args, data->path_dirs);
 		exit(0);
@@ -86,7 +86,7 @@ int execute_prepared_command(t_execute_data *data)
  *         - 2 if there is a redirection syntax or file error.
  *         - 127 if the command was not found in PATH.
  */
-int prepare_command_execution(char *line, char **envp, t_execute_data *data)
+int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *data)
 {
     if (line == NULL || *line == '\0')
 	{
@@ -114,10 +114,10 @@ int prepare_command_execution(char *line, char **envp, t_execute_data *data)
 	if (is_builtin(data->clean_args[0]))
     {
         data->cmd_path = NULL;
-        data->path_dirs = find_path_dirs(envp);
+        data->path_dirs = find_path_dirs(env_list);
         return (1); // Success
     }
-    data->path_dirs = find_path_dirs(envp);
+    data->path_dirs = find_path_dirs(env_list);
     if (!data->path_dirs)
     {
         printf("Error: PATH variable not found\n");
@@ -134,6 +134,7 @@ int prepare_command_execution(char *line, char **envp, t_execute_data *data)
         free_split(data->path_dirs);
         return (127); // typical command not found exit code
     }
+	data-> env_list= env_list; // Store the environment variables for built-in commands
     return (1); // success
 }
 
@@ -153,14 +154,14 @@ int prepare_command_execution(char *line, char **envp, t_execute_data *data)
  * @return Returns 1 on success, or 0 if an error occurs (e.g., memory allocation
  *         failure).
  */
-static int build_commands_from_parts(t_command **cmds, char **parts, int index, int count, char **envp)
+static int build_commands_from_parts(t_command **cmds, char **parts, int index, int count, t_env_var *env_list)
 {
     char **path_dirs;
     char **tokens;
 
     if (index == 0)
     {
-        path_dirs = find_path_dirs(envp);
+        path_dirs = find_path_dirs(env_list);
         if (path_dirs == NULL)
         {
             ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO);
@@ -207,7 +208,7 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
  * @return An allocated array of `t_command*` pointers ready for execution,
  *         or `NULL` on failure (syntax error, allocation failure, etc.).
  */
-t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, char **envp)
+t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, t_env_var *env_list)
 {
 	t_command **cmds;
 	
@@ -228,7 +229,7 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, cha
 		return (NULL);
 	}
     cmds[*count] = NULL;
-    if (!build_commands_from_parts(cmds, *parts, 0, *count, envp))
+    if (!build_commands_from_parts(cmds, *parts, 0, *count, env_list))
     {
         free_commands_recursive(cmds, 0, *count);
         free(cmds);

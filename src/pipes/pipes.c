@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 10:40:29 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 13:37:08 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ static int fork_all_processes_recursive(t_process_data *data, int i)
         close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
         if (is_builtin(data->cmds[i]->args[0]))
         {
-            exit(run_builtin(data->cmds[i]->args));
+            exit(run_builtin(data->cmds[i]->args, data->env_list));
         }
         else
         {
@@ -156,7 +156,8 @@ int **create_pipe_fds_between_commands(int cmd_count)
  *         0 if no commands need to be executed,
  *         or -1 on error (pipe creation, memory allocation, or forking failure).
  */
-static int setup_and_fork_pipeline(t_process_data *data, t_command **cmds, int cmd_count, char **path_dirs)
+static int setup_and_fork_pipeline(t_process_data *data, t_command **cmds, int cmd_count, 
+	char **path_dirs, t_env_var *env_list)
 {
     if (cmd_count < 1)
         return (0);
@@ -176,6 +177,7 @@ static int setup_and_fork_pipeline(t_process_data *data, t_command **cmds, int c
     data->cmds = cmds;
     data->path_dirs = path_dirs;
     data->cmd_count = cmd_count;
+	data->env_list = env_list; // Store the environment variables for built-in commands
     if (fork_all_processes_recursive(data, 0) == -1)
         return (-1);
     return (1); // Success
@@ -197,13 +199,13 @@ static int setup_and_fork_pipeline(t_process_data *data, t_command **cmds, int c
  * @return The exit status of the last command in the pipeline on success,
  *         or -1 on failure (e.g., memory allocation or forking error).
  */
-int run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs)
+int run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs, t_env_var *env_list)
 {
     t_process_data data;
     int fork_status;
 	int exit_status;
 
-    fork_status = setup_and_fork_pipeline(&data, cmds, cmd_count, path_dirs);
+    fork_status = setup_and_fork_pipeline(&data, cmds, cmd_count, path_dirs, env_list);
     if (fork_status == -1)
     {
         free(data.pids);

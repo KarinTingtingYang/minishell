@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:34:52 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 08:33:44 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 13:58:47 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,16 +48,37 @@ char	*find_full_cmd_path(char *cmd, char **path_dirs)
 	return (ft_strdup(cmd));
 }
 
-char	**find_path_dirs(char **envp)
-{
-	int		i;
-	char	*path_value;
+// char	**find_path_dirs(char **envp)
+// {
+// 	int		i;
+// 	char	*path_value;
 
-	i = 0;
-	while (envp[i] != NULL && ft_strncmp(envp[i], "PATH=", 5) != 0)
-		i++;
-	if (envp[i] == NULL)
-		return (NULL);
-	path_value = envp[i] + 5;
-	return (ft_split(path_value, ':'));
+// 	i = 0;
+// 	while (envp[i] != NULL && ft_strncmp(envp[i], "PATH=", 5) != 0)
+// 		i++;
+// 	if (envp[i] == NULL)
+// 		return (NULL);
+// 	path_value = envp[i] + 5;
+// 	return (ft_split(path_value, ':'));
+// }
+
+char **find_path_dirs(t_env_var *env_list)
+{
+    t_env_var *current = env_list;
+    char *path_value;
+
+    while (current)
+    {
+        if (ft_strncmp(current->key, "PATH", 4) == 0 && current->key[4] == '\0')
+        {
+            path_value = current->value;
+            if (path_value == NULL)
+                return NULL;
+            return ft_split(path_value, ':');
+        }
+        current = current->next;
+    }
+    return NULL;
 }
+
+

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 09:00:14 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 10:28:34 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 13:47:25 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 
 // returns 0 on success, 1 on failure
-int run_builtin(char **args)
+int run_builtin(char **args, t_env_var *env_list)
 {
 	if (args == NULL || args[0] == NULL)
 		return (1);
@@ -38,14 +38,22 @@ int run_builtin(char **args)
 	{
 		return (builtin_exit(args));
 	}
+	else if (ft_strncmp(args[0], "env", 4) == 0)
+	{
+		builtin_env( env_list);
+		return (0);
+	}
 	return (0); // should not reach here if is_builtin is used correctly
 }
 
 int	is_builtin(char *cmd)
 {
+	if (cmd == NULL)
+		return (0);
 	return (ft_strncmp(cmd, "echo", 5) == 0 ||
 			ft_strncmp(cmd, "cd", 3) == 0 || 
 			ft_strncmp(cmd, "pwd", 4) == 0 ||
-			ft_strncmp(cmd, "exit", 5) == 0);
+			ft_strncmp(cmd, "exit", 5) == 0 ||
+			ft_strncmp(cmd, "env", 4) == 0);
 	// Add more built-ins as needed
 }

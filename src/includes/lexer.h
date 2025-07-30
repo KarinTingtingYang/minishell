@@ -6,9 +6,10 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 08:42:04 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 10:05:31 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 11:44:42 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef LEXER_H
 #define LEXER_H
@@ -26,4 +27,3 @@ char **print_error(const char *msg);
 char **split_line_by_pipe(char *line);
 
 #endif
-

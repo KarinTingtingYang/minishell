@@ -6,9 +6,10 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 11:22:23 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 08:35:50 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 11:46:04 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "../includes/minishell.h"
 

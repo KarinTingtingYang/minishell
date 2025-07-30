@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 11:03:53 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 14:09:46 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,17 +70,41 @@ static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
  */
 void execute_cmd(char *cmd_path, char **args, char **path_dirs)
 {
-    // Reset signal handlers to default for the child process
-    reset_child_signal_handlers(); //
-	if (cmd_path == NULL)
+    // // Reset signal handlers to default for the child process
+    // reset_child_signal_handlers(); //
+	// if (cmd_path == NULL)
+	// {
+	// 	free_split(path_dirs);
+	// 	ft_putstr_fd(args[0], STDERR_FILENO);
+	// 	ft_putstr_fd(": command not found\n", STDERR_FILENO);
+	// 	exit(127);
+	// }
+	// execve(cmd_path, args, environ);
+	// handle_execve_error(cmd_path, args, path_dirs);
+
+	char **path_dirs = find_path_dirs(env_list);
+	if (!path_dirs)
 	{
-		free_split(path_dirs);
-		ft_putstr_fd(args[0], STDERR_FILENO);
-		ft_putstr_fd(": command not found\n", STDERR_FILENO);
-		exit(127);
+		ft_putendl_fd("Error: PATH variable not found", 2);
+		return (1); // Don't continue execution
 	}
-	execve(cmd_path, args, environ);
-	handle_execve_error(cmd_path, args, path_dirs);
+
+	char *cmd_path = find_full_path(path_dirs, args[0]);
+	if (!cmd_path)
+	{
+		ft_putendl_fd("Command not found", 2);
+		free_split(path_dirs);
+		return (127);
+	}
+
+	execve(cmd_path, args, convert_env_list_to_array(env_list));
+
+	// If execve fails:
+	perror("execve failed");
+	free(cmd_path);
+	free_split(path_dirs);
+	exit(1);
+
 }
 
 /**
@@ -102,7 +126,7 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs)
  *         - 2 or higher for syntax errors or other issues,
  *         - -1 on critical fork or execution errors.
  */
-static int execute_single_command(char *line, char **envp)
+static int execute_single_command(char *line, t_env_var *env_list)
 {
     t_execute_data	data;
     int				prepare_status;
@@ -110,7 +134,7 @@ static int execute_single_command(char *line, char **envp)
 	int				original_stdout;
 	int				exit_status;
 
-    prepare_status = prepare_command_execution(line, envp, &data);
+    prepare_status = prepare_command_execution(line, env_list, &data);
     if (prepare_status != 1)
 	{
 		free_execute_data(&data); // added to ensure cleanup
@@ -123,7 +147,7 @@ static int execute_single_command(char *line, char **envp)
 	if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
 		exit_status = 1;
 	else
-		exit_status = run_builtin(data.clean_args);
+		exit_status = run_builtin(data.clean_args, env_list);
 	// Restore STDIN and STDOUT
 	dup2(original_stdin, STDIN_FILENO);
 	dup2(original_stdout, STDOUT_FILENO);
@@ -147,7 +171,7 @@ static int execute_single_command(char *line, char **envp)
  *         - 0 on success,
  *         - non-zero value on error or failure during preparation or execution.
  */
-static int prepare_and_run_pipeline(char *line, char **envp)
+static int prepare_and_run_pipeline(char *line,  t_env_var *env_list)
 {
     char **parts;
 	t_command **cmds;
@@ -157,11 +181,16 @@ static int prepare_and_run_pipeline(char *line, char **envp)
 
 	parts = NULL;
 	count = 0;			
-    cmds = prepare_pipeline_commands(line, &count, &parts, envp);
+    cmds = prepare_pipeline_commands(line, &count, &parts, env_list);
     if (cmds == NULL)
         return (1);
-    path_dirs = find_path_dirs(envp);
-    status = run_command_pipeline(cmds, count, path_dirs);
+    path_dirs = find_path_dirs(env_list);
+	if (!path_dirs)
+	{
+		ft_putendl_fd("Error: PATH variable not found", 2);
+		return (1);
+	}
+    status = run_command_pipeline(cmds, count, path_dirs, env_list);
     free_split(path_dirs);
     free_commands_recursive(cmds, 0, count);
     free(cmds);
@@ -182,10 +211,10 @@ static int prepare_and_run_pipeline(char *line, char **envp)
  *         - 0 on success,
  *         - non-zero value on failure or command error.
  */
-int execute_command(char *line, char **envp)
+int execute_command(char *line, t_env_var *env_list)
 {
     if (ft_strchr(line, '|'))
-        return prepare_and_run_pipeline(line, envp);
+        return prepare_and_run_pipeline(line, env_list);
     else
-        return execute_single_command(line, envp);
+        return execute_single_command(line, env_list);
 }

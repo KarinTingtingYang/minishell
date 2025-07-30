@@ -6,9 +6,10 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 08:44:04 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 13:12:22 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 
 #ifndef MINISHELL_H
@@ -39,6 +40,14 @@
 #include "./signal_handling.h"
 #include "./lexer.h"
 
+
+// typedef struct s_env_var // Structure to represent an environment variable
+// {
+//     char            *key;       // Variable name (key)
+//     char            *value;     // Variable value
+//     struct s_env_var *next; 	// Pointer to the next environment variable in the linked list
+// }   t_env_var;
+
 // Global flag to indicate if a child process is currently running.
 // volatile sig_atomic_t is used for variables modified by signal handlers.
 extern volatile sig_atomic_t g_child_running;
@@ -46,5 +55,7 @@ extern volatile sig_atomic_t g_child_running;
 void		free_split(char **array);
 void		error_exit(const char *msg);
 void		error_msg_exit(const char *msg);
+t_env_var	*init_env(char **environ);
+void		free_env(t_env_var *env);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 11:51:29 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 08:37:14 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 11:48:22 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,4 +54,3 @@ void	print_signal_message(int status)
         ft_putstr_fd("\n", STDOUT_FILENO);
     }
 }
-

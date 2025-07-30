@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 08:37:40 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 13:01:59 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,21 @@ volatile sig_atomic_t g_child_running = 0;
  */
 int	main(int argc, char **argv, char **envp)
 {
-	char	*input;
+	char		*input;
+	t_env_var	*env_list;
 
 	(void)argc;
 	(void)argv;
-	setup_signal_handlers(); // set up the handlers for the parent process
+
+	env_list = init_env(envp);
+	if (!env_list)
+		return (1);
+
+	setup_signal_handlers();
+
 	while (1)
 	{
-		g_child_running = 0; // No child running while waiting for input
+		g_child_running = 0;
 		input = readline("\001\033[1;32m\002minishell>\001\033[0m\002 ");
 		if (input == NULL)
 		{
@@ -45,15 +52,11 @@ int	main(int argc, char **argv, char **envp)
 		}
 		if (*input)
 			add_history(input);
-		// if (ft_strncmp(input, "exit", ft_strlen("exit") + 1) == 0)
-		// {
-		// 	printf("exit\n");
-		// 	free(input);
-		// 	break ;
-		// } // exiting the shell is handled by the built-in exit command
-		if (execute_command(input, envp) == -1)
+		if (execute_command(input, env_list) == -1)
 			ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
 		free(input);
 	}
+
+	free_env(env_list);
 	return (0);
 }

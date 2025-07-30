@@ -6,12 +6,15 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 11:30:32 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 10:41:15 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 13:33:23 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #ifndef PIPEX_UTILS_H
 #define PIPEX_UTILS_H
+
+typedef struct s_env_var t_env_var;
 
 typedef struct s_command
 {
@@ -29,6 +32,8 @@ typedef struct s_process_data
     char		**path_dirs; // Array of directories from the PATH environment variable to search for executables
     pid_t		*pids;       // Array of process IDs for the forked child processes
     int			cmd_count;   // Total number of commands in the pipeline to execute
+	// char    **envp;       // Environment variables for the child processes
+	t_env_var *env_list;
 } t_process_data;
 
 int		**prepare_pipe_fds(int cmd_count);
@@ -36,6 +41,6 @@ int		**create_pipe_fds_between_commands(int cmd_count);
 pid_t	*create_child_processes(int cmd_count, int **pipes);
 void	close_free_pipes_recursively(int **pipes, int idx, int max);
 int		create_all_pipes_recursively(int **pipes, int index, int max);
-int		run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs);
+int		run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs, t_env_var *env_list);
 
 #endif

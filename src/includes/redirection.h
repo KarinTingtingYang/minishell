@@ -6,9 +6,10 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 11:11:42 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 10:30:22 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 11:45:26 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef	REDIRECTION_H
 # define REDIRECTION_H

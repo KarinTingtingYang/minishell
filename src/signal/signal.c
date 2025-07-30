@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 12:41:05 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 08:37:28 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 11:48:11 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,4 +134,3 @@ int wait_for_child_and_handle_status(pid_t pid)
     }
     return get_exit_status(status);
 }
-
