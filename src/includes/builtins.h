@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 09:01:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/28 12:29:48 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 08:34:04 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,6 @@ int		run_builtin(char **args);
 int	builtin_pwd(void);
 int	builtin_cd(char **args);
 void	run_echo(char **args);
+int		builtin_exit(char **args);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/28 13:23:44 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 09:51:31 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,10 +89,14 @@ int execute_prepared_command(t_execute_data *data)
 int prepare_command_execution(char *line, char **envp, t_execute_data *data)
 {
     if (line == NULL || *line == '\0')
+	{
         return (0);		 // No command to execute
-    data->original_args = ft_split(line, ' ');
+	}	
+    // data->original_args = ft_split(line, ' ');
+	data->original_args = tokenize_input(line); // DEBUG: tokenize_input() should handle splitting by spaces
     if (!data->original_args || !data->original_args[0])
     {
+		ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: changed to a more generic error message
         free_split(data->original_args);
         return (0);		 // no command to execute
     }
@@ -197,10 +201,12 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, cha
 {
 	t_command **cmds;
 	
-    *parts = ft_split(line, '|');
+    // *parts = ft_split(line, '|');
+	*parts = tokenize_input(line);   //DEBUG: tokenize_input() should handle splitting by '|'
     if (*parts == NULL || (*parts)[0] == NULL)
     {
-        ft_putstr_fd("Error: invalid pipe syntax\n", STDERR_FILENO);
+        // ft_putstr_fd("Error: invalid pipe syntax\n", STDERR_FILENO);
+		ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO);  // DEBUG: changed to a more generic error message
         if (*parts != NULL)
             free_split(*parts);
         return (NULL);

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/28 10:21:02 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 08:37:40 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,12 @@ int	main(int argc, char **argv, char **envp)
 		}
 		if (*input)
 			add_history(input);
-		if (ft_strncmp(input, "exit", ft_strlen("exit") + 1) == 0)
-		{
-			printf("exit\n");
-			free(input);
-			break ;
-		}
+		// if (ft_strncmp(input, "exit", ft_strlen("exit") + 1) == 0)
+		// {
+		// 	printf("exit\n");
+		// 	free(input);
+		// 	break ;
+		// } // exiting the shell is handled by the built-in exit command
 		if (execute_command(input, envp) == -1)
 			ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
 		free(input);

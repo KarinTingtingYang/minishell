@@ -19,11 +19,13 @@ SRCS       = $(SRC_DIR)/main.c \
 			 $(SRC_DIR)/builtins/builtins_io.c \
 			 $(SRC_DIR)/builtins/cd_pwd.c \
 			 $(SRC_DIR)/builtins/echo.c \
+			 $(SRC_DIR)/builtins/exit.c \
              $(SRC_DIR)/pipes/pipes.c \
              $(SRC_DIR)/pipes/pipes_helper.c \
              $(SRC_DIR)/parser/parse_line.c \
              $(SRC_DIR)/parser/command_create.c \
              $(SRC_DIR)/parser/command_free.c \
+			 $(SRC_DIR)/parser/lexer.c \
              $(SRC_DIR)/utils.c \
              $(SRC_DIR)/signal/signal.c \
              $(SRC_DIR)/signal/signal_utils.c \

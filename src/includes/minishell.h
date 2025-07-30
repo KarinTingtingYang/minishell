@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/28 09:11:56 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 08:44:04 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 #include "./builtins.h"
 #include "./redirection.h"
 #include "./signal_handling.h"
+#include "./lexer.h"
 
 // Global flag to indicate if a child process is currently running.
 // volatile sig_atomic_t is used for variables modified by signal handlers.

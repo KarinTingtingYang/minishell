@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 13:46:49 by makhudon          #+#    #+#             */
-/*   Updated: 2025/05/04 13:14:05 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 09:34:03 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 // • use only the write() function
 // • Must not return anything
 
-void	ft_putstr_fd(char *s, int fd)
+void	ft_putstr_fd(const char *s, int fd)
 {
 	int	i;
 

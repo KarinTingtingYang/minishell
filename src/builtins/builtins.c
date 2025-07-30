@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   builtins.c                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/28 09:00:14 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/28 11:23:38 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   builtins.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/28 09:00:14 by makhudon          #+#    #+#             */
+/*   Updated: 2025/07/30 08:31:36 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,10 @@ int run_builtin(char **args)
 	{
 		return (builtin_pwd());
 	}
+	else if (ft_strncmp(args[0], "exit", ft_strlen("exit") + 1) == 0)
+	{
+		return (builtin_exit(args));
+	}
 	return (0); // should not reach here if is_builtin is used correctly
 }
 
@@ -41,6 +45,7 @@ int	is_builtin(char *cmd)
 {
 	return (ft_strncmp(cmd, "echo", 5) == 0 ||
 			ft_strncmp(cmd, "cd", 3) == 0 || 
-			ft_strncmp(cmd, "pwd", 4) == 0);
+			ft_strncmp(cmd, "pwd", 4) == 0 ||
+			ft_strncmp(cmd, "exit", 5) == 0);
 	// Add more built-ins as needed
 }
