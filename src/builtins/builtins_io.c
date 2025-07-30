@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 10:27:49 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 10:27:11 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 10:28:49 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,13 +36,19 @@ static int	redirect_builtin_input(char *input_file)
 }
 
 // helper function to redirect output
-static int	redirect_builtin_output(char *output_file)
+// APPEND REDIRECTION: ADDED FLAG PARAMETER 0=none, 1=truncate(>), 2=append(>>)
+static int	redirect_builtin_output(char *output_file, int output_mode)
 {
     int	fd;
+	int flags;
 
-    if (!output_file)
-        return (0);
-    fd = open(output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (!output_file)
+		return (0);
+	if (output_mode == 2) // 2 == O_APPEND
+		flags = O_WRONLY | O_CREAT | O_APPEND;
+	else // Default to O_TRUNC
+		flags = O_WRONLY | O_CREAT | O_TRUNC;
+    fd = open(output_file, flags, 0644);
     if (fd == -1)
     {
         perror("minishell");
@@ -68,11 +74,11 @@ static int	redirect_builtin_output(char *output_file)
  * @return 0 on success, -1 on failure.
  */
 
-int	apply_builtin_redirection(char *input_file, char *output_file)
+int	apply_builtin_redirection(char *input_file, char *output_file, int output_mode)
 {
     if (redirect_builtin_input(input_file) == -1)
         return (-1);
-    if (redirect_builtin_output(output_file) == -1)
+    if (redirect_builtin_output(output_file, output_mode) == -1)
         return (-1);
     return (0);
 }

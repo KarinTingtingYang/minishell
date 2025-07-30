@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 10:20:46 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 11:06:48 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int execute_prepared_command(t_execute_data *data)
 	}
 	else if (pid == 0)
 	{
-		redirect_io(data->input_file, data->output_file);
+		redirect_io(data->input_file, data->output_file, data->output_mode);
 		if (is_builtin(data->clean_args[0]))
 			run_builtin(data->clean_args);
 		else
@@ -92,7 +92,6 @@ int prepare_command_execution(char *line, char **envp, t_execute_data *data)
 	{
         return (0);		 // No command to execute
 	}	
-    // data->original_args = ft_split(line, ' ');
 	data->original_args = tokenize_input(line); // DEBUG: tokenize_input() should handle splitting by spaces
     if (!data->original_args || !data->original_args[0])
     {
@@ -100,7 +99,7 @@ int prepare_command_execution(char *line, char **envp, t_execute_data *data)
         free_split(data->original_args);
         return (0);		 // no command to execute
     }
-    data->clean_args = handle_redirection(data->original_args, &data->input_file, &data->output_file);
+    data->clean_args = handle_redirection(data->original_args, &data->input_file, &data->output_file, &data->output_mode);
     if (!data->clean_args)
     {
         free_split(data->original_args);
@@ -139,49 +138,21 @@ int prepare_command_execution(char *line, char **envp, t_execute_data *data)
 }
 
 /**
- * @brief Builds an array of command structures from split pipeline parts.
+ * @brief Builds command structures from split command parts.
  * 
- * Allocates and fills `t_command` structures for each part of a piped command.
- * Only processes the command parts if the starting index is 0 (initial call),
- * otherwise returns success immediately (useful for recursion-like interface).
- * The function resolves the command paths using the PATH environment variable.
- * If any command fails to be created or if PATH is missing, cleanup is performed
- * and the function returns failure.
- * @param cmds     The array of `t_command*` to populate.
- * @param parts    The array of strings representing individual piped commands.
- * @param index    The current index (usually 0) to start from.
- * @param count    The total number of command parts to process.
- * @param envp     The environment variables used to resolve PATH.
- * 
- * @return Returns 1 on success, or 0 on failure (e.g., PATH not found or malloc failure).
+ * This function iterates through the split command parts, creates a `t_command`
+ * structure for each part, and populates it with arguments and redirection
+ * information. It uses the provided environment variables to resolve command paths.
+ * If any step fails (e.g., memory allocation, command creation), it cleans up
+ * previously allocated resources and returns `NULL`.
+ * @param cmds     Pointer to an array of `t_command*` where commands will be stored.
+ * @param parts    Array of command parts split by pipes.
+ * @param index    Current index in the parts array.
+ * @param count    Total number of command parts.
+ * @param envp     The environment variable array used to resolve command paths.
+ * @return Returns 1 on success, or 0 if an error occurs (e.g., memory allocation
+ *         failure).
  */
-// static int build_commands_from_parts(t_command **cmds, char **parts, int index, int count, char **envp)
-// {
-// 	char **path_dirs;
-//     if (index == 0)
-//     {
-//         path_dirs = find_path_dirs(envp);
-//         if (path_dirs == NULL)
-//         {
-//             ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO);
-//             return (0);
-//         }
-//         while (index < count)
-//         {
-//             cmds[index] = create_command(parts[index], path_dirs);
-//             if (!cmds[index])
-//             {
-//                 free_split(path_dirs);
-//                 return (0);
-//             }
-//             index++;
-//         }
-//         free_split(path_dirs);
-//         return (1);
-//     }
-//     return (1);
-// }
-
 static int build_commands_from_parts(t_command **cmds, char **parts, int index, int count, char **envp)
 {
     char **path_dirs;
@@ -198,20 +169,21 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
         while (index < count)
         {
             tokens = tokenize_input(parts[index]); // DEBUG: tokenize_input() should handle splitting by spaces
-            if (!tokens)
-            {
-                free_split(path_dirs);
-                return (0);
-            }
-
+            if (tokens == NULL)
+			{
+				ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: changed to a more generic error message
+				free_split(path_dirs);
+				return (0);
+			}
             cmds[index] = create_command(tokens, path_dirs);
             free_split(tokens);
 
-            if (!cmds[index])
-            {
-                free_split(path_dirs);
-                return (0);
-            }
+            if (cmds[index] == NULL)
+			{
+				ft_putstr_fd("minishell: command creation failed\n", STDERR_FILENO); // DEBUG: changed to a more generic error message
+				free_split(path_dirs);
+				return (0);
+			}
             index++;
         }
         free_split(path_dirs);
@@ -239,11 +211,9 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, cha
 {
 	t_command **cmds;
 	
-    // *parts = ft_split(line, '|');
 	*parts = split_line_by_pipe(line);   //DEBUG: tokenize_input() should handle splitting by '|'
     if (*parts == NULL || (*parts)[0] == NULL)
     {
-        // ft_putstr_fd("Error: invalid pipe syntax\n", STDERR_FILENO);
 		ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO);  // DEBUG: changed to a more generic error message
         if (*parts != NULL)
             free_split(*parts);

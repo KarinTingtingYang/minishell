@@ -26,6 +26,7 @@ SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/parser/command_create.c \
              $(SRC_DIR)/parser/command_free.c \
 			 $(SRC_DIR)/parser/lexer.c \
+			 $(SRC_DIR)/parser/lexer_helper.c \
              $(SRC_DIR)/utils.c \
              $(SRC_DIR)/signal/signal.c \
              $(SRC_DIR)/signal/signal_utils.c \

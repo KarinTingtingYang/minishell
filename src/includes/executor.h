@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/26 11:55:42 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 10:38:45 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ typedef struct s_execute_data
     char *output_file;     // File name for output redirection (if any)
     char **path_dirs;      // Array of directories in PATH environment variable
     char *cmd_path;        // Full path to the executable command
+	int  output_mode;	   //  FOR APPEND REDIRECTION: 0=none, 1=truncate(>), 2=append(>>)
 } t_execute_data;
 
 char		**find_path_dirs(char **envp);

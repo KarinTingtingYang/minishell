@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 08:25:34 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 08:36:59 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 10:30:46 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,17 @@
  * and uses dup2 to replace STDIN_FILENO and STDOUT_FILENO.
  */
 // Main redirection function
-void	redirect_io(char *input_file, char *output_file)
+void	redirect_io(char *input_file, char *output_file, int output_mode)
 {
-    if (input_file)
-        open_and_redirect_input(input_file);
-    if (output_file)
-        open_and_redirect_output(output_file);
+	if (input_file)
+		open_and_redirect_input(input_file);
+	if (output_file)
+		open_and_redirect_output(output_file, output_mode);
 }
 
 // handle_redirection() Helper: Process a single redirection and update input/output file pointers
-static int	process_redirection_token(char **args, int i, char **final_input_file, char **final_output_file)
+static int	process_redirection_token(char **args, int i, 
+								char **final_input_file, char **final_output_file, int *output_mode)
 {
     if (!args[i + 1])
     {
@@ -44,11 +45,20 @@ static int	process_redirection_token(char **args, int i, char **final_input_file
     }
     else if (ft_strncmp(args[i], ">", 2) == 0)
     {
-		if (process_output_file(args[i + 1]) == -1)
+		if (process_output_file(args[i + 1], 0) != 0) // 0 = truncate
             return (-1);
         free(*final_output_file);
         *final_output_file = ft_strdup(args[i + 1]);
+		*output_mode = 1; // 1 = O_TRUNC
     }
+	else if (ft_strncmp(args[i], ">>", 3) == 0)
+	{
+		if (process_output_file(args[i + 1], 1) != 0) // 1 = append
+			return (-1);
+		free(*final_output_file);
+		*final_output_file = ft_strdup(args[i + 1]);
+		*output_mode = 2; // 2 = O_APPEND
+	}
     return (0);
 }
 
@@ -78,21 +88,23 @@ static char	**build_clean_args(char **args, int argc)
  * and its arguments. Returns NULL on syntax or file error.
  */
 // Main function split into helpers
-char	**handle_redirection(char **args, char **final_input_file, char **final_output_file)
+char	**handle_redirection(char **args, char **final_input_file, char **final_output_file,
+							int *output_mode)
 {
     int		i = 0;
     int		argc;
 
     *final_input_file = NULL;
     *final_output_file = NULL;
-
+	*output_mode = 0; // Initialize output_mode
     // First pass: process redirections and count clean args
     argc = 0;
     while (args[i])
     {
         if (is_redirection(args[i]))
         {
-            if (process_redirection_token(args, i, final_input_file, final_output_file) != 0)
+            if (process_redirection_token(args, i, final_input_file, final_output_file,
+											output_mode) != 0)
                 return NULL;
             i += 2;
         }

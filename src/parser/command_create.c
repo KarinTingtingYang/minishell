@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 10:17:43 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 11:12:55 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,72 +31,66 @@ static int search_command_in_path(t_command *cmd, char **path_dirs)
     return (0);
 }
 
+/**
+ * @brief Duplicates a NULL-terminated array of strings.
+ * 
+ * Allocates memory for a new array and copies each string from the original
+ * array to the new one. The new array is also NULL-terminated.
+ * @param split  The original array of strings to duplicate.
+ * @return       A new NULL-terminated array of strings, or NULL on failure.
+ */
 static char **duplicate_split(char **split)
 {
-    int i = 0;
-    char **copy;
+	int		i;
+	char	**copy;
 
-    if (split == NULL)
-        return NULL;
-    
-    while (split[i])
-        i++;
-
-    copy = malloc(sizeof(char *) * (i + 1));
-    if (!copy)
-        return NULL;
-
-    for (i = 0; split[i]; i++)
-    {
-        copy[i] = strdup(split[i]);
-        if (!copy[i])
-        {
-            // free all previously allocated strings
-            while (--i >= 0)
-                free(copy[i]);
-            free(copy);
-            return NULL;
-        }
-    }
-    copy[i] = NULL;
-    return copy;
+	if (split == NULL)
+		return (NULL);
+	i = 0;
+	while (split[i])
+		i++;
+	copy = malloc(sizeof(char *) * (i + 1));
+	if (copy == NULL)
+		return (NULL);
+	i = 0;
+	while (split[i])
+	{
+		copy[i] = strdup(split[i]);
+		if (!copy[i])
+		{
+			while (--i >= 0)
+				free(copy[i]);
+			free(copy);
+			return (NULL);
+		}
+		i++;
+	}
+	copy[i] = NULL;
+	return (copy);
 }
 
 /**
- * @brief Parses a command line string into arguments and handles redirection.
+ * @brief Parses the command arguments and handles redirection.
  * 
- * This function splits the input line into tokens using spaces, extracts any
- * redirection operators (`<`, `>`) and their associated file paths, and stores
- * them in the given `t_command` structure. It updates `cmd->args` with a cleaned
- * argument list (without redirection tokens), and sets `cmd->input_file` and
- * `cmd->output_file` accordingly.
- * Special return values:
- * - Returns  0 on success with valid arguments and optional redirections.
- * - Returns  1 if the command is only a redirection with no executable
- *   (e.g., `> out.txt`).
- * - Returns -1 on error, such as memory allocation failure or redirection
- *   syntax error.
- * @param cmd  Pointer to the command structure to populate.
- * @param line Raw input command line string to parse.
- * @return     0 on success, 1 if only redirection, -1 on failure.
+ * This function takes a command structure and an array of tokens,
+ * parses the tokens to extract command arguments, and handles any
+ * input/output redirection specified in the tokens.
+ * If parsing fails, it returns -1; if only redirection is present,
+ * it returns 1; otherwise, it returns 0 on success.
+ * @param cmd    Pointer to the command structure to fill.
+ * @param tokens Array of strings representing the command and its arguments.
+ * @return       0 on success, -1 on failure, 1 if only redirection is present.
  */
 static int parse_args_and_redirection(t_command *cmd, char **tokens)
 {
     char **original_args;
 	
-	// original_args = ft_split(tokens, ' ');
-    // if (original_args == NULL || original_args[0] == NULL)
-    // {
-    //     free_split(original_args);
-    //     return (-1);
-    // }
-	if (tokens == NULL || tokens[0] == NULL)
+	if (tokens == NULL || tokens[0] == NULL) // no command to execute
         return (-1);
-    // Duplicate tokens if needed, or assign directly if you won't modify them
-    original_args = duplicate_split(tokens);
+    original_args = duplicate_split(tokens); // DEBUG: duplicate_split() should handle splitting by spaces
     if (original_args == NULL)
         return (-1);
-    cmd->args = handle_redirection(original_args, &cmd->input_file, &cmd->output_file);
+    cmd->args = handle_redirection(original_args, &cmd->input_file, &cmd->output_file, &cmd->output_mode);
     free_split(original_args);
     if (cmd->args == NULL)
         return (-1);

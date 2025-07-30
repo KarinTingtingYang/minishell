@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 08:36:27 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 10:40:29 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,8 @@ static int fork_all_processes_recursive(t_process_data *data, int i)
     if (data->pids[i] == 0)
     {
         reset_child_signal_handlers();
-        redirect_io(data->cmds[i]->input_file, data->cmds[i]->output_file);
+        redirect_io(data->cmds[i]->input_file, data->cmds[i]->output_file, 
+				data->cmds[i]->output_mode);
         if (i > 0)
             dup2(data->pipes[i - 1][0], STDIN_FILENO);
         if (i < data->cmd_count - 1)

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   exit.c                                             :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/28 13:12:47 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/07/28 14:23:27 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   exit.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/28 13:12:47 by tiyang            #+#    #+#             */
+/*   Updated: 2025/07/30 10:29:23 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,9 @@ int builtin_exit(char **args)
 	}
 	else // Case 3: "exit" with one argument
 	{
+		// Attempt to convert the argument to a long long
+		// If conversion fails or the argument is not a valid number, print an error
+		// and exit with status 255.
 		if (ft_str_to_llong(args[1], &exit_code) == 0)
 		{
 			ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
@@ -88,7 +91,8 @@ int builtin_exit(char **args)
 			ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
 			exit(255); // Standard failure code for this error // NEED TO DOUBLE CHECK!!!!
 		}
-		exit((unsigned char)exit_code); // Exit with the specified code
+		// If the conversion is successful, exit with the specified code
+		exit((unsigned char)exit_code); 
 	}
 	return 0; // This line is never reached, but added for completeness
 }

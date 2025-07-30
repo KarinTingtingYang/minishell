@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 11:30:32 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/24 13:05:36 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 10:41:15 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ typedef struct s_command
     char	**args;        // NULL-terminated array of arguments (argv)
     char	*input_file;
     char	*output_file;
+	int     output_mode;    // FOR APPEND REDIRECTION: 0=none, 1=truncate(>), 2=append(>>)
 }   t_command;
 
 typedef struct s_process_data

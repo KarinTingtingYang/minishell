@@ -6,15 +6,17 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 09:01:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 08:34:04 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 10:30:05 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef BUILTINS_H
 # define BUILTINS_H
 
 // I/O handling for built-ins
-int		apply_builtin_redirection(char *input_file, char *output_file);
+// APPEND REDIRECTION: ADDED FLAG FOR OUTPUT MODE 0=none, 1=truncate(>), 2=append(>>)
+int		apply_builtin_redirection(char *input_file, char *output_file, int output_mode);
 
 
 

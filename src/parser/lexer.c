@@ -6,58 +6,21 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 08:42:09 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 10:05:20 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 10:49:33 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-char **save_token(char **tokens, char *token, int *count)
-{
-	char	**new_tokens;
-	int		i = 0;
-
-	new_tokens = malloc(sizeof(char *) * (*count + 2));
-	if (!new_tokens)
-		return (NULL);
-	while (i < *count)
-	{
-		new_tokens[i] = tokens[i];
-		i++;
-	}
-	new_tokens[i++] = token;
-	new_tokens[i] = NULL;
-	free(tokens);
-	(*count)++;
-	return (new_tokens);
-}
-
-char **print_error(const char *msg)
-{
-	ft_putstr_fd("minishell: ", STDERR_FILENO);
-	ft_putstr_fd(msg, STDERR_FILENO);
-	ft_putchar_fd('\n', STDERR_FILENO);
-	return (NULL);
-}
-
-char *append_char(char *str, char c)
-{
-	int		len = str ? ft_strlen(str) : 0;
-	char	*new_str = malloc(len + 2);
-	if (!new_str)
-		return (NULL);
-	if (str)
-	{
-		ft_strlcpy(new_str, str, len + 1);
-		free(str);
-	}
-	new_str[len] = c;
-	new_str[len + 1] = '\0';
-	return (new_str);
-}
-
-
-
+/**
+ * @brief Tokenizes the input line into an array of tokens.
+ * 
+ * This function processes the input line, handling quotes and spaces,
+ * and returns an array of tokens. It respects quoted strings and
+ * handles spaces as delimiters.
+ * @param line The input command line string to tokenize.
+ * @return A NULL-terminated array of tokens, or NULL on error.
+ */
 char **tokenize_input(char *line)
 {
 	int		i = 0;
@@ -93,29 +56,15 @@ char **tokenize_input(char *line)
 	return tokens;
 }
 
-
-static char **append_str(char **arr, char *line, int start, int end, int *count)
-{
-    int len = end - start;
-    char *substr = malloc(len + 1);
-    if (!substr)
-        return NULL;
-    strncpy(substr, line + start, len);
-    substr[len] = '\0';
-
-    char **new_arr = realloc(arr, sizeof(char *) * (*count + 2));
-    if (!new_arr)
-    {
-        free(substr);
-        return NULL;
-    }
-    new_arr[*count] = substr;
-    (*count)++;
-    new_arr[*count] = NULL;
-    return new_arr;
-}
-
-// Splits input line by pipes '|' respecting quotes, returns NULL on error
+/**
+ * @brief Splits the input line by pipe characters into command parts.
+ * 
+ * This function splits the input line into separate commands based on
+ * the pipe character '|'. It handles quoted strings correctly and returns
+ * an array of command parts.
+ * @param line The input command line string to split.
+ * @return A NULL-terminated array of command parts, or NULL on error.
+ */
 char **split_line_by_pipe(char *line)
 {
     int i = 0;

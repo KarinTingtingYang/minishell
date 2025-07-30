@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 08:33:29 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 11:03:53 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ static int execute_single_command(char *line, char **envp)
 	int				exit_status;
 
     prepare_status = prepare_command_execution(line, envp, &data);
-    if (prepare_status != 1) // DEBUG Change it to prepare_status != 1 for clear control flow.
+    if (prepare_status != 1)
 	{
 		free_execute_data(&data); // added to ensure cleanup
         return (prepare_status); // 0 means empty, errors propagated
@@ -120,7 +120,7 @@ static int execute_single_command(char *line, char **envp)
 		return (execute_prepared_command(&data));
 	original_stdin = dup(STDIN_FILENO);
 	original_stdout = dup(STDOUT_FILENO);
-	if (apply_builtin_redirection(data.input_file, data.output_file) == -1)
+	if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
 		exit_status = 1;
 	else
 		exit_status = run_builtin(data.clean_args);
