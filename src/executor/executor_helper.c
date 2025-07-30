@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 09:51:31 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 10:20:46 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,9 +155,38 @@ int prepare_command_execution(char *line, char **envp, t_execute_data *data)
  * 
  * @return Returns 1 on success, or 0 on failure (e.g., PATH not found or malloc failure).
  */
+// static int build_commands_from_parts(t_command **cmds, char **parts, int index, int count, char **envp)
+// {
+// 	char **path_dirs;
+//     if (index == 0)
+//     {
+//         path_dirs = find_path_dirs(envp);
+//         if (path_dirs == NULL)
+//         {
+//             ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO);
+//             return (0);
+//         }
+//         while (index < count)
+//         {
+//             cmds[index] = create_command(parts[index], path_dirs);
+//             if (!cmds[index])
+//             {
+//                 free_split(path_dirs);
+//                 return (0);
+//             }
+//             index++;
+//         }
+//         free_split(path_dirs);
+//         return (1);
+//     }
+//     return (1);
+// }
+
 static int build_commands_from_parts(t_command **cmds, char **parts, int index, int count, char **envp)
 {
-	char **path_dirs;
+    char **path_dirs;
+    char **tokens;
+
     if (index == 0)
     {
         path_dirs = find_path_dirs(envp);
@@ -168,7 +197,16 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
         }
         while (index < count)
         {
-            cmds[index] = create_command(parts[index], path_dirs);
+            tokens = tokenize_input(parts[index]); // DEBUG: tokenize_input() should handle splitting by spaces
+            if (!tokens)
+            {
+                free_split(path_dirs);
+                return (0);
+            }
+
+            cmds[index] = create_command(tokens, path_dirs);
+            free_split(tokens);
+
             if (!cmds[index])
             {
                 free_split(path_dirs);
@@ -202,7 +240,7 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, cha
 	t_command **cmds;
 	
     // *parts = ft_split(line, '|');
-	*parts = tokenize_input(line);   //DEBUG: tokenize_input() should handle splitting by '|'
+	*parts = split_line_by_pipe(line);   //DEBUG: tokenize_input() should handle splitting by '|'
     if (*parts == NULL || (*parts)[0] == NULL)
     {
         // ft_putstr_fd("Error: invalid pipe syntax\n", STDERR_FILENO);

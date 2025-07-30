@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 08:35:40 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 10:17:43 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,37 @@ static int search_command_in_path(t_command *cmd, char **path_dirs)
     return (0);
 }
 
+static char **duplicate_split(char **split)
+{
+    int i = 0;
+    char **copy;
+
+    if (split == NULL)
+        return NULL;
+    
+    while (split[i])
+        i++;
+
+    copy = malloc(sizeof(char *) * (i + 1));
+    if (!copy)
+        return NULL;
+
+    for (i = 0; split[i]; i++)
+    {
+        copy[i] = strdup(split[i]);
+        if (!copy[i])
+        {
+            // free all previously allocated strings
+            while (--i >= 0)
+                free(copy[i]);
+            free(copy);
+            return NULL;
+        }
+    }
+    copy[i] = NULL;
+    return copy;
+}
+
 /**
  * @brief Parses a command line string into arguments and handles redirection.
  * 
@@ -49,16 +80,22 @@ static int search_command_in_path(t_command *cmd, char **path_dirs)
  * @param line Raw input command line string to parse.
  * @return     0 on success, 1 if only redirection, -1 on failure.
  */
-static int parse_args_and_redirection(t_command *cmd, char *line)
+static int parse_args_and_redirection(t_command *cmd, char **tokens)
 {
     char **original_args;
 	
-	original_args = ft_split(line, ' ');
-    if (original_args == NULL || original_args[0] == NULL)
-    {
-        free_split(original_args);
+	// original_args = ft_split(tokens, ' ');
+    // if (original_args == NULL || original_args[0] == NULL)
+    // {
+    //     free_split(original_args);
+    //     return (-1);
+    // }
+	if (tokens == NULL || tokens[0] == NULL)
         return (-1);
-    }
+    // Duplicate tokens if needed, or assign directly if you won't modify them
+    original_args = duplicate_split(tokens);
+    if (original_args == NULL)
+        return (-1);
     cmd->args = handle_redirection(original_args, &cmd->input_file, &cmd->output_file);
     free_split(original_args);
     if (cmd->args == NULL)
@@ -101,12 +138,12 @@ static t_command *create_empty_command(void)
  * resources and returns NULL.
  * If the command line contains only redirections without an executable command,
  * it returns the command structure with redirection fields set.
- * @param line       The input command line string to parse.
+ * @param tokens     The input command line string to parse.
  * @param path_dirs  An array of directory strings representing the system PATH.
  * @return A pointer to a fully initialized t_command structure on success,
  *         or NULL on failure.
  */
-t_command *create_command(char *line, char **path_dirs)
+t_command *create_command(char **tokens, char **path_dirs)
 {
     t_command *cmd;
 	int redir_parse_result;
@@ -116,7 +153,7 @@ t_command *create_command(char *line, char **path_dirs)
 	{
         return (NULL);
 	}
-	redir_parse_result = parse_args_and_redirection(cmd, line);
+	redir_parse_result = parse_args_and_redirection(cmd, tokens);
     if (redir_parse_result == -1)
     {
         free(cmd);

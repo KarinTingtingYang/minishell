@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 08:42:09 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 09:49:16 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/07/30 10:05:20 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,41 +58,6 @@ char *append_char(char *str, char c)
 
 
 
-// char **tokenize_input(char *line)
-// {
-// 	int		i = 0;
-// 	char	*token = NULL;
-// 	char	**tokens = NULL;
-// 	int		count = 0;
-// 	char	quote = 0;
-
-// 	while (line[i])
-// 	{
-// 		if (!quote && (line[i] == '\'' || line[i] == '\"'))
-// 			quote = line[i]; // entering quote
-// 		else if (quote && line[i] == quote)
-// 			quote = 0; // exiting quote
-// 		else if (!quote && line[i] == ' ')
-// 		{
-// 			if (token)
-// 			{
-// 				tokens = save_token(tokens, token, &count);
-// 				token = NULL;
-// 			}
-// 		}
-// 		else
-// 			token = append_char(token, line[i]);
-// 		i++;
-// 	}
-// 	if (quote)
-// 		return print_error("unclosed quote");
-// 	if (token)
-// 		tokens = save_token(tokens, token, &count);
-// 	if (tokens)
-// 		tokens[count] = NULL;
-// 	return tokens;
-// }
-
 char **tokenize_input(char *line)
 {
 	int		i = 0;
@@ -107,18 +72,12 @@ char **tokenize_input(char *line)
 			quote = line[i]; // entering quote
 		else if (quote && line[i] == quote)
 			quote = 0; // exiting quote
-		else if (!quote && (line[i] == ' ' || line[i] == '|'))
+		else if (!quote && line[i] == ' ')
 		{
-			// Save current token if exists
 			if (token)
 			{
 				tokens = save_token(tokens, token, &count);
 				token = NULL;
-			}
-			// Save '|' as separate token
-			if (line[i] == '|')
-			{
-				tokens = save_token(tokens, strdup("|"), &count);
 			}
 		}
 		else
@@ -132,4 +91,59 @@ char **tokenize_input(char *line)
 	if (tokens)
 		tokens[count] = NULL;
 	return tokens;
+}
+
+
+static char **append_str(char **arr, char *line, int start, int end, int *count)
+{
+    int len = end - start;
+    char *substr = malloc(len + 1);
+    if (!substr)
+        return NULL;
+    strncpy(substr, line + start, len);
+    substr[len] = '\0';
+
+    char **new_arr = realloc(arr, sizeof(char *) * (*count + 2));
+    if (!new_arr)
+    {
+        free(substr);
+        return NULL;
+    }
+    new_arr[*count] = substr;
+    (*count)++;
+    new_arr[*count] = NULL;
+    return new_arr;
+}
+
+// Splits input line by pipes '|' respecting quotes, returns NULL on error
+char **split_line_by_pipe(char *line)
+{
+    int i = 0;
+    int start = 0;
+    char quote = 0;
+    char **parts = NULL;
+    int count = 0;
+
+    while (line[i])
+    {
+        if (!quote && (line[i] == '\'' || line[i] == '\"'))
+            quote = line[i];
+        else if (quote && line[i] == quote)
+            quote = 0;
+        else if (!quote && line[i] == '|')
+        {
+            // Append substring [start, i) as one command
+            parts = append_str(parts, line, start, i, &count);
+            if (!parts)
+                return NULL;
+            start = i + 1;
+        }
+        i++;
+    }
+    // Append last command substring
+    parts = append_str(parts, line, start, i, &count);
+    if (!parts)
+        return NULL;
+
+    return parts;
 }
