@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   builtins.h                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 09:01:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 13:45:20 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   builtins.h                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/28 09:01:24 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/07/31 09:40:02 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,6 @@ int		builtin_exit(char **args);
 void builtin_env(t_env_var *env_list);
 int run_export(t_env_var *env_list, char **args);
 char *get_env_value(t_env_var *env, char *key);
+char **env_list_to_array(t_env_var *env);
 
 #endif

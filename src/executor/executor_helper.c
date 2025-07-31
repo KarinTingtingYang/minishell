@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor_helper.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 13:35:49 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor_helper.c                                  :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/07/31 09:57:01 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ int execute_prepared_command(t_execute_data *data)
 		if (is_builtin(data->clean_args[0]))
 			run_builtin(data->clean_args, data->env_list);
 		else
-			execute_cmd(data->cmd_path, data->clean_args, data->path_dirs);
+			execute_cmd(data->cmd_path, data->clean_args, data->path_dirs, data->env_list);
 		exit(0);
 	}
 	else

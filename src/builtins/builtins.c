@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 09:00:14 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 13:47:25 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   builtins.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/28 09:00:14 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/07/31 10:04:00 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,13 @@ int run_builtin(char **args, t_env_var *env_list)
 	}
 	else if (ft_strncmp(args[0], "env", 4) == 0)
 	{
-		builtin_env( env_list);
+		builtin_env(env_list);
 		return (0);
 	}
+	else if (ft_strncmp(args[0], "export", 7) == 0)
+    {
+        return (run_export(env_list, args)); // Pass the list to export
+    }
 	return (0); // should not reach here if is_builtin is used correctly
 }
 
@@ -54,6 +58,7 @@ int	is_builtin(char *cmd)
 			ft_strncmp(cmd, "cd", 3) == 0 || 
 			ft_strncmp(cmd, "pwd", 4) == 0 ||
 			ft_strncmp(cmd, "exit", 5) == 0 ||
-			ft_strncmp(cmd, "env", 4) == 0);
+			ft_strncmp(cmd, "env", 4) == 0 ||
+			ft_strncmp(cmd, "export", 7) == 0);
 	// Add more built-ins as needed
 }

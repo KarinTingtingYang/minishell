@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   pipes.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 13:37:08 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   pipes.c                                            :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/22 10:08:55 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/07/31 09:40:25 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ static int fork_all_processes_recursive(t_process_data *data, int i)
         }
         else
         {
-            execute_cmd(data->cmds[i]->cmd_path, data->cmds[i]->args, data->path_dirs);
+            execute_cmd(data->cmds[i]->cmd_path, data->cmds[i]->args, data->path_dirs, data->env_list);
         }
         perror("execve");
         exit(EXIT_FAILURE);

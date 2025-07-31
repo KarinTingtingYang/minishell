@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 14:09:46 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/07/31 10:03:01 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
  * @note This function does not return if successful. On failure, it exits the
  * child process. @exit 127 if the command is not found.
  */
-void execute_cmd(char *cmd_path, char **args, char **path_dirs)
+void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
 {
     // // Reset signal handlers to default for the child process
     // reset_child_signal_handlers(); //
@@ -82,29 +82,59 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs)
 	// execve(cmd_path, args, environ);
 	// handle_execve_error(cmd_path, args, path_dirs);
 
-	char **path_dirs = find_path_dirs(env_list);
-	if (!path_dirs)
-	{
-		ft_putendl_fd("Error: PATH variable not found", 2);
-		return (1); // Don't continue execution
-	}
+	// char **path_dirs = find_path_dirs(env_list);
+	// if (!path_dirs)
+	// {
+	// 	ft_putendl_fd("Error: PATH variable not found", 2);
+	// 	return (1); // Don't continue execution
+	// }
 
-	char *cmd_path = find_full_path(path_dirs, args[0]);
-	if (!cmd_path)
-	{
-		ft_putendl_fd("Command not found", 2);
-		free_split(path_dirs);
-		return (127);
-	}
+	// char *cmd_path = find_full_path(path_dirs, args[0]);
+	// if (!cmd_path)
+	// {
+	// 	ft_putendl_fd("Command not found", 2);
+	// 	free_split(path_dirs);
+	// 	return (127);
+	// }
 
-	execve(cmd_path, args, convert_env_list_to_array(env_list));
+	// execve(cmd_path, args, convert_env_list_to_array(env_list));
 
-	// If execve fails:
-	perror("execve failed");
-	free(cmd_path);
-	free_split(path_dirs);
-	exit(1);
+	// // If execve fails:
+	// perror("execve failed");
+	// free(cmd_path);
+	// free_split(path_dirs);
+	// exit(1);
 
+	// DEBUG FIX EXPORT :)
+	char **envp;
+
+    // Reset signal handlers to their default behavior for the child process.
+    reset_child_signal_handlers();
+
+    // Convert our linked list of environment variables into a char** array.
+    envp = env_list_to_array(env_list); // Using the helper from utils.c
+
+    // The command path should already be validated, but we check again.
+    if (cmd_path == NULL)
+    {
+        if (args && args[0])
+        {
+             ft_putstr_fd("minishell: ", STDERR_FILENO);
+             ft_putstr_fd(args[0], STDERR_FILENO);
+             ft_putstr_fd(": command not found\n", STDERR_FILENO);
+        }
+        if (envp)
+            free_split(envp);
+        exit(127);
+    }
+
+    // Execute the command. This line should not return if it succeeds.
+    execve(cmd_path, args, envp);
+
+    // If execve *does* return, it means an error occurred.
+    // We must clean up and exit the child process with an error code.
+    free_split(envp);
+    handle_execve_error(cmd_path, args, path_dirs); // This function will exit.
 }
 
 /**

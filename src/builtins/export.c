@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   export.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 13:04:25 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   export.c                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/30 13:03:36 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/07/31 10:05:11 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ static int env_list_len(t_env_var *env)
     return len;
 }
 
-static char **env_list_to_array(t_env_var *env)
+// DEBUG FIX EXPORT :) made this function visible to other files
+char **env_list_to_array(t_env_var *env)
 {
     int len = env_list_len(env);
     char **arr = malloc(sizeof(char *) * (len + 1));

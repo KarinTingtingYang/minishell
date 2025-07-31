@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 13:42:30 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   utils.c                                            :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:02:37 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/07/31 10:02:36 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,13 @@ t_env_var *init_env(char **environ)
         char *key = malloc(key_len + 1);
         if (!key)
             return (NULL); // handle cleanup in real code
-        ft_strlcpy(key, environ[i], key_len);
+        //ft_strlcpy(key, environ[i], key_len);
+		ft_strlcpy(key, environ[i], key_len + 1); // DEBUG FIX EXPORT! :)
+		// The function ft_strlcpy(dest, src, size) copies up to size - 1 characters 
+		// to the destination buffer and guarantees it will be null-terminated. 
+		// to copy 4 characters, we need size = 5
+		// without the change, the key would not be copied correctly
+		// leading to find_path_dirs() returning NULL
         key[key_len] = '\0';
 
         char *value = ft_strdup(equal + 1);
