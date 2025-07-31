@@ -33,7 +33,9 @@ SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/signal/signal.c \
              $(SRC_DIR)/signal/signal_utils.c \
              $(SRC_DIR)/redirection/redirection.c \
-             $(SRC_DIR)/redirection/redirection_utils.c
+             $(SRC_DIR)/redirection/redirection_utils.c \
+             $(SRC_DIR)/env/env_utils.c \
+			 $(SRC_DIR)/env/env_init.c
 
 # === Object Files ===
 OBJS       = $(SRCS:$(SRC_DIR)/%.c=$(OBJDIR)/%.o)
