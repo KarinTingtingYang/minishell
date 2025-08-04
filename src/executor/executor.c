@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor.c                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/04 11:49:29 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/04 13:00:21 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,43 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_l
  *         - 2 or higher for syntax errors or other issues,
  *         - -1 on critical fork or execution errors.
  */
+// static int execute_single_command(char *line, t_env_var *env_list)
+// {
+//     t_execute_data	data;
+//     int				prepare_status;
+// 	int				original_stdin;
+// 	int				original_stdout;
+// 	int				exit_status;
+
+// 	  // KEY CHANGE HERE: Zero out the struct before use.
+//     // This ensures all pointers inside are initialized to NULL.
+//     ft_bzero(&data, sizeof(t_execute_data));
+
+//     prepare_status = prepare_command_execution(line, env_list, &data);
+//     if (prepare_status != 1)
+// 	{
+// 		free_execute_data(&data); // added to ensure cleanup
+//         return (prepare_status); // 0 means empty, errors propagated
+// 	}
+	
+// 	expand_args(data.clean_args, env_list, g_last_exit_status);
+	
+// 	if (!is_builtin(data.clean_args[0]))
+// 		return (execute_prepared_command(&data));
+// 	original_stdin = dup(STDIN_FILENO);
+// 	original_stdout = dup(STDOUT_FILENO);
+// 	if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
+// 		exit_status = 1;
+// 	else
+// 		exit_status = run_builtin(data.clean_args, env_list);
+// 	// Restore STDIN and STDOUT
+// 	dup2(original_stdin, STDIN_FILENO);
+// 	dup2(original_stdout, STDOUT_FILENO);
+// 	close(original_stdin);
+// 	close(original_stdout);
+// 	free_execute_data(&data);
+// 	return (exit_status);
+// }
 static int execute_single_command(char *line, t_env_var *env_list)
 {
     t_execute_data	data;
@@ -164,32 +201,48 @@ static int execute_single_command(char *line, t_env_var *env_list)
 	int				original_stdout;
 	int				exit_status;
 
-	  // KEY CHANGE HERE: Zero out the struct before use.
-    // This ensures all pointers inside are initialized to NULL.
-    ft_bzero(&data, sizeof(t_execute_data));
+	ft_bzero(&data, sizeof(t_execute_data));
 
-    prepare_status = prepare_command_execution(line, env_list, &data);
-    if (prepare_status != 1)
+	prepare_status = prepare_command_execution(line, env_list, &data);
+	if (prepare_status != 1)
 	{
-		free_execute_data(&data); // added to ensure cleanup
-        return (prepare_status); // 0 means empty, errors propagated
+		free_execute_data(&data);
+		return (prepare_status);
 	}
-	if (!is_builtin(data.clean_args[0]))
-		return (execute_prepared_command(&data));
+
+	expand_args(data.clean_args, env_list, g_last_exit_status);
+
+	if (data.clean_args[0] && !is_builtin(data.clean_args[0]))
+	{
+		exit_status = execute_prepared_command(&data);
+		// Update global exit status here after external command
+		g_last_exit_status = exit_status;
+		free_execute_data(&data);
+		return exit_status;
+	}
+
 	original_stdin = dup(STDIN_FILENO);
 	original_stdout = dup(STDOUT_FILENO);
+
 	if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
 		exit_status = 1;
 	else
 		exit_status = run_builtin(data.clean_args, env_list);
+
 	// Restore STDIN and STDOUT
 	dup2(original_stdin, STDIN_FILENO);
 	dup2(original_stdout, STDOUT_FILENO);
 	close(original_stdin);
 	close(original_stdout);
+
+	// Update global exit status after builtin command
+	g_last_exit_status = exit_status;
+
 	free_execute_data(&data);
-	return (exit_status);
+
+	return exit_status;
 }
+
 
 /**
  * @brief Prepares and executes a pipeline of shell commands.

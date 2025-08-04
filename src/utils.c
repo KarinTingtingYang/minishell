@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   utils.c                                            :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:02:37 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/04 11:37:58 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/04 12:21:29 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,4 +43,11 @@ void	free_split(char **array)
 	array = NULL;
 }
 
+char *ft_strjoin_free(char *s1, char *s2)
+{
+    char *joined = ft_strjoin(s1, s2);
+    free(s1);
+    free(s2);
+    return (joined);
+}
 

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   minishell.h                                        :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:10:15 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/31 11:54:48 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/04 12:50:06 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@
 #include "./signal_handling.h"
 #include "./lexer.h"
 #include "./env.h"
+#include "./expander.h"
+#include "./global.h"
 
 
 // typedef struct s_env_var // Structure to represent an environment variable
@@ -58,5 +60,6 @@ void		error_exit(const char *msg);
 void		error_msg_exit(const char *msg);
 t_env_var	*init_env(char **environ);
 void		free_env(t_env_var *env);
+char		*ft_strjoin_free(char *s1, char *s2);
 
 #endif

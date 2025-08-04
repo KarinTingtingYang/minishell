@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 13:01:59 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/04 12:50:13 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 // Global flag definition
 volatile sig_atomic_t g_child_running = 0;
+int g_last_exit_status = 0;
 
 /**
  * @brief  Main loop for the minishell program, handling user input and
