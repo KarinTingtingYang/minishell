@@ -1,17 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   env_utils.c                                        :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/31 11:47:23 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/07/31 11:53:34 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   env_utils.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/31 11:47:23 by tiyang            #+#    #+#             */
+/*   Updated: 2025/08/04 09:56:56 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-// TO DO: NEED TO REPLACE SPRINTF AS IT IS NOT ALLOWED IN THIS PROJECT
 
 /**
  * @brief Finds an environment variable in the linked list.
@@ -80,38 +79,43 @@ int env_list_len(t_env_var *env)
     return len;
 }
 
-// DEBUG FIX EXPORT :) made this function visible to other files
 /**
  * @brief Converts the environment linked list to a char** array.
  *
- * Allocates memory for an array of strings, each representing an environment
- * variable in the format "KEY=VALUE". The last element of the array is NULL.
- * @param env The head of the environment linked list.
- * @return A dynamically allocated array of strings, or NULL on failure.
+ * @param env The head of the environment list.
+ * @return A dynamically allocated array of strings representing the environment
+ * variables, or NULL on failure.
  */
-
 char **env_list_to_array(t_env_var *env)
 {
     int len = env_list_len(env);
     char **arr = malloc(sizeof(char *) * (len + 1));
     int i = 0;
 
+    if (arr == NULL)
+        return NULL;
+
     while (env)
     {
         size_t len_key = strlen(env->key);
-        size_t len_val = env->value ? ft_strlen(env->value) : 0;
-        char *entry = malloc(len_key + len_val + 2); // for '=' and '\0'
-        if (!entry)
+        size_t len_val = 0;
+        char *entry;
+        if (env->value)
+            len_val = ft_strlen(env->value);
+        entry = malloc(len_key + len_val + 2);
+        if (entry == NULL)
         {
             while (i--)
                 free(arr[i]);
             free(arr);
             return NULL;
         }
+        ft_strlcpy(entry, env->key, len_key + 1);
+        entry[len_key] = '=';
         if (env->value)
-            sprintf(entry, "%s=%s", env->key, env->value);
+            ft_strlcpy(entry + len_key + 1, env->value, len_val + 1);
         else
-            sprintf(entry, "%s=", env->key);
+            entry[len_key + 1] = '\0';
         arr[i++] = entry;
         env = env->next;
     }

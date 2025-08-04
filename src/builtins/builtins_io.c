@@ -6,13 +6,22 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 10:27:49 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 11:41:59 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/04 10:12:03 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-// helper function to redirect input
+/**
+ * @brief Redirects input and output for built-in commands.
+ *
+ * This function handles redirection of input and output for built-in commands
+ * like `cd`, `pwd`, etc. It opens the files and uses dup2 to redirect
+ * STDIN and/or STDOUT.
+ * @param input_file The file to redirect STDIN from.
+ * @param output_file The file to redirect STDOUT to.
+ * @return 0 on success, -1 on failure.
+ */
 static int	redirect_builtin_input(char *input_file)
 {
     int	fd;
@@ -35,8 +44,16 @@ static int	redirect_builtin_input(char *input_file)
     return (0);
 }
 
-// helper function to redirect output
-// APPEND REDIRECTION: ADDED FLAG PARAMETER 0=none, 1=truncate(>), 2=append(>>)
+/**
+ * @brief Redirects input and output for built-in commands.
+ *
+ * This function handles redirection of input and output for built-in commands
+ * like `cd`, `pwd`, etc. It opens the files and uses dup2 to redirect
+ * STDIN and/or STDOUT.
+ * @param input_file The file to redirect STDIN from.
+ * @param output_file The file to redirect STDOUT to.
+ * @return 0 on success, -1 on failure.
+ */
 static int	redirect_builtin_output(char *output_file, int output_mode)
 {
     int	fd;
@@ -73,7 +90,6 @@ static int	redirect_builtin_output(char *output_file, int output_mode)
  * @param output_file The file to redirect STDOUT to.
  * @return 0 on success, -1 on failure.
  */
-
 int	apply_builtin_redirection(char *input_file, char *output_file, int output_mode)
 {
     if (redirect_builtin_input(input_file) == -1)

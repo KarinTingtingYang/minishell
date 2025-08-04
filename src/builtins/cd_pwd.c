@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 10:45:26 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 11:42:21 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/04 10:15:45 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,18 @@
 
 /**
  * @brief Implements the 'cd' built-in command.
- * Changes the current working directory.
- * @param args The arguments array, where args[1] is the path.
+ *
+ * Changes the current working directory to the specified path.
+ * If no path is provided, it changes to the home directory.
+ * @param args The arguments array. Should contain the target directory as args[1].
  * @return Returns 0 on success, 1 on failure.
  */
 int	builtin_cd(char **args)
 {
 	if (args[1] == NULL)
 	{
-		// In a real shell, this would go to the HOME directory.
-		// For this implementation, we'll treat it as an error.
-		// as the subject requires "cd with only a relative or absolute path"
 		ft_putstr_fd("minishell: cd: missing argument\n", STDERR_FILENO);
 		return (1);
-
-		/* //to mimic the real shell behavior, use the below code instead:
-		path = getenv("HOME");
-		if (path == NULL)
-		{
-			ft_putstr_fd("minishell: cd: HOME not set\n", STDERR_FILENO);
-			return (1);
-		}
-		*/
-		
 	}
 	if (chdir(args[1]) != 0)
 	{
@@ -49,7 +38,7 @@ int	builtin_cd(char **args)
 
 /**
  * @brief Implements the 'pwd' built-in command.
- * Prints the current working directory to standard output.
+ * Prints the current working directory.
  * @return Returns 0 on success, 1 on failure.
  */
 int	builtin_pwd(void)

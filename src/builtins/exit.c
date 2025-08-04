@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 13:12:47 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 11:43:12 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/04 10:31:43 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,15 +38,12 @@ static int	ft_str_to_llong(const char *str, long long *out_val)
 			sign = -1;
 		str++;
 	}
-	if (!*str) // String with only a sign is invalid
+	if (!*str)
 		return (0);
-	while (*str)
+	while (*str != '\0')
 	{
-		if (!ft_isdigit(*str)) // Invalid character
+		if (!ft_isdigit(*str))
 			return (0);
-		// THE OVERFLOW CHECK:
-		// Before we do result = result * 10 + digit, we check if doing so
-		// would exceed the limits of long long.
 		if (sign == 1 && (result > LLONG_MAX / 10 ||
 			(result == LLONG_MAX / 10 && (*str - '0') > LLONG_MAX % 10)))
 			return (0); // Overflow
