@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/31 10:03:01 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/04 11:49:29 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,10 @@ static int execute_single_command(char *line, t_env_var *env_list)
 	int				original_stdin;
 	int				original_stdout;
 	int				exit_status;
+
+	  // KEY CHANGE HERE: Zero out the struct before use.
+    // This ensures all pointers inside are initialized to NULL.
+    ft_bzero(&data, sizeof(t_execute_data));
 
     prepare_status = prepare_command_execution(line, env_list, &data);
     if (prepare_status != 1)

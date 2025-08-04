@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/04 10:29:23 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/04 11:53:25 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,19 +104,21 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
 		&data->output_file, &data->output_mode, &data->heredoc_file);
     if (!data->clean_args)
     {
-		// Cleanup if handle_redirection fails
-        if (data->heredoc_file)
-        {
-            unlink(data->heredoc_file);
-            free(data->heredoc_file);
-        }
-        free_split(data->original_args);
+		// // Cleanup if handle_redirection fails
+        // if (data->heredoc_file)
+        // {
+        //     unlink(data->heredoc_file);
+        //     free(data->heredoc_file);
+		// 	data->heredoc_file = NULL; // Ensure it's set to NULL after freeing
+        // }
+        // free_split(data->original_args);
         return (2); // error in redirection or syntax
     }
     if (!data->clean_args[0])
     {
-        free_split(data->original_args);
-        free(data->clean_args);
+        // free_split(data->original_args);
+        // free(data->clean_args);
+		// data->clean_args = NULL; // Ensure clean_args is set to NULL after freeing
         return (0);	 // no command to execute
     }
 	if (is_builtin(data->clean_args[0]))
@@ -129,17 +131,17 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
     if (!data->path_dirs)
     {
         printf("Error: PATH variable not found\n");
-        free_split(data->original_args);
-        free_split(data->clean_args);
+        // free_split(data->original_args);
+        // free_split(data->clean_args);
         return (1); // error in finding path directories
     }
     data->cmd_path = find_full_cmd_path(data->clean_args[0], data->path_dirs);
     if (!data->cmd_path)
     {
         // command not found
-        free_split(data->original_args);
-        free_split(data->clean_args);
-        free_split(data->path_dirs);
+        // free_split(data->original_args);
+        // free_split(data->clean_args);
+        // free_split(data->path_dirs);
         return (127); // typical command not found exit code
     }
 	data-> env_list= env_list; // Store the environment variables for built-in commands

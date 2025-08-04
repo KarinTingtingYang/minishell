@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 08:25:34 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/04 10:23:30 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/04 11:29:47 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,15 @@ static int	process_redirection_token(char **args, int i,
         ft_putstr_fd("minishell: syntax error near `newline'\n", 2);
         return (-1);
     }
+	// KEY CHANGE HERE: Validate the token after the redirection operator.
+    if (is_redirection(args[i + 1]))
+    {
+        ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+        ft_putstr_fd(args[i + 1], 2);
+        ft_putstr_fd("'\n", 2);
+        return (-1);
+    }
+
 	if (ft_strncmp(args[i], "<<", 3) == 0)
 	{
 		if (*heredoc_file)
