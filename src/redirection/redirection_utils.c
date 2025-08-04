@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   redirection_utils.c                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 11:10:49 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 11:47:57 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   redirection_utils.c                                :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 11:10:49 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/04 09:55:29 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,8 @@ int	is_redirection(const char *token)
 	if (ft_strncmp(token, ">", 2) == 0)
 		return (1);
 	if (ft_strncmp(token, ">>", 3) == 0)
+		return (1);
+	if (ft_strncmp(token, "<<", 3) == 0)
 		return (1);
 	return (0);
 }

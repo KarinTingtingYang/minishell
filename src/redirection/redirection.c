@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   redirection.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 08:25:34 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 11:47:44 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   redirection.c                                      :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 08:25:34 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/04 10:23:30 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,27 @@ void	redirect_io(char *input_file, char *output_file, int output_mode)
 
 // handle_redirection() Helper: Process a single redirection and update input/output file pointers
 static int	process_redirection_token(char **args, int i, 
-								char **final_input_file, char **final_output_file, int *output_mode)
+			char **final_input_file, char **final_output_file, int *output_mode, char **heredoc_file)
 {
     if (!args[i + 1])
     {
         ft_putstr_fd("minishell: syntax error near `newline'\n", 2);
         return (-1);
     }
-    if (ft_strncmp(args[i], "<", 2) == 0)
+	if (ft_strncmp(args[i], "<<", 3) == 0)
+	{
+		if (*heredoc_file)
+		{
+			unlink(*heredoc_file);
+			free(*heredoc_file);
+		}
+		*heredoc_file = handle_heredoc(args[i + 1]);
+		if (!*heredoc_file)
+			return (-1);
+		free(*final_input_file);
+		*final_input_file = ft_strdup(*heredoc_file);
+	}
+    else if (ft_strncmp(args[i], "<", 2) == 0)
     {
         free(*final_input_file);
         *final_input_file = ft_strdup(args[i + 1]);
@@ -89,7 +102,7 @@ static char	**build_clean_args(char **args, int argc)
  */
 // Main function split into helpers
 char	**handle_redirection(char **args, char **final_input_file, char **final_output_file,
-							int *output_mode)
+							int *output_mode, char **heredoc_file)
 {
     int		i = 0;
     int		argc;
@@ -97,6 +110,7 @@ char	**handle_redirection(char **args, char **final_input_file, char **final_out
     *final_input_file = NULL;
     *final_output_file = NULL;
 	*output_mode = 0; // Initialize output_mode
+	*heredoc_file = NULL;
     // First pass: process redirections and count clean args
     argc = 0;
     while (args[i])
@@ -104,8 +118,15 @@ char	**handle_redirection(char **args, char **final_input_file, char **final_out
         if (is_redirection(args[i]))
         {
             if (process_redirection_token(args, i, final_input_file, final_output_file,
-											output_mode) != 0)
-                return NULL;
+											output_mode, heredoc_file) != 0)
+            {
+				if (*heredoc_file)
+				{
+					unlink(*heredoc_file);
+					free(*heredoc_file);
+				}
+				return (NULL);
+			}
             i += 2;
         }
         else

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   env.c                                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/30 11:42:52 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 13:56:40 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   env.c                                              :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/30 11:42:52 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/04 08:42:16 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ char *get_env_value(t_env_var *env_list, char *key)
     return NULL;
 }
 
-
+// TO DO: NEEDS MORE ROBUST ERROR HANDLING
 void builtin_env(t_env_var *env_list)
 {
     while (env_list)

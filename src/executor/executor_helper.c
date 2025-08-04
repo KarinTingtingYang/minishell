@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/31 09:57:01 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/04 10:29:23 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ int execute_prepared_command(t_execute_data *data)
  */
 int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *data)
 {
+	data->heredoc_file = NULL;
     if (line == NULL || *line == '\0')
 	{
         return (0);		 // No command to execute
@@ -99,9 +100,16 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
         free_split(data->original_args);
         return (0);		 // no command to execute
     }
-    data->clean_args = handle_redirection(data->original_args, &data->input_file, &data->output_file, &data->output_mode);
+    data->clean_args = handle_redirection(data->original_args, &data->input_file, 
+		&data->output_file, &data->output_mode, &data->heredoc_file);
     if (!data->clean_args)
     {
+		// Cleanup if handle_redirection fails
+        if (data->heredoc_file)
+        {
+            unlink(data->heredoc_file);
+            free(data->heredoc_file);
+        }
         free_split(data->original_args);
         return (2); // error in redirection or syntax
     }

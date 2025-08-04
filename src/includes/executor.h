@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/21 09:39:33 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/31 09:37:08 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/04 10:27:41 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ typedef struct s_execute_data
 	int  output_mode;		//  FOR APPEND REDIRECTION: 0=none, 1=truncate(>), 2=append(>>)
 	// char **envp;	   // passing envp down to built-in commands
 	t_env_var *env_list;
+	char *heredoc_file;    // File name for heredoc redirection (if any)
+	
 } t_execute_data;
 
 char		**find_path_dirs(t_env_var *env_list);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   pipes.h                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/22 11:30:32 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 13:33:23 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   pipes.h                                            :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/22 11:30:32 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/04 09:50:34 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ typedef struct s_command
     char	*input_file;
     char	*output_file;
 	int     output_mode;    // FOR APPEND REDIRECTION: 0=none, 1=truncate(>), 2=append(>>)
+	  char    *heredoc_file; // Add this line
 }   t_command;
 
 typedef struct s_process_data

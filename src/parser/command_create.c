@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   command_create.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 11:45:54 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   command_create.c                                   :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/26 10:49:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/04 10:25:04 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,8 @@ static int parse_args_and_redirection(t_command *cmd, char **tokens)
     original_args = duplicate_split(tokens); // DEBUG: duplicate_split() should handle splitting by spaces
     if (original_args == NULL)
         return (-1);
-    cmd->args = handle_redirection(original_args, &cmd->input_file, &cmd->output_file, &cmd->output_mode);
+    cmd->args = handle_redirection(original_args, &cmd->input_file, 
+		&cmd->output_file, &cmd->output_mode, &cmd->heredoc_file);
     free_split(original_args);
     if (cmd->args == NULL)
         return (-1);
@@ -119,6 +120,8 @@ static t_command *create_empty_command(void)
 	cmd->cmd_path = NULL;
 	cmd->input_file = NULL;
 	cmd->output_file = NULL;
+	cmd->output_mode = 0; // Initialize output_mode to 0 (no redirection)
+	cmd->heredoc_file = NULL; // Initialize heredoc file to NULL
 	return (cmd);
 }
 

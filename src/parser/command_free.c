@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   command_free.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 11:22:23 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 11:46:04 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   command_free.c                                     :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/26 11:22:23 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/04 10:25:53 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,10 @@ void free_command(t_command *cmd)
 		free(cmd->input_file);
 	if (cmd->output_file != NULL)
 		free(cmd->output_file);
+	if (cmd->heredoc_file != NULL)
+	{
+		unlink(cmd->heredoc_file);
+		free(cmd->heredoc_file);
+	}
 	free(cmd);
 }
