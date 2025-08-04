@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/04 11:53:25 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/04 12:00:15 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,7 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
 		&data->output_file, &data->output_mode, &data->heredoc_file);
     if (!data->clean_args)
     {
+		// DEBUG FIX: centralise freeing of resources in the caller function 
 		// // Cleanup if handle_redirection fails
         // if (data->heredoc_file)
         // {
@@ -238,7 +239,9 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, t_e
 		free_split(*parts);
 		return (NULL);
 	}
-    cmds[*count] = NULL;
+    //cmds[*count] = NULL;
+	  //KEY CHANGE HERE: Zero out the array of pointers.
+    ft_bzero(cmds, sizeof(t_command *) * (*count + 1));
     if (!build_commands_from_parts(cmds, *parts, 0, *count, env_list))
     {
         free_commands_recursive(cmds, 0, *count);
