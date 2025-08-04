@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   main.c                                             :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:09:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/21 12:43:18 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
+/*   Updated: 2025/07/30 13:01:59 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,78 +15,36 @@
 // Global flag definition
 volatile sig_atomic_t g_child_running = 0;
 
-// static int	wait_for_children(pid_t first_pid, pid_t last_pid)
-// {
-// 	int	status;
-
-// 	waitpid(first_pid, NULL, 0);
-// 	waitpid(last_pid, &status, 0);
-// 	if (WIFSIGNALED(status))
-// 		return (128 + WTERMSIG(status));
-// 	if (WIFEXITED(status))
-// 		return (WEXITSTATUS(status));
-// 	return (1);
-// }
-
-// static int	last_child(int pipe_fd[2], char **argv, char **envp)
-// {
-// 	pid_t	pid;
-
-// 	pid = fork();
-// 	if (pid < 0)
-// 		return (pid);
-// 	if (pid == 0)
-// 		run_last_child(pipe_fd, argv, envp);
-// 	return (pid);
-// }
-
-// static int	first_child(int pipe_fd[2], char **argv, char **envp)
-// {
-// 	pid_t	pid;
-
-// 	pid = fork();
-// 	if (pid < 0)
-// 		return (pid);
-// 	if (pid == 0)
-// 		run_first_child(pipe_fd, argv, envp);
-// 	return (pid);
-// }
-
-// static int	run_pipex(char **args, char **envp)
-// {
-// 	int		pipe_fd[2];
-// 	pid_t	first_pid;
-// 	pid_t	last_pid;
-
-// 	// args[0] = file1, args[1] = cmd1, args[2] = cmd2, args[3] = file2
-// 	if (pipe(pipe_fd) == -1)
-// 		error_exit("pipe");
-// 	first_pid = first_child(pipe_fd, args, envp);
-// 	if (first_pid < 0)
-// 		error_exit("fork first");
-// 	last_pid = last_child(pipe_fd, args + 2, envp);
-// 	if (last_pid < 0)
-// 	{(pid, &status, 0)
-// 		waitpid(first_pid, NULL, 0);
-// 		error_exit("fork second");
-// 	}
-// 	close(pipe_fd[0]);
-// 	close(pipe_fd[1]);
-// 	return (wait_for_children(first_pid, last_pid));
-// }
-
-
+/**
+ * @brief  Main loop for the minishell program, handling user input and
+ *         command execution.
+ * Sets up signal handlers for the shell, then repeatedly prompts the user for
+ * input. Reads commands from the standard input, adds non-empty commands to
+ * history, processes built-in "exit" command to quit, and executes other commands
+ * via execute_command(). Handles graceful exit on EOF or "exit" command.
+ * @param argc  Argument count from the command line (ignored).
+ * @param argv  Argument vector from the command line (ignored).
+ * @param envp  Environment variables array passed to commands.
+ * @return Returns 0 on normal shell exit.
+ */
 int	main(int argc, char **argv, char **envp)
 {
-	char	*input;
+	char		*input;
+	t_env_var	*env_list;
 
 	(void)argc;
 	(void)argv;
-	setup_signal_handlers(); // set up the handlers for the parent process
+
+	env_list = init_env(envp);
+	if (!env_list)
+		return (1);
+
+	setup_signal_handlers();
+
 	while (1)
 	{
-		g_child_running = 0; // No child running while waiting for input
-		input = readline("minishell> ");
+		g_child_running = 0;
+		input = readline("\001\033[1;32m\002minishell>\001\033[0m\002 ");
 		if (input == NULL)
 		{
 			printf("exit\n");
@@ -94,16 +52,11 @@ int	main(int argc, char **argv, char **envp)
 		}
 		if (*input)
 			add_history(input);
-		if (ft_strncmp(input, "exit", ft_strlen("exit") + 1) == 0)
-		{
-			printf("exit\n");
-			free(input);
-			break ;
-		}
-		if (execute_command(input, envp) == -1)
+		if (execute_command(input, env_list) == -1)
 			ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
-
 		free(input);
 	}
+
+	free_env(env_list);
 	return (0);
 }
