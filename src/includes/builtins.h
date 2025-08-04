@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   builtins.h                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/28 09:01:24 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/31 11:53:10 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   builtins.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/28 09:01:24 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/04 09:13:58 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ int run_export(t_env_var *env_list, char **args);
 
 int			is_valid_identifier(const char *str);
 int         run_export(t_env_var *env_list, char **args);
+int	run_unset(t_env_var **env_list, char **args);
+
 
 
 #endif
