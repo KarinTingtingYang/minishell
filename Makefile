@@ -22,6 +22,7 @@ SRCS       = $(SRC_DIR)/main.c \
 			 $(SRC_DIR)/builtins/exit.c \
 			 $(SRC_DIR)/builtins/env.c \
 			 $(SRC_DIR)/builtins/export.c \
+			 $(SRC_DIR)/builtins/unset.c \
              $(SRC_DIR)/pipes/pipes.c \
              $(SRC_DIR)/pipes/pipes_helper.c \
              $(SRC_DIR)/parser/parse_line.c \

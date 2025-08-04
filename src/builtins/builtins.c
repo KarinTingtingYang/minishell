@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   builtins.c                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/28 09:00:14 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/31 10:04:00 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   builtins.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/28 09:00:14 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/04 09:31:28 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,10 @@ int run_builtin(char **args, t_env_var *env_list)
     {
         return (run_export(env_list, args)); // Pass the list to export
     }
+	else if (ft_strncmp(args[0], "unset", 6) == 0)
+	{
+		return (run_unset(&env_list, args));
+	}
 	return (0); // should not reach here if is_builtin is used correctly
 }
 
@@ -59,6 +63,7 @@ int	is_builtin(char *cmd)
 			ft_strncmp(cmd, "pwd", 4) == 0 ||
 			ft_strncmp(cmd, "exit", 5) == 0 ||
 			ft_strncmp(cmd, "env", 4) == 0 ||
-			ft_strncmp(cmd, "export", 7) == 0);
+			ft_strncmp(cmd, "export", 7) == 0 ||
+			ft_strncmp(cmd, "unset", 6) == 0);
 	// Add more built-ins as needed
 }
