@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/05 09:10:15 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/05 10:57:58 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,8 +213,18 @@ static int execute_single_command(char *line, t_env_var *env_list, t_process_dat
 		return (prepare_status);
 	}
 
+	char **expanded_args;
 	// expand_args(data.clean_args, env_list, g_last_exit_status);
-	expand_args(data.clean_args, process_data->env_list, process_data->last_exit_status);
+	// expand_args(data.clean_args, process_data->env_list, process_data->last_exit_status);
+	expanded_args = expand_and_split_args(data.clean_args, process_data->env_list, process_data->last_exit_status);
+	if (!expanded_args)
+	{
+		free_execute_data(&data);
+		return (1);
+	}
+
+	free_split(data.clean_args);
+	data.clean_args = expanded_args;
 
 	if (data.clean_args[0] && !is_builtin(data.clean_args[0]))
 	{

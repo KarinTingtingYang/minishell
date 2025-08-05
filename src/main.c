@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   main.c                                             :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:09:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/05 09:54:56 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/05 12:06:48 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,9 +72,14 @@ int	main(int argc, char **argv, char **envp)
 		if (*input && g_signal_received != SIGINT)
 		{
 			add_history(input);
-		// if (execute_command(input, env_list) == -1)
-			if (execute_command(input, env_list, &process_data) == -1)
-				ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
+			char **args = parse_line(input);
+			if (args)
+    		{
+				// if (execute_command(input, env_list) == -1)
+				if (execute_command(input, env_list, &process_data) == -1)
+					ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
+				free_split(args); // Free after use
+			}
 		}
 		free(input);
 	}
