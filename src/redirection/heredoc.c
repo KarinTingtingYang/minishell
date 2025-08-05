@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/04 10:15:34 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/05 08:58:17 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/05 09:53:31 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,21 +55,6 @@ static char *generate_unique_heredoc_file(int *out_fd)
 }
 
 /**
- * @brief The event hook for heredoc. Readline calls this function periodically.
- * @return 0 on success.
- */
-static int	heredoc_event_hook(void)
-{
-    // If our signal handler has set the global variable...
-	if (g_signal_received == SIGINT)
-	{
-        // ...tell readline to stop waiting for input and return immediately.
-		rl_done = 1;
-	}
-	return (0);
-}
-
-/**
  * @brief Handles heredoc (<<) input by reading from stdin.
  *
  * Reads input from the user line by line until the specified delimiter
@@ -92,7 +77,7 @@ char *handle_heredoc(const char *delimiter)
 	}
 	 // Set the readline event hook. This function will be called
     // periodically by readline while it waits for input.
-	rl_event_hook = heredoc_event_hook;
+	rl_event_hook = signal_event_hook;
 	while (1)
 	{
 		line = readline("> ");

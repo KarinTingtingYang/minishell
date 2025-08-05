@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 11:51:29 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/05 09:35:35 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/05 09:42:02 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,4 +52,20 @@ void	print_signal_message(int status)
     {
         ft_putstr_fd("\n", STDOUT_FILENO);
     }
+}
+
+/**
+ * @brief The event hook for readline. Readline calls this periodically
+ * while waiting for input.
+ * @return 0 on success.
+ */
+int	signal_event_hook(void)
+{
+	// If our signal handler has set the global variable...
+	if (g_signal_received)
+	{
+		// ...tell readline to stop waiting and return immediately.
+		rl_done = 1;
+	}
+	return (0);
 }

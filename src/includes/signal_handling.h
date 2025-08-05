@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   signal_handling.h                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 14:31:47 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 11:45:36 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   signal_handling.h                                  :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 14:31:47 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/05 09:42:21 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,5 +23,5 @@ void reset_child_signal_handlers(void);
 int wait_for_child_and_handle_status(pid_t pid);
 void handle_parent_sigint(int signum);
 void print_signal_message(int status);
-
+int	signal_event_hook(void); // Add this line
 #endif

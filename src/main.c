@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:09:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/05 09:37:27 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/05 09:54:56 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,25 +50,32 @@ int	main(int argc, char **argv, char **envp)
 	{
 		//g_child_running = 0;
 		g_signal_received = 0; // Reset signal received flag for each new prompt
+		// Set the event hook before calling readline.
+		rl_event_hook = signal_event_hook;
 		input = readline("\001\033[1;32m\002minishell>\001\033[0m\002 ");
+		// Unset the hook immediately after.
+		rl_event_hook = NULL;
 		// After readline, check if it was interrupted by our handler.
 		if (g_signal_received == SIGINT)
 		{
-			ft_putstr_fd("\n", STDOUT_FILENO);
-			rl_on_new_line();
-			rl_replace_line("", 0);
-			rl_redisplay();
+			rl_on_new_line();                 // Tell readline we are on a new line.
+			rl_replace_line("", 0);           // Clear readline's internal buffer.
+			free(input);                      // Free the empty string from the interrupted readline.
+			continue;                         // Skip the rest of the loop and show a fresh prompt.
 		}
 		if (input == NULL)
 		{  // Ctrl+D was pressed
 			printf("exit\n");
 			break ;
 		}
-		if (*input)
+		// If the command was not interrupted, proceed.
+		if (*input && g_signal_received != SIGINT)
+		{
 			add_history(input);
 		// if (execute_command(input, env_list) == -1)
-		if (execute_command(input, env_list, &process_data) == -1)
-			ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
+			if (execute_command(input, env_list, &process_data) == -1)
+				ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
+		}
 		free(input);
 	}
 
