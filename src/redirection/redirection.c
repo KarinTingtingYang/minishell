@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 08:25:34 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/04 11:29:47 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/05 09:10:39 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ static int	process_redirection_token(char **args, int i,
 		{
 			unlink(*heredoc_file);
 			free(*heredoc_file);
+			*heredoc_file = NULL; // Ensure it's set to NULL after freeing
 		}
 		*heredoc_file = handle_heredoc(args[i + 1]);
 		if (!*heredoc_file)
@@ -133,6 +134,7 @@ char	**handle_redirection(char **args, char **final_input_file, char **final_out
 				{
 					unlink(*heredoc_file);
 					free(*heredoc_file);
+					*heredoc_file = NULL; // Ensure it's set to NULL after freeing
 				}
 				return (NULL);
 			}

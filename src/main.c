@@ -1,19 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/04 12:50:13 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   main.c                                             :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:09:59 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/05 08:46:04 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../src/includes/minishell.h"
 
 // Global flag definition
-volatile sig_atomic_t g_child_running = 0;
+// volatile sig_atomic_t g_child_running = 0;
+volatile sig_atomic_t g_signal_received = 0; // new global variable for signal handling
 int g_last_exit_status = 0;
 
 /**
@@ -44,10 +45,19 @@ int	main(int argc, char **argv, char **envp)
 
 	while (1)
 	{
-		g_child_running = 0;
+		//g_child_running = 0;
+		g_signal_received = 0; // Reset signal received flag for each new prompt
 		input = readline("\001\033[1;32m\002minishell>\001\033[0m\002 ");
-		if (input == NULL)
+		// After readline, check if it was interrupted by our handler.
+		if (g_signal_received == SIGINT)
 		{
+			ft_putstr_fd("\n", STDOUT_FILENO);
+			rl_on_new_line();
+			rl_replace_line("", 0);
+			rl_redisplay();
+		}
+		if (input == NULL)
+		{  // Ctrl+D was pressed
 			printf("exit\n");
 			break ;
 		}

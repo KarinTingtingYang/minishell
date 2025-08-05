@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   signal.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/21 12:41:05 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 11:48:11 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   signal.c                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/21 12:41:05 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/05 09:15:42 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void setup_signal_handlers(void) { //
     // rl_catch_signals = 0; // <--- This is the crucial line
 	// without setting the variable to 0, the '^C' is echoed in terminal
 	
-	rl_catch_signals = 0; // Disable readline's own signal handlers!
+	// rl_catch_signals = 0; // Disable readline's own signal handlers!
     // --- Configure SIGINT handler ---
     sa_int.sa_handler = handle_parent_sigint; // Set our custom handler
     sigemptyset(&sa_int.sa_mask);           // Clear the mask of signals to be blocked during handler execution
@@ -106,25 +106,27 @@ static int	get_exit_status(int status)
 }
 
 /**
- * @brief Waits for a child process to terminate and handles its exit status,
- * including signal-related messages like "Quit (core dumped)".
+ * @brief Waits for a child process to finish and handles its exit status.
  *
- * This function is called by the parent process after forking a child.
- * It manages the g_child_running flag and ensures waitpid is robust against EINTR.
+ * This function waits for the specified child process to terminate and
+ * prints a message if it was terminated by a signal. It also returns the
+ * exit status of the child process.
  *
  * @param pid The process ID of the child to wait for.
- * @return The exit status of the child process, or -1 if waitpid encounters an error.
- * Returns 128 + signal_number if terminated by a signal.
+ * @return The exit status of the child process.
  */
 int wait_for_child_and_handle_status(pid_t pid)
 {
     int status;
     pid_t wpid;
 
-    g_child_running = 1;
+    // g_child_running = 1;
     wpid = wait_for_child(pid, &status);
-    g_child_running = 0;
-
+    // g_child_running = 0;
+	
+	// The g_child_running flag is no longer needed here. The parent's
+    // main loop is blocked by waitpid, not readline, so the main
+    // loop's signal handling logic won't run anyway.
     if (wpid != -1 && WIFSIGNALED(status))
         print_signal_message(status);
     else if (wpid == -1)

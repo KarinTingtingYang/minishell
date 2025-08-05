@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/04 10:15:34 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/04 10:19:58 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/05 08:58:17 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,21 @@ static char *generate_unique_heredoc_file(int *out_fd)
 }
 
 /**
+ * @brief The event hook for heredoc. Readline calls this function periodically.
+ * @return 0 on success.
+ */
+static int	heredoc_event_hook(void)
+{
+    // If our signal handler has set the global variable...
+	if (g_signal_received == SIGINT)
+	{
+        // ...tell readline to stop waiting for input and return immediately.
+		rl_done = 1;
+	}
+	return (0);
+}
+
+/**
  * @brief Handles heredoc (<<) input by reading from stdin.
  *
  * Reads input from the user line by line until the specified delimiter
@@ -75,10 +90,35 @@ char *handle_heredoc(const char *delimiter)
 		perror("minishell: heredoc");
 		return (NULL);
 	}
+	 // Set the readline event hook. This function will be called
+    // periodically by readline while it waits for input.
+	rl_event_hook = heredoc_event_hook;
 	while (1)
 	{
 		line = readline("> ");
-		if (!line || ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
+		// After readline returns, check if it was due to our signal.
+		if (g_signal_received == SIGINT)
+		{
+			free(line);
+			close(fd);
+			unlink(tmp_filename);
+			free(tmp_filename);
+            rl_event_hook = NULL; // Unset the hook
+			return (NULL); // Abort the command
+		}
+		// if (!line || ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
+		// {
+		// 	free(line);
+		// 	break ;
+		// }
+		if (!line) // Ctrl+D pressed
+		{
+			ft_putstr_fd("minishell: warning: here-document delimited by end-of-file (wanted `", 2);
+            ft_putstr_fd((char *)delimiter, 2);
+            ft_putstr_fd("')\n", 2);
+			break ;
+		}
+		if (ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
 		{
 			free(line);
 			break ;
@@ -88,6 +128,7 @@ char *handle_heredoc(const char *delimiter)
 		free(line);
 	}
 	close(fd);
+	rl_event_hook = NULL; // Unset the hook before returning
 	return (tmp_filename);
 }
 
