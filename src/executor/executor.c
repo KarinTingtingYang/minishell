@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/04 13:00:21 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/05 09:10:15 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,10 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_l
 // 	free_execute_data(&data);
 // 	return (exit_status);
 // }
-static int execute_single_command(char *line, t_env_var *env_list)
+
+
+// static int execute_single_command(char *line, t_env_var *env_list)
+static int execute_single_command(char *line, t_env_var *env_list, t_process_data *process_data)
 {
     t_execute_data	data;
     int				prepare_status;
@@ -210,13 +213,17 @@ static int execute_single_command(char *line, t_env_var *env_list)
 		return (prepare_status);
 	}
 
-	expand_args(data.clean_args, env_list, g_last_exit_status);
+	// expand_args(data.clean_args, env_list, g_last_exit_status);
+	expand_args(data.clean_args, process_data->env_list, process_data->last_exit_status);
 
 	if (data.clean_args[0] && !is_builtin(data.clean_args[0]))
 	{
-		exit_status = execute_prepared_command(&data);
+		// exit_status = execute_prepared_command(&data);
+		exit_status = execute_prepared_command(&data, process_data);
+
 		// Update global exit status here after external command
-		g_last_exit_status = exit_status;
+		// g_last_exit_status = exit_status;
+		process_data->last_exit_status = exit_status;
 		free_execute_data(&data);
 		return exit_status;
 	}
@@ -236,8 +243,8 @@ static int execute_single_command(char *line, t_env_var *env_list)
 	close(original_stdout);
 
 	// Update global exit status after builtin command
-	g_last_exit_status = exit_status;
-
+	// g_last_exit_status = exit_status;
+	process_data->last_exit_status = exit_status;
 	free_execute_data(&data);
 
 	return exit_status;
@@ -298,10 +305,11 @@ static int prepare_and_run_pipeline(char *line,  t_env_var *env_list)
  *         - 0 on success,
  *         - non-zero value on failure or command error.
  */
-int execute_command(char *line, t_env_var *env_list)
+// int execute_command(char *line, t_env_var *env_list)
+int execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
 {
     if (ft_strchr(line, '|'))
         return prepare_and_run_pipeline(line, env_list);
     else
-        return execute_single_command(line, env_list);
+        return execute_single_command(line, env_list, process_data);
 }

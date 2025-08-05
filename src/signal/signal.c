@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/21 12:41:05 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/05 09:15:42 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/05 09:32:38 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void setup_signal_handlers(void) { //
     // rl_catch_signals = 0; // <--- This is the crucial line
 	// without setting the variable to 0, the '^C' is echoed in terminal
 	
-	// rl_catch_signals = 0; // Disable readline's own signal handlers!
+	rl_catch_signals = 0; // Disable readline's own signal handlers!
     // --- Configure SIGINT handler ---
     sa_int.sa_handler = handle_parent_sigint; // Set our custom handler
     sigemptyset(&sa_int.sa_mask);           // Clear the mask of signals to be blocked during handler execution

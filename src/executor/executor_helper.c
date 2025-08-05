@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor_helper.c                                  :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/04 12:00:15 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor_helper.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/05 08:58:40 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@
  *         - The child process's exit code on success.
  *         - -1 if `fork()` fails.
  */
-int execute_prepared_command(t_execute_data *data)
+// int execute_prepared_command(t_execute_data *data)
+int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
 {
 	pid_t pid;
 	int exit_code;
@@ -58,6 +59,7 @@ int execute_prepared_command(t_execute_data *data)
 	else
 	{
 		exit_code = wait_for_child_and_handle_status(pid);
+		process_data->last_exit_status = exit_code; // Update the last exit status in process_data
 		free_execute_data(data);
 		return (exit_code);
 	}
