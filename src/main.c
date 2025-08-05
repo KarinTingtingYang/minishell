@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/04 12:50:13 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/05 09:15:12 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 // Global flag definition
 volatile sig_atomic_t g_child_running = 0;
-int g_last_exit_status = 0;
+// int g_last_exit_status = 0;  // Global variable to store the last exit status
 
 /**
  * @brief  Main loop for the minishell program, handling user input and
@@ -32,6 +32,8 @@ int	main(int argc, char **argv, char **envp)
 {
 	char		*input;
 	t_env_var	*env_list;
+	t_process_data process_data;
+
 
 	(void)argc;
 	(void)argv;
@@ -39,7 +41,8 @@ int	main(int argc, char **argv, char **envp)
 	env_list = init_env(envp);
 	if (!env_list)
 		return (1);
-
+	process_data.env_list = env_list;
+	process_data.last_exit_status = 0;
 	setup_signal_handlers();
 
 	while (1)
@@ -53,7 +56,8 @@ int	main(int argc, char **argv, char **envp)
 		}
 		if (*input)
 			add_history(input);
-		if (execute_command(input, env_list) == -1)
+		// if (execute_command(input, env_list) == -1)
+		if (execute_command(input, env_list, &process_data) == -1)
 			ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
 		free(input);
 	}

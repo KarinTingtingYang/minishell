@@ -6,13 +6,13 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:49:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/04 12:49:42 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/05 08:33:15 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GLOBAL_H
-# define GLOBAL_H
+// #ifndef GLOBAL_H
+// # define GLOBAL_H
 
-extern int g_last_exit_status;
+// extern int g_last_exit_status;
 
-#endif
+// #endif
