@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/05 12:06:48 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/05 12:37:06 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ int	main(int argc, char **argv, char **envp)
 		// After readline, check if it was interrupted by our handler.
 		if (g_signal_received == SIGINT)
 		{
+			process_data.last_exit_status = 130; // Set exit status for SIGINT
 			rl_on_new_line();                 // Tell readline we are on a new line.
 			rl_replace_line("", 0);           // Clear readline's internal buffer.
 			free(input);                      // Free the empty string from the interrupted readline.

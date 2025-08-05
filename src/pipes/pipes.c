@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   pipes.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/05 09:14:46 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   pipes.c                                            :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/22 10:08:55 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/05 11:55:43 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,10 @@ static int wait_all_children(pid_t *pids, int index, int max, int last_status)
     else if (WIFSIGNALED(status))
     {
         if (index == max - 1)
-            last_status = 128 + WTERMSIG(status);
+        {
+			print_signal_message(status);
+			last_status = 128 + WTERMSIG(status);
+		}
     }
     return (wait_all_children(pids, index + 1, max, last_status));
 }
@@ -214,6 +217,7 @@ int run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs, t_en
     }
     close_free_pipes_recursively(data.pipes, 0, cmd_count - 1);
 	exit_status = wait_all_children(data.pids, 0, cmd_count, 0);
+	data.last_exit_status = exit_status;
     free(data.pids);
     return (exit_status);
 }
