@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/05 09:10:15 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/05 12:06:55 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -265,7 +265,7 @@ static int execute_single_command(char *line, t_env_var *env_list, t_process_dat
  *         - 0 on success,
  *         - non-zero value on error or failure during preparation or execution.
  */
-static int prepare_and_run_pipeline(char *line,  t_env_var *env_list)
+static int prepare_and_run_pipeline(char *line,  t_env_var *env_list, t_process_data *process_data)
 {
     char **parts;
 	t_command **cmds;
@@ -289,6 +289,7 @@ static int prepare_and_run_pipeline(char *line,  t_env_var *env_list)
     free_commands_recursive(cmds, 0, count);
     free(cmds);
     free_split(parts);
+	process_data->last_exit_status = status; // Update the last exit status in process_data
     return (status);
 }
 
@@ -309,7 +310,8 @@ static int prepare_and_run_pipeline(char *line,  t_env_var *env_list)
 int execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
 {
     if (ft_strchr(line, '|'))
-        return prepare_and_run_pipeline(line, env_list);
+        //return prepare_and_run_pipeline(line, env_list);
+		return prepare_and_run_pipeline(line, env_list, process_data);
     else
         return execute_single_command(line, env_list, process_data);
 }
