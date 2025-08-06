@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 08:42:09 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 10:17:15 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/06 13:40:56 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,7 @@ char **tokenize_input(char *line)
 		tokens = save_token(tokens, token, &count);
 	if (tokens)
 		tokens[count] = NULL;
+	// print_array(tokens); // DEBUG: Print tokens for verification
 	return tokens;
 }
 

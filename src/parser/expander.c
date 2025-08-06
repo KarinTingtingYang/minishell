@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 09:12:21 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/06 13:10:23 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -324,215 +324,164 @@ char *expand_variables(char *input, t_env_var *env_list, int last_exit_status, t
 }
 
 
+static int is_export_assignment(t_token *token)
+{
+	return (ft_strchr(token->value, '=') != NULL);
+}
 
 
-
-// void expand_args(char **args, t_env_var *env_list, int last_exit_status)
+// char **expand_and_split_args(t_token **tokens, t_env_var *env_list, int last_exit_status)
 // {
-//     int i = 0;
-//     char *expanded;
+//     char **final_args = NULL;
+//     int final_count = 0;
 
-//     while (args[i])
+//     for (int i = 0; tokens[i] != NULL; i++)
 //     {
-//         expanded = expand_variables(args[i], env_list, last_exit_status);
-//         free(args[i]);
-//         args[i] = expanded;
-//         i++;
-//     }
-// }
+//         char *expanded = expand_variables(tokens[i]->value, env_list, last_exit_status, tokens[i]->quote);
 
-// char **expand_and_split_args(char **args, t_env_var *env_list, int last_exit_status)
-// {
-//     char **tmp_result = NULL;
-//     int tmp_size = 0;
-//     int i = 0;
+//         char **split = NULL;
 
-//     while (args[i] != NULL)
-//     {
-//         char *expanded = expand_variables(args[i], env_list, last_exit_status);
-//         char **split = ft_split_whitespace(expanded);
-//         int j = 0;
-//         free(expanded);
-
-//         // Count how many tokens in split
-//         while (split[j] != NULL)
+//         if (tokens[i]->quote == SINGLE_QUOTE)
 //         {
-//             tmp_size++;
-//             j++;
-//         }
-//         // Reallocate tmp_result to hold new tokens
-//         char **new_tmp = malloc((tmp_size + 1) * sizeof(char *));
-//         if (!new_tmp)
-//         {
-//             // Free all allocated so far on error
-//             int k = 0;
-//             while (tmp_result && tmp_result[k] != NULL)
+//             // No splitting inside single quotes
+//             split = malloc(sizeof(char *) * 2);
+//             if (!split)
 //             {
-//                 free(tmp_result[k]);
-//                 k++;
+//                 free(expanded);
+//                 // free final_args before return NULL — left as exercise
+//                 return NULL;
 //             }
-//             free(tmp_result);
-//             free_split(split);
+//             split[0] = expanded;
+//             split[1] = NULL;
+//         }
+
+//         else if (tokens[i]->quote == DOUBLE_QUOTE)
+//         {
+//             // No splitting inside double quotes, allow expansion only
+//             split = malloc(sizeof(char *) * 2);
+//             if (!split)
+//             {
+//                 free(expanded);
+//                 return NULL;
+//             }
+//             split[0] = expanded;
+//             split[1] = NULL;
+//         }
+//         else
+//         {
+//             // No quotes: split on whitespace
+//             split = ft_split_whitespace(expanded);
+//             free(expanded);
+//         }
+
+//         // Count split tokens
+//         int split_count = 0;
+//         while (split && split[split_count] != NULL)
+//             split_count++;
+
+//         // Reallocate final_args to hold new tokens
+//         char **new_final = malloc(sizeof(char *) * (final_count + split_count + 1));
+//         if (!new_final)
+//         {
+//             // Free allocated memory (not shown for brevity)
 //             return NULL;
 //         }
-//         // Copy old tokens to new array
-//         int k = 0;
-//         while (tmp_result && tmp_result[k] != NULL)
-//         {
-//             new_tmp[k] = tmp_result[k];
-//             k++;
-//         }
-//         free(tmp_result);
-//         // Append new tokens from split
-//         j = 0;
-//         while (split[j] != NULL)
-//         {
-//             new_tmp[k + j] = split[j];
-//             j++;
-//         }
-//         new_tmp[k + j] = NULL;
-//         free(split); // free only the array pointer, strings now owned by new_tmp
-//         tmp_result = new_tmp;
-//         i++;
+//         // Copy old final args
+//         for (int j = 0; j < final_count; j++)
+//             new_final[j] = final_args[j];
+
+//         // Append new tokens
+//         for (int j = 0; j < split_count; j++)
+//             new_final[final_count + j] = split[j];
+
+//         new_final[final_count + split_count] = NULL;
+
+//         free(final_args);
+//         free(split); // only free array pointer, strings moved to new_final
+
+//         final_args = new_final;
+//         final_count += split_count;
 //     }
 
-//     return tmp_result;
+//     return final_args;
 // }
-
-// char **expand_and_split_args(char **args, t_env_var *env_list, int last_exit_status)
-// {
-//     char **tmp_result = NULL;
-//     int tmp_size = 0;
-//     int i = 0;
-
-//     while (args[i] != NULL)
-//     {
-//         char *expanded = expand_variables(args[i], env_list, last_exit_status);
-
-//         // Check if the original arg is quoted
-//         int quoted = (args[i][0] == '"' && args[i][ft_strlen(args[i]) - 1] == '"')
-//                   || (args[i][0] == '\'' && args[i][ft_strlen(args[i]) - 1] == '\'');
-
-//         char **split = quoted ? ft_split_single(expanded) : ft_split_whitespace(expanded);
-//         // `ft_split_single()` is a custom function that returns one-element array with `expanded` unchanged
-
-//         int j = 0;
-//         free(expanded);
-
-//         // Count tokens in split
-//         while (split[j] != NULL)
-//         {
-//             tmp_size++;
-//             j++;
-//         }
-
-//         char **new_tmp = malloc((tmp_size + 1) * sizeof(char *));
-//         if (!new_tmp)
-//         {
-//             int k = 0;
-//             while (tmp_result && tmp_result[k] != NULL)
-//                 free(tmp_result[k++]);
-//             free(tmp_result);
-//             free_split(split);
-//             return NULL;
-//         }
-
-//         int k = 0;
-//         while (tmp_result && tmp_result[k] != NULL)
-//         {
-//             new_tmp[k] = tmp_result[k];
-//             k++;
-//         }
-//         free(tmp_result);
-
-//         j = 0;
-//         while (split[j] != NULL)
-//         {
-//             new_tmp[k + j] = split[j];
-//             j++;
-//         }
-//         new_tmp[k + j] = NULL;
-//         free(split);
-//         tmp_result = new_tmp;
-//         i++;
-//     }
-
-//     return tmp_result;
-// }
-
 
 
 char **expand_and_split_args(t_token **tokens, t_env_var *env_list, int last_exit_status)
 {
-    char **final_args = NULL;
-    int final_count = 0;
+	char **final_args = NULL;
+	int final_count = 0;
 
-    for (int i = 0; tokens[i] != NULL; i++)
-    {
-        char *expanded = expand_variables(tokens[i]->value, env_list, last_exit_status, tokens[i]->quote);
+	for (int i = 0; tokens[i] != NULL; i++)
+	{
+		char *expanded = expand_variables(tokens[i]->value, env_list, last_exit_status, tokens[i]->quote);
 
-        char **split = NULL;
+		char **split = NULL;
 
-        if (tokens[i]->quote == SINGLE_QUOTE)
-        {
-            // No splitting inside single quotes
-            split = malloc(sizeof(char *) * 2);
-            if (!split)
-            {
-                free(expanded);
-                // free final_args before return NULL — left as exercise
-                return NULL;
-            }
-            split[0] = expanded;
-            split[1] = NULL;
-        }
-        else if (tokens[i]->quote == DOUBLE_QUOTE)
-        {
-            // No splitting inside double quotes, allow expansion only
-            split = malloc(sizeof(char *) * 2);
-            if (!split)
-            {
-                free(expanded);
-                return NULL;
-            }
-            split[0] = expanded;
-            split[1] = NULL;
-        }
-        else
-        {
-            // No quotes: split on whitespace
-            split = ft_split_whitespace(expanded);
-            free(expanded);
-        }
+		// ✅ NEW: Preserve export-style assignments like TEST="value"
+		if (is_export_assignment(tokens[i]) && tokens[i]->quote != NO_QUOTE)
+		{
+			split = malloc(sizeof(char *) * 2);
+			// if (!split)
+			// {
+			// 	free(expanded);
+			// 	// free final_args here before return (optional)
+			// 	return (NULL);
+			// }
+			split[0] = ft_strdup(tokens[i]->value);  // Use raw value, not expanded
+			split[1] = NULL;
+			free(expanded);
+		}
+		else if (tokens[i]->quote == SINGLE_QUOTE)
+		{
+			split = malloc(sizeof(char *) * 2);
+			if (!split)
+			{
+				free(expanded);
+				return NULL;
+			}
+			split[0] = expanded;
+			split[1] = NULL;
+		}
+		else if (tokens[i]->quote == DOUBLE_QUOTE)
+		{
+			split = malloc(sizeof(char *) * 2);
+			if (!split)
+			{
+				free(expanded);
+				return NULL;
+			}
+			split[0] = expanded;
+			split[1] = NULL;
+		}
+		else
+		{
+			split = ft_split_whitespace(expanded);
+			free(expanded);
+		}
 
-        // Count split tokens
-        int split_count = 0;
-        while (split && split[split_count] != NULL)
-            split_count++;
+		// Count and add split results into final_args
+		int split_count = 0;
+		while (split && split[split_count] != NULL)
+			split_count++;
 
-        // Reallocate final_args to hold new tokens
-        char **new_final = malloc(sizeof(char *) * (final_count + split_count + 1));
-        if (!new_final)
-        {
-            // Free allocated memory (not shown for brevity)
-            return NULL;
-        }
-        // Copy old final args
-        for (int j = 0; j < final_count; j++)
-            new_final[j] = final_args[j];
+		char **new_final = malloc(sizeof(char *) * (final_count + split_count + 1));
+		if (!new_final)
+			return NULL;
 
-        // Append new tokens
-        for (int j = 0; j < split_count; j++)
-            new_final[final_count + j] = split[j];
+		for (int j = 0; j < final_count; j++)
+			new_final[j] = final_args[j];
+		for (int j = 0; j < split_count; j++)
+			new_final[final_count + j] = split[j];
 
-        new_final[final_count + split_count] = NULL;
+		new_final[final_count + split_count] = NULL;
 
-        free(final_args);
-        free(split); // only free array pointer, strings moved to new_final
+		free(final_args);
+		free(split); // free pointer, not content
 
-        final_args = new_final;
-        final_count += split_count;
-    }
+		final_args = new_final;
+		final_count += split_count;
+	}
 
-    return final_args;
+	return final_args;
 }

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor.c                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/06 12:02:00 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/06 13:36:21 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -386,6 +386,7 @@ int	execute_command(char *line, t_env_var *env_list, t_process_data *process_dat
 			return (1);
 		// Expand + split
 		char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
+		print_array(args); // DEBUG
 		free_tokens(tokens);
 		if (!args || !args[0])
 		{

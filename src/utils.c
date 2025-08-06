@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/04 12:21:29 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/06 13:38:15 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,3 +51,35 @@ char *ft_strjoin_free(char *s1, char *s2)
     return (joined);
 }
 
+void print_array(char **array)
+{
+	int i = 0;
+	if (!array)
+	{
+		ft_putstr_fd("NULL\n", STDOUT_FILENO);
+		return;
+	}
+	while (array[i])
+	{
+		ft_putstr_fd(array[i], STDOUT_FILENO);
+		ft_putstr_fd("\n", STDOUT_FILENO);
+		i++;
+	}
+}
+
+void print_tokens(t_token **tokens)
+{
+	int i = 0;
+	if (!tokens)
+	{
+		ft_putstr_fd("NULL\n", STDOUT_FILENO);
+		return;
+	}
+	while (tokens[i])
+	{
+		ft_putstr_fd("Token: ", STDOUT_FILENO);
+		ft_putstr_fd(tokens[i]->value, STDOUT_FILENO);
+		ft_putstr_fd("\n", STDOUT_FILENO);
+		i++;
+	}
+}

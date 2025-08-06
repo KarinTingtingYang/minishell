@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 09:38:49 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/06 12:43:13 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,6 @@ volatile sig_atomic_t g_signal_received = 0; // new global variable for signal h
 // 	return (0);
 // }
 
-#include "../includes/minishell.h"
 
 int	main(int argc, char **argv, char **envp)
 {

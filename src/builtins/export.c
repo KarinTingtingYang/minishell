@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   export.c                                           :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/30 13:03:36 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/06 12:14:44 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/06 13:15:38 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,42 @@ static void	display_export(t_env_var *env_list)
  * @param env_list The environment list where the variable should be added.
  * @return 0 on success, 1 on error (invalid identifier).
  */
+// static int	export_variable(const char *arg, t_env_var *env_list)
+// {
+// 	char		*key;
+// 	char		*value;
+// 	char		*equal_sign;
+// 	t_env_var	*existing_var;
+
+// 	equal_sign = ft_strchr(arg, '=');
+// 	if (!equal_sign) // If there's no '=', we do nothing for now.
+// 		return (0);
+// 	key = ft_substr(arg, 0, equal_sign - arg);
+// 	printf("export_variable: key = %s\n", key); // DEBUG: Print the key being exported
+// 	if (!is_valid_identifier(key))
+// 	{
+// 		ft_putstr_fd("minishell: export: `", STDERR_FILENO);
+// 		ft_putstr_fd(arg, STDERR_FILENO);
+// 		ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
+// 		free(key);
+// 		return (1); // Return error
+// 	}
+// 	value = ft_strdup(equal_sign + 1);
+// 	printf("export_variable: value = %s\n", value); // DEBUG: Print the value being exported
+// 	existing_var = find_env_var(key, env_list);
+// 	if (existing_var)
+// 	{
+// 		free(existing_var->value); // Free the old value
+// 		existing_var->value = value; // Assign the new one
+// 	}
+// 	else
+// 	{
+// 		add_env_var(key, value, env_list);
+// 	}
+// 	free(key);
+// 	return (0);
+// }
+
 static int	export_variable(const char *arg, t_env_var *env_list)
 {
 	char		*key;
@@ -157,8 +193,11 @@ static int	export_variable(const char *arg, t_env_var *env_list)
 	equal_sign = ft_strchr(arg, '=');
 	if (!equal_sign) // If there's no '=', we do nothing for now.
 		return (0);
+
+	// Extract key before '='
 	key = ft_substr(arg, 0, equal_sign - arg);
-	printf("export_variable: key = %s\n", key); // DEBUG: Print the key being exported
+	printf("export_variable: key = %s\n", key); // DEBUG
+
 	if (!is_valid_identifier(key))
 	{
 		ft_putstr_fd("minishell: export: `", STDERR_FILENO);
@@ -167,21 +206,36 @@ static int	export_variable(const char *arg, t_env_var *env_list)
 		free(key);
 		return (1); // Return error
 	}
+
+	// Duplicate value part (after '=')
 	value = ft_strdup(equal_sign + 1);
-	printf("export_variable: value = %s\n", value); // DEBUG: Print the value being exported
+
+	// ✅ Strip surrounding quotes if both first and last chars are matching quotes
+	if (value && ((value[0] == '"' || value[0] == '\'') && value[ft_strlen(value) - 1] == value[0]))
+	{
+		char *unquoted = ft_substr(value, 1, ft_strlen(value) - 2);
+		free(value);
+		value = unquoted;
+	}
+
+	printf("export_variable: value = %s\n", value); // DEBUG
+
+	// Replace or add variable
 	existing_var = find_env_var(key, env_list);
 	if (existing_var)
 	{
-		free(existing_var->value); // Free the old value
-		existing_var->value = value; // Assign the new one
+		free(existing_var->value); // Free old value
+		existing_var->value = value;
 	}
 	else
 	{
 		add_env_var(key, value, env_list);
 	}
+
 	free(key);
 	return (0);
 }
+
 
 int	run_export(t_env_var *env_list, char **args)
 {
