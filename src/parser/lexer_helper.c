@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 10:44:35 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 11:46:33 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/06 09:12:40 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,4 +118,17 @@ char **append_str(char **arr, char *line, int start, int end, int *count)
     (*count)++;
     new_arr[*count] = NULL;
     return (new_arr);
+}
+
+
+void free_tokens(t_token **tokens)
+{
+    if (!tokens)
+        return;
+    for (int i = 0; tokens[i]; i++)
+    {
+        free(tokens[i]->value);
+        free(tokens[i]);
+    }
+    free(tokens);
 }

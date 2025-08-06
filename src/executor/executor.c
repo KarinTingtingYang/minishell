@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/05 12:36:07 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/06 10:28:35 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,48 +196,94 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_l
 
 
 // static int execute_single_command(char *line, t_env_var *env_list)
-static int execute_single_command(char *line, t_env_var *env_list, t_process_data *process_data)
+// static int execute_single_command(char *line, t_env_var *env_list, t_process_data *process_data)
+// {
+//     t_execute_data	data;
+//     int				prepare_status;
+// 	int				original_stdin;
+// 	int				original_stdout;
+// 	int				exit_status;
+
+// 	ft_bzero(&data, sizeof(t_execute_data));
+
+// 	prepare_status = prepare_command_execution(line, env_list, &data);
+// 	if (prepare_status != 1)
+// 	{
+// 		free_execute_data(&data);
+// 		return (prepare_status);
+// 	}
+
+// 	char **expanded_args;
+// 	// expand_args(data.clean_args, env_list, g_last_exit_status);
+// 	// expand_args(data.clean_args, process_data->env_list, process_data->last_exit_status);
+// 	expanded_args = expand_and_split_args(data.clean_args, process_data->env_list, process_data->last_exit_status);
+// 	if (!expanded_args)
+// 	{
+// 		free_execute_data(&data);
+// 		return (1);
+// 	}
+
+// 	free_split(data.clean_args);
+// 	data.clean_args = expanded_args;
+
+// 	if (data.clean_args[0] && !is_builtin(data.clean_args[0]))
+// 	{
+// 		// exit_status = execute_prepared_command(&data);
+// 		exit_status = execute_prepared_command(&data, process_data);
+
+// 		// Update global exit status here after external command
+// 		// g_last_exit_status = exit_status;
+// 		process_data->last_exit_status = exit_status;
+// 		free_execute_data(&data);
+// 		return exit_status;
+// 	}
+
+// 	original_stdin = dup(STDIN_FILENO);
+// 	original_stdout = dup(STDOUT_FILENO);
+
+// 	if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
+// 		exit_status = 1;
+// 	else
+// 		exit_status = run_builtin(data.clean_args, env_list);
+
+// 	// Restore STDIN and STDOUT
+// 	dup2(original_stdin, STDIN_FILENO);
+// 	dup2(original_stdout, STDOUT_FILENO);
+// 	close(original_stdin);
+// 	close(original_stdout);
+
+// 	// Update global exit status after builtin command
+// 	// g_last_exit_status = exit_status;
+// 	process_data->last_exit_status = exit_status;
+// 	free_execute_data(&data);
+
+// 	return exit_status;
+// }
+
+
+static int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data)
 {
-    t_execute_data	data;
-    int				prepare_status;
+	t_execute_data	data;
 	int				original_stdin;
 	int				original_stdout;
 	int				exit_status;
 
 	ft_bzero(&data, sizeof(t_execute_data));
 
-	prepare_status = prepare_command_execution(line, env_list, &data);
-	if (prepare_status != 1)
-	{
-		free_execute_data(&data);
-		return (prepare_status);
-	}
-
-	char **expanded_args;
-	// expand_args(data.clean_args, env_list, g_last_exit_status);
-	// expand_args(data.clean_args, process_data->env_list, process_data->last_exit_status);
-	expanded_args = expand_and_split_args(data.clean_args, process_data->env_list, process_data->last_exit_status);
-	if (!expanded_args)
-	{
-		free_execute_data(&data);
+	// Use ft_split_dup to duplicate args
+	data.clean_args = ft_split_dup(args);
+	if (!data.clean_args)
 		return (1);
-	}
-
-	free_split(data.clean_args);
-	data.clean_args = expanded_args;
 
 	if (data.clean_args[0] && !is_builtin(data.clean_args[0]))
 	{
-		// exit_status = execute_prepared_command(&data);
 		exit_status = execute_prepared_command(&data, process_data);
-
-		// Update global exit status here after external command
-		// g_last_exit_status = exit_status;
 		process_data->last_exit_status = exit_status;
 		free_execute_data(&data);
-		return exit_status;
+		return (exit_status);
 	}
 
+	// Save STDIN and STDOUT (if you implement redirection manually, do that here)
 	original_stdin = dup(STDIN_FILENO);
 	original_stdout = dup(STDOUT_FILENO);
 
@@ -252,13 +298,11 @@ static int execute_single_command(char *line, t_env_var *env_list, t_process_dat
 	close(original_stdin);
 	close(original_stdout);
 
-	// Update global exit status after builtin command
-	// g_last_exit_status = exit_status;
 	process_data->last_exit_status = exit_status;
 	free_execute_data(&data);
-
-	return exit_status;
+	return (exit_status);
 }
+
 
 
 /**
@@ -317,11 +361,39 @@ static int prepare_and_run_pipeline(char *line,  t_env_var *env_list, t_process_
  *         - non-zero value on failure or command error.
  */
 // int execute_command(char *line, t_env_var *env_list)
-int execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
+// int execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
+// {
+//     if (ft_strchr(line, '|'))
+//         //return prepare_and_run_pipeline(line, env_list);
+// 		return prepare_and_run_pipeline(line, env_list, process_data);
+//     else
+//         return execute_single_command(line, env_list, process_data);
+// }
+
+
+int	execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
 {
-    if (ft_strchr(line, '|'))
-        //return prepare_and_run_pipeline(line, env_list);
+	if (ft_strchr(line, '|'))
+	{
 		return prepare_and_run_pipeline(line, env_list, process_data);
-    else
-        return execute_single_command(line, env_list, process_data);
+	}
+	else
+	{
+		// Tokenize line
+		t_token **tokens = parse_line(line);
+		if (!tokens)
+			return (1);
+		// Expand + split
+		char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
+		free_tokens(tokens);
+		if (!args || !args[0])
+		{
+			free_split(args);
+			return (0);
+		}
+		// Execute
+		int result = execute_single_command(args, env_list, process_data);
+		free_split(args);
+		return result;
+	}
 }

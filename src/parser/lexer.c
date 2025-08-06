@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 08:42:09 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 08:33:28 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/06 10:17:15 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,52 @@
  * @param line The input command line string to tokenize.
  * @return A NULL-terminated array of tokens, or NULL on error.
  */
+// char **tokenize_input(char *line)
+// {
+// 	int		i = 0;
+// 	char	*token = NULL;
+// 	char	**tokens = NULL;
+// 	int		count = 0;
+// 	char	quote = 0;
+
+// 	while (line[i])
+// 	{
+// 		// if (!quote && (line[i] == '\'' || line[i] == '\"'))
+// 		// 	quote = line[i]; // entering quote
+// 		// else if (quote && line[i] == quote)
+// 		// 	quote = 0; // exiting quote
+			
+// 		if (!quote && (line[i] == '\'' || line[i] == '\"'))
+// 		{
+// 			quote = line[i];
+// 			token = append_char(token, line[i]);  // Preserve opening quote
+// 		}
+// 		else if (quote && line[i] == quote)
+// 		{
+// 			quote = 0;
+// 			token = append_char(token, line[i]);  // Preserve closing quote
+// 		}
+// 		else if (!quote && line[i] == ' ')
+// 		{
+// 			if (token)
+// 			{
+// 				tokens = save_token(tokens, token, &count);
+// 				token = NULL;
+// 			}
+// 		}
+// 		else
+// 			token = append_char(token, line[i]);
+// 		i++;
+// 	}
+// 	if (quote)
+// 		return print_error("unclosed quote");
+// 	if (token)
+// 		tokens = save_token(tokens, token, &count);
+// 	if (tokens)
+// 		tokens[count] = NULL;
+// 	return tokens;
+// }
+
 char **tokenize_input(char *line)
 {
 	int		i = 0;
@@ -31,20 +77,17 @@ char **tokenize_input(char *line)
 
 	while (line[i])
 	{
-		// if (!quote && (line[i] == '\'' || line[i] == '\"'))
-		// 	quote = line[i]; // entering quote
-		// else if (quote && line[i] == quote)
-		// 	quote = 0; // exiting quote
-			
 		if (!quote && (line[i] == '\'' || line[i] == '\"'))
 		{
-			quote = line[i];
-			token = append_char(token, line[i]);  // Preserve opening quote
+			quote = line[i];  // Enter quote mode
+			i++;              // Skip the quote itself (do not add to token)
+			continue;
 		}
 		else if (quote && line[i] == quote)
 		{
-			quote = 0;
-			token = append_char(token, line[i]);  // Preserve closing quote
+			quote = 0;        // Exit quote mode
+			i++;              // Skip the quote itself (do not add to token)
+			continue;
 		}
 		else if (!quote && line[i] == ' ')
 		{
@@ -53,9 +96,13 @@ char **tokenize_input(char *line)
 				tokens = save_token(tokens, token, &count);
 				token = NULL;
 			}
+			i++;  // skip space
+			continue;
 		}
 		else
+		{
 			token = append_char(token, line[i]);
+		}
 		i++;
 	}
 	if (quote)
@@ -66,6 +113,7 @@ char **tokenize_input(char *line)
 		tokens[count] = NULL;
 	return tokens;
 }
+
 
 /**
  * @brief Splits the input line by pipe characters into command parts.

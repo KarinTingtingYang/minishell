@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   minishell.h                                        :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:10:15 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/05 08:42:36 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/06 09:04:44 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@
 
 #include "./libft.h"
 #include "./pipes.h"
-#include "./parse.h"
+#include "./parser.h"
 #include "./executor.h"
 #include "./builtins.h"
 #include "./redirection.h"

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor_helper.c                                  :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/05 12:11:02 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor_helper.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/06 10:30:27 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,7 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
 				free_split(path_dirs);
 				return (0);
 			}
+			
             cmds[index] = create_command(tokens, path_dirs);
             free_split(tokens);
 
@@ -252,4 +253,42 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, t_e
         return (NULL);
     }
     return (cmds);
+}
+
+
+
+char **ft_split_dup(char **args)
+{
+	int		count = 0;
+	char	**dup;
+	int		i;
+
+	if (!args)
+		return (NULL);
+
+	// Count number of strings
+	while (args[count])
+		count++;
+
+	// Allocate memory for the new array
+	dup = malloc((count + 1) * sizeof(char *));
+	if (!dup)
+		return (NULL);
+
+	i = 0;
+	while (i < count)
+	{
+		dup[i] = ft_strdup(args[i]);
+		if (!dup[i])
+		{
+			// Free already duplicated strings on failure
+			while (--i >= 0)
+				free(dup[i]);
+			free(dup);
+			return (NULL);
+		}
+		i++;
+	}
+	dup[count] = NULL;
+	return (dup);
 }

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/05 09:11:01 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/06 09:46:41 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,12 @@ char		**find_path_dirs(t_env_var *env_list);
 int			count_command_parts(char **parts);
 void		free_execute_data(t_execute_data *data);
 // int execute_command(char *line, t_env_var *env_list);
+
+
 int execute_command(char *line, t_env_var *env_list, t_process_data *process_data);
+// int execute_command(char **args, t_env_var *env_list, t_process_data *process_data);
+
+
 // int			execute_prepared_command(t_execute_data *data);
 int execute_prepared_command(t_execute_data *data, t_process_data *process_data);
 char		*find_full_cmd_path(char *cmd, char **path_dirs);
@@ -44,5 +49,6 @@ void		execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_
 void		free_commands_recursive(t_command **cmds, int index, int count);
 int			prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *data);
 t_command	**prepare_pipeline_commands(char *line, int *count, char ***parts, t_env_var *env_list);
+char **ft_split_dup(char **args);
 
 #endif
