@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 13:38:15 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   utils.c                                            :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:02:37 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/06 14:29:35 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,7 @@ void print_array(char **array)
 	}
 	while (array[i])
 	{
-		ft_putstr_fd(array[i], STDOUT_FILENO);
-		ft_putstr_fd("\n", STDOUT_FILENO);
+		printf("Array[%d]: %s\n", i, array[i]);
 		i++;
 	}
 }
@@ -77,9 +76,7 @@ void print_tokens(t_token **tokens)
 	}
 	while (tokens[i])
 	{
-		ft_putstr_fd("Token: ", STDOUT_FILENO);
-		ft_putstr_fd(tokens[i]->value, STDOUT_FILENO);
-		ft_putstr_fd("\n", STDOUT_FILENO);
+		printf("Token %d: value='%s', quote=%d\n", i, tokens[i]->value, tokens[i]->quote);
 		i++;
 	}
 }

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 13:41:37 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   parser.c                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/21 11:05:27 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/06 14:51:27 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,7 +249,11 @@
 // Skip whitespaces
 static void skip_spaces(const char **s)
 {
-    while (**s == ' ' || **s == '\t')
+    // while (**s == ' ' || **s == '\t')
+    //     (*s)++;
+
+	// DEBUG EXPORT
+	while (**s && (**s == ' ' || **s == '\t'))
         (*s)++;
 }
 
@@ -294,10 +298,11 @@ static char *substr_dup(const char *start, size_t len)
 //     return count;
 // }
 
-
+// EXPORT DEBUG
 static int count_tokens(const char *s)
 {
     int count = 0;
+	char quote = 0; // initialize quote type, track if we are inside quotes
 
     while (*s)
     {
@@ -309,100 +314,139 @@ static int count_tokens(const char *s)
         count++;
 
         // Move until space or end of token
-        while (*s && *s != ' ' && *s != '\t')
-        {
-            if (*s == '\'' || *s == '"')
-            {
-                char quote = *s++;
-                while (*s && *s != quote)
-                    s++;
-                if (*s == quote)
-                    s++;
-            }
-            else if (*s == '=')
-            {
-                s++;
-                // If next char is quote, consume quoted string as part of token
-                if (*s == '\'' || *s == '"')
-                {
-                    char quote = *s++;
-                    while (*s && *s != quote)
-                        s++;
-                    if (*s == quote)
-                        s++;
-                }
-            }
-            else
-                s++;
-        }
+        while (*s && ((*s != ' ' && *s != '\t') || quote))
+		{
+			// if (*s == '\'' || *s == '"')
+			// {
+				// If we encounter a quote, toggle the quote type
+				if (quote == 0 && (*s == '\'' || *s == '"'))
+					quote = *s; // Start of quoted token
+				else if (*s == quote)
+					quote = 0; // End of quoted token
+			//}
+			s++;
+		}
+        // {
+        //     if (*s == '\'' || *s == '"')
+        //     {
+        //         char quote = *s++;
+        //         while (*s && *s != quote)
+        //             s++;
+        //         if (*s == quote)
+        //             s++;
+        //     }
+        //     else if (*s == '=')
+        //     {
+        //         s++;
+        //         // If next char is quote, consume quoted string as part of token
+        //         if (*s == '\'' || *s == '"')
+        //         {
+        //             char quote = *s++;
+        //             while (*s && *s != quote)
+        //                 s++;
+        //             if (*s == quote)
+        //                 s++;
+        //         }
+        //     }
+        //     else
+        //         s++;
+        // }
     }
-	printf("%d\n", count); // DEBUG
+	printf("Token count: %d\n", count); // DEBUG
     return count;
 }
 
 
-static t_token *create_token(const char *start, size_t len, t_quote_type quote)
+// static t_token *create_token(const char *start, size_t len, t_quote_type quote)
+// {
+//     t_token *token = malloc(sizeof(t_token));
+//     if (!token)
+//         return NULL;
+//     token->value = substr_dup(start, len);
+//     if (!token->value)
+//     {
+//         free(token);
+//         return NULL;
+//     }
+//     token->quote = quote;
+//     return token;
+// }
+
+// EXPORT DEBUG
+static t_token *create_token(char *value, t_quote_type quote_type)
 {
     t_token *token = malloc(sizeof(t_token));
     if (!token)
         return NULL;
-    token->value = substr_dup(start, len);
-    if (!token->value)
-    {
-        free(token);
-        return NULL;
-    }
-    token->quote = quote;
+    token->value = value;
+    token->quote = quote_type;
     return token;
 }
 
 // Main parser function
 t_token **parse_line(char *line)
 {
-    if (!line || *line == '\0')
-        return NULL;
+	if (!line || *line == '\0')
+		return NULL;
 
-    int argc = count_tokens(line);
-    t_token **tokens = malloc(sizeof(t_token *) * (argc + 1));
-    if (!tokens)
-        return NULL;
+    //int argc = count_tokens(line);
+	int token_count = count_tokens(line); // EXPORT DEBUG: better naming
+	t_token **tokens = malloc(sizeof(t_token *) * (token_count + 1));
+	if (!tokens)
+		return NULL;
 
     const char *s = line;
     int i = 0;
-    while (*s && i < argc)
+	char *current_token_val; // EXPORT DEBUG: Store current token value
+    char quote_char; // EXPORT DEBUG: Track quote type
+
+    while (*s && i < token_count)
     {
         skip_spaces(&s);
         if (*s == '\0')
             break;
 
-        if (*s == '\'')
+		const char *start = s;
+        quote_char = 0;
+        while (*s && ((*s != ' ' && *s != '\t') || quote_char))
         {
-            const char *start = ++s;
-            while (*s && *s != '\'')
-                s++;
-            size_t len = s - start;
-            tokens[i++] = create_token(start, len, SINGLE_QUOTE);
-            if (*s == '\'')
-                s++;
+            if (*s == quote_char)
+                quote_char = 0; // Exiting quote
+            else if (!quote_char && (*s == '\'' || *s == '"'))
+                quote_char = *s; // Entering quote
+            s++;
         }
-        else if (*s == '"')
-        {
-            const char *start = ++s;
-            while (*s && *s != '"')
-                s++;
-            size_t len = s - start;
-            tokens[i++] = create_token(start, len, DOUBLE_QUOTE);
-            if (*s == '"')
-                s++;
-        }
-        else
-        {
-            const char *start = s;
-            while (*s && *s != ' ' && *s != '\t' && *s != '\'' && *s != '"')
-                s++;
-            size_t len = s - start;
-            tokens[i++] = create_token(start, len, NO_QUOTE);
-        }
+        current_token_val = substr_dup(start, s - start);
+        tokens[i++] = create_token(current_token_val, NO_QUOTE); // Quote type handled later
+
+        // if (*s == '\'')
+        // {
+        //     const char *start = ++s;
+        //     while (*s && *s != '\'')
+        //         s++;
+        //     size_t len = s - start;
+        //     tokens[i++] = create_token(start, len, SINGLE_QUOTE);
+        //     if (*s == '\'')
+        //         s++;
+        // }
+        // else if (*s == '"')
+        // {
+        //     const char *start = ++s;
+        //     while (*s && *s != '"')
+        //         s++;
+        //     size_t len = s - start;
+        //     tokens[i++] = create_token(start, len, DOUBLE_QUOTE);
+        //     if (*s == '"')
+        //         s++;
+        // }
+        // else
+        // {
+        //     const char *start = s;
+        //     while (*s && *s != ' ' && *s != '\t' && *s != '\'' && *s != '"')
+        //         s++;
+        //     size_t len = s - start;
+        //     tokens[i++] = create_token(start, len, NO_QUOTE);
+        // }
     }
     tokens[i] = NULL;
 	print_tokens(tokens); // DEBUG: Print tokens for verification

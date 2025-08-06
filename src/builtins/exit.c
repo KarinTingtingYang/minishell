@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exit.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 13:12:47 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/04 10:31:43 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   exit.c                                             :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/28 13:12:47 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/06 14:12:37 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,32 +64,31 @@ static int	ft_str_to_llong(const char *str, long long *out_val)
  * It prints a message indicating the exit status and terminates the program.
  * @param status The exit status to return to the operating system.
  */
-int builtin_exit(char **args)
+int run_exit(char **args)
 {
 	long long exit_code;
 
 	ft_putstr_fd("exit\n", STDOUT_FILENO);
 	if (args[1] == NULL) // Case 1: Just "exit"
 		exit(0); // default: Exit with status 0 if no argument is provided
-	else if (args[2] != NULL) // Case 2: "exit" with too many arguments
+	else // Case 2: exit with argument(s)
 	{
-		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
-		return 1; // Return 1 to indicate an error, do not exit
-	}
-	else // Case 3: "exit" with one argument
-	{
-		// Attempt to convert the argument to a long long
-		// If conversion fails or the argument is not a valid number, print an error
-		// and exit with status 255.
+		// try to convert the first argument to a number
 		if (ft_str_to_llong(args[1], &exit_code) == 0)
 		{
 			ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 			ft_putstr_fd(args[1], STDERR_FILENO);
 			ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
-			exit(255); // Standard failure code for this error // NEED TO DOUBLE CHECK!!!!
+			exit(2); // Standard failure code for this error 
 		}
-		// If the conversion is successful, exit with the specified code
-		exit((unsigned char)exit_code); 
+		// If the conversion is successful, check if there are more arguments
+		if (args[2] != NULL) // Case 2.1: "exit" with too many arguments
+		{
+			ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
+			return 1; // Return 1 to indicate an error, do not exit
+		}
+		else // Case 2.2: "exit" with one argument that is a valid number
+			exit((unsigned char)exit_code); 
 	}
 	return 0; // This line is never reached, but added for completeness
 }

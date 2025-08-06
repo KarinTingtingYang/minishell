@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/30 11:42:52 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/04 10:49:28 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/06 14:12:07 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ char *get_env_value(t_env_var *env_list, char *key)
  * and prints each key-value pair in the format "KEY=VALUE".
  * @param env_list The head of the environment linked list.
  */
-void builtin_env(t_env_var *env_list)
+void run_env(t_env_var *env_list)
 {
     while (env_list != NULL)
     {

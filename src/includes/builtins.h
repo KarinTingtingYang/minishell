@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   builtins.h                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 09:01:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/04 09:13:58 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   builtins.h                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/28 09:01:24 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/06 14:13:30 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,12 @@ int		run_builtin(char **args, t_env_var *env_list);
 // TO DO: THE RETURN VALUES OF BUILTINS ARE NOT CONSISTENT 
 // (CD AND PWD RETURN 0 ON SUCCESS, ECHO BUILTIN RETURNS NOTHING)
 
-int	builtin_pwd(void);
-int	builtin_cd(char **args);
+int		run_pwd(void);
+int		run_cd(char **args, t_env_var *env_list);
 void	run_echo(char **args);
-int		builtin_exit(char **args);
-void builtin_env(t_env_var *env_list);
-int run_export(t_env_var *env_list, char **args);
+int		run_exit(char **args);
+void 	run_env(t_env_var *env_list);
+int 	run_export(t_env_var *env_list, char **args);
 
 int			is_valid_identifier(const char *str);
 int         run_export(t_env_var *env_list, char **args);

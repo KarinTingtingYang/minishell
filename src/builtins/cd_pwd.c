@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   cd_pwd.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 10:45:26 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/04 10:15:45 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   cd_pwd.c                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/28 10:45:26 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/06 14:11:47 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,28 +20,45 @@
  * @param args The arguments array. Should contain the target directory as args[1].
  * @return Returns 0 on success, 1 on failure.
  */
-int	builtin_cd(char **args)
+int	run_cd(char **args, t_env_var *env_list)
 {
+	char	*path;
+	t_env_var	*home_var;
+
+	// Case 1: If no path is provided, it changes to the home directory.
 	if (args[1] == NULL)
 	{
-		ft_putstr_fd("minishell: cd: missing argument\n", STDERR_FILENO);
-		return (1);
+		//ft_putstr_fd("minishell: cd: missing argument\n", STDERR_FILENO);
+		
+		home_var = find_env_var("HOME", env_list);
+		if (home_var == NULL || home_var->value == NULL || *(home_var->value) == '\0')
+		{
+			ft_putstr_fd("minishell: cd: HOME not set\n", STDERR_FILENO);
+			return (1);
+		}
+		path = home_var->value;
+		
 	}
-	if (chdir(args[1]) != 0)
+	// Case 2: 'cd' with an argument (e.g., "cd /tmp")
+	else
+	{
+		path = args[1];
+	}
+	// Execute the change of directory
+	if (chdir(path) != 0)
 	{
 		ft_putstr_fd("minishell: cd: ", STDERR_FILENO);
-		perror(args[1]);
+		perror(path);
 		return (1);
 	}
 	return (0);
 }
-
 /**
  * @brief Implements the 'pwd' built-in command.
  * Prints the current working directory.
  * @return Returns 0 on success, 1 on failure.
  */
-int	builtin_pwd(void)
+int	run_pwd(void)
 {
 	char	cwd[1024];
 
