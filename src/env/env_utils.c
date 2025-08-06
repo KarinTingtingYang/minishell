@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   env_utils.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/31 11:47:23 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/04 09:56:56 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   env_utils.c                                        :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/31 11:47:23 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/06 12:15:44 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,9 @@ void	add_env_var(const char *key, const char *value, t_env_var *env_list)
 	if (!new_var)
 		error_exit("malloc");
 	new_var->key = ft_strdup(key);
+	printf("add_env_var: key = %s\n", new_var->key); // DEBUG: Print the key being added
 	new_var->value = ft_strdup(value);
+	printf("add_env_var: value = %s\n", new_var->value); // DEBUG: Print the value being added
 	new_var->next = NULL;
 	if (!new_var->key || !new_var->value)
 		error_exit("malloc");

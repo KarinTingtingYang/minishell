@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   export.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 10:13:45 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   export.c                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/30 13:03:36 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/06 12:14:44 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,6 +158,7 @@ static int	export_variable(const char *arg, t_env_var *env_list)
 	if (!equal_sign) // If there's no '=', we do nothing for now.
 		return (0);
 	key = ft_substr(arg, 0, equal_sign - arg);
+	printf("export_variable: key = %s\n", key); // DEBUG: Print the key being exported
 	if (!is_valid_identifier(key))
 	{
 		ft_putstr_fd("minishell: export: `", STDERR_FILENO);
@@ -167,6 +168,7 @@ static int	export_variable(const char *arg, t_env_var *env_list)
 		return (1); // Return error
 	}
 	value = ft_strdup(equal_sign + 1);
+	printf("export_variable: value = %s\n", value); // DEBUG: Print the value being exported
 	existing_var = find_env_var(key, env_list);
 	if (existing_var)
 	{

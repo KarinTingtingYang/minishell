@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 10:28:35 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/06 12:02:00 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -274,9 +274,10 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
 	data.clean_args = ft_split_dup(args);
 	if (!data.clean_args)
 		return (1);
-
 	if (data.clean_args[0] && !is_builtin(data.clean_args[0]))
 	{
+		// BUG FIX: NEED TO POPULATE CMD PATH BEFORE PROCEEDING TO EXECUTION
+		data.cmd_path = find_full_cmd_path(data.clean_args[0], find_path_dirs(env_list));
 		exit_status = execute_prepared_command(&data, process_data);
 		process_data->last_exit_status = exit_status;
 		free_execute_data(&data);
