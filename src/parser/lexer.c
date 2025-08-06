@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 08:42:09 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 11:46:18 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/06 08:33:28 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,21 @@ char **tokenize_input(char *line)
 
 	while (line[i])
 	{
+		// if (!quote && (line[i] == '\'' || line[i] == '\"'))
+		// 	quote = line[i]; // entering quote
+		// else if (quote && line[i] == quote)
+		// 	quote = 0; // exiting quote
+			
 		if (!quote && (line[i] == '\'' || line[i] == '\"'))
-			quote = line[i]; // entering quote
+		{
+			quote = line[i];
+			token = append_char(token, line[i]);  // Preserve opening quote
+		}
 		else if (quote && line[i] == quote)
-			quote = 0; // exiting quote
+		{
+			quote = 0;
+			token = append_char(token, line[i]);  // Preserve closing quote
+		}
 		else if (!quote && line[i] == ' ')
 		{
 			if (token)
@@ -96,3 +107,4 @@ char **split_line_by_pipe(char *line)
 
     return parts;
 }
+
