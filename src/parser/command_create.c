@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   command_create.c                                   :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/26 10:49:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/04 10:25:04 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   command_create.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/07 13:23:39 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ static int parse_args_and_redirection(t_command *cmd, char **tokens)
 	
 	if (tokens == NULL || tokens[0] == NULL) // no command to execute
         return (-1);
-    original_args = duplicate_split(tokens); // DEBUG: duplicate_split() should handle splitting by spaces
+    original_args = duplicate_split(tokens);
     if (original_args == NULL)
         return (-1);
     cmd->args = handle_redirection(original_args, &cmd->input_file, 
@@ -120,25 +120,21 @@ static t_command *create_empty_command(void)
 	cmd->cmd_path = NULL;
 	cmd->input_file = NULL;
 	cmd->output_file = NULL;
-	cmd->output_mode = 0; // Initialize output_mode to 0 (no redirection)
-	cmd->heredoc_file = NULL; // Initialize heredoc file to NULL
+	cmd->output_mode = 0;
+	cmd->heredoc_file = NULL;
 	return (cmd);
 }
 
 /**
- * @brief Creates and initializes a command structure from a command line string.
+ * @brief Creates a t_command structure from an array of tokens.
  * 
- * This function initializes a new t_command structure, parses the command line
- * to separate arguments and handle input/output redirection, and resolves the
- * command's executable path using the provided list of path directories.
- * If parsing fails or the command path cannot be resolved, it frees allocated
- * resources and returns NULL.
- * If the command line contains only redirections without an executable command,
- * it returns the command structure with redirection fields set.
- * @param tokens     The input command line string to parse.
- * @param path_dirs  An array of directory strings representing the system PATH.
- * @return A pointer to a fully initialized t_command structure on success,
- *         or NULL on failure.
+ * This function initializes a new t_command structure, parses the tokens
+ * to extract command arguments and redirection information, and resolves
+ * the command path using the provided PATH directories.
+ * If any step fails, it cleans up and returns NULL.
+ * @param tokens    Array of strings representing the command and its arguments.
+ * @param path_dirs NULL-terminated array of directories from the PATH environment variable.
+ * @return A pointer to the newly created t_command structure, or NULL on failure.
  */
 t_command *create_command(char **tokens, char **path_dirs)
 {

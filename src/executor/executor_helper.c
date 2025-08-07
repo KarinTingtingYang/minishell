@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 10:30:27 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/07 15:04:23 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,10 +182,10 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
         }
         while (index < count)
         {
-            tokens = tokenize_input(parts[index]); // DEBUG: tokenize_input() should handle splitting by spaces
+            tokens = tokenize_input(parts[index]);
             if (tokens == NULL)
 			{
-				ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: changed to a more generic error message
+				ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO);
 				free_split(path_dirs);
 				return (0);
 			}
@@ -195,7 +195,7 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
 
             if (cmds[index] == NULL)
 			{
-				ft_putstr_fd("minishell: command creation failed\n", STDERR_FILENO); // DEBUG: changed to a more generic error message
+				ft_putstr_fd("minishell: command creation failed\n", STDERR_FILENO);
 				free_split(path_dirs);
 				return (0);
 			}
@@ -226,10 +226,10 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, t_e
 {
 	t_command **cmds;
 	
-	*parts = split_line_by_pipe(line);   //DEBUG: tokenize_input() should handle splitting by '|'
+	*parts = split_line_by_pipe(line);
     if (*parts == NULL || (*parts)[0] == NULL)
     {
-		ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO);  // DEBUG: changed to a more generic error message
+		ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO);
         if (*parts != NULL)
             free_split(*parts);
         return (NULL);
@@ -242,8 +242,6 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, t_e
 		free_split(*parts);
 		return (NULL);
 	}
-    //cmds[*count] = NULL;
-	  //KEY CHANGE HERE: Zero out the array of pointers.
     ft_bzero(cmds, sizeof(t_command *) * (*count + 1));
     if (!build_commands_from_parts(cmds, *parts, 0, *count, env_list))
     {
@@ -255,33 +253,35 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, t_e
     return (cmds);
 }
 
-
-
+/**
+ * @brief Duplicates an array of strings (e.g., command arguments).
+ * 
+ * This function allocates a new array of strings and copies each string
+ * from the original array into the new one. It ensures that the new array
+ * is NULL-terminated. If memory allocation fails, it cleans up and returns NULL.
+ * @param args The original array of strings to duplicate.
+ * @return A newly allocated array of strings, or NULL on failure.
+ */
 char **ft_split_dup(char **args)
 {
 	int		count = 0;
 	char	**dup;
 	int		i;
 
-	if (!args)
+	if (args == NULL)
 		return (NULL);
-
-	// Count number of strings
 	while (args[count])
 		count++;
-
-	// Allocate memory for the new array
 	dup = malloc((count + 1) * sizeof(char *));
-	if (!dup)
+	if (dup == NULL)
 		return (NULL);
-
 	i = 0;
 	while (i < count)
 	{
 		dup[i] = ft_strdup(args[i]);
-		if (!dup[i])
+		if (dup[i] == NULL)
 		{
-			// Free already duplicated strings on failure
+			// If strdup fails, we need to free previously allocated strings
 			while (--i >= 0)
 				free(dup[i]);
 			free(dup);

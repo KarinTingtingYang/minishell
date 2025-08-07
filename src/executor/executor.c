@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 13:36:21 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/07 14:09:22 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -349,29 +349,20 @@ static int prepare_and_run_pipeline(char *line,  t_env_var *env_list, t_process_
 }
 
 /**
- * @brief Executes a shell command, supporting both single and piped commands.
+ * @brief Executes a command line input, handling both single commands and pipelines.
  *
- * This function checks whether the input line contains a pipe ('|') character.
- * If it does, the command is treated as a pipeline and processed accordingly
- * using `prepare_and_run_pipeline()`. Otherwise, it executes a single command
- * using `execute_single_command()`.
- * @param line The input command line entered by the user.
- * @param envp The environment variables passed to the shell.
- * @return Returns the exit status of the command:
- *         - 0 on success,
- *         - non-zero value on failure or command error.
+ * This function checks if the input line contains a pipe character ('|'). If it does,
+ * it prepares and executes a pipeline of commands. If not, it processes the command
+ * as a single command, handling redirection and environment variables.
+ * It uses `execute_single_command()` for single commands and `prepare_and_run_pipeline()`
+ * for pipelines.
+ * @param line  The command line input to be executed.
+ * @param env_list  The environment variable list used for command execution.
+ * @param process_data  Pointer to process data structure for managing execution state.
+ * @return Returns the exit status of the executed command(s):
+ *         - 0 if no command was executed,
+ *         - non-zero value on error or failure during execution.
  */
-// int execute_command(char *line, t_env_var *env_list)
-// int execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
-// {
-//     if (ft_strchr(line, '|'))
-//         //return prepare_and_run_pipeline(line, env_list);
-// 		return prepare_and_run_pipeline(line, env_list, process_data);
-//     else
-//         return execute_single_command(line, env_list, process_data);
-// }
-
-
 int	execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
 {
 	if (ft_strchr(line, '|'))
@@ -380,20 +371,16 @@ int	execute_command(char *line, t_env_var *env_list, t_process_data *process_dat
 	}
 	else
 	{
-		// Tokenize line
 		t_token **tokens = parse_line(line);
-		if (!tokens)
+		if (tokens == NULL)
 			return (1);
-		// Expand + split
 		char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
-		print_array(args); // DEBUG
 		free_tokens(tokens);
-		if (!args || !args[0])
+		if (args == NULL || args[0] == NULL)
 		{
 			free_split(args);
-			return (0);
+			return (0); 
 		}
-		// Execute
 		int result = execute_single_command(args, env_list, process_data);
 		free_split(args);
 		return result;

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 10:44:35 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 09:12:40 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/07 15:04:57 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,9 +92,9 @@ char **save_token(char **tokens, char *token, int *count)
  * This function appends a substring from the input line to an array of strings,
  * reallocating memory as necessary. It updates the count of strings in the array.
  * @param arr The current array of strings, or NULL if empty.
- * @param line The input line from which to extract the substring.
- * @param start The starting index of the substring in the input line.
- * @param end The ending index (exclusive) of the substring in the input line.
+ * @param line The input line containing the substring.
+ * @param start The starting index of the substring in the line.
+ * @param end The ending index (exclusive) of the substring in the line.
  * @param count Pointer to the current count of strings, which will be updated.
  * @return A new array of strings with the substring added, or NULL on failure.
  */
@@ -106,7 +106,7 @@ char **append_str(char **arr, char *line, int start, int end, int *count)
 	
     if (substr == NULL)
         return NULL;
-    strncpy(substr, line + start, len);
+    ft_strlcpy(substr, line + start, len + 1);
     substr[len] = '\0';
     new_arr = realloc(arr, sizeof(char *) * (*count + 2));
     if (new_arr == NULL)
@@ -120,15 +120,24 @@ char **append_str(char **arr, char *line, int start, int end, int *count)
     return (new_arr);
 }
 
-
+/** @brief Frees an array of t_token structures.
+ * 
+ * This function iterates through an array of t_token pointers, freeing
+ * each token's value and the token itself. It then frees the array of tokens.
+ * @param tokens The array of t_token pointers to free.
+ */
 void free_tokens(t_token **tokens)
 {
-    if (!tokens)
-        return;
-    for (int i = 0; tokens[i]; i++)
-    {
-        free(tokens[i]->value);
-        free(tokens[i]);
-    }
+    int i = 0;
+
+    if (tokens == NULL)
+        return ;
+    while (tokens[i] != NULL)
+	{
+		free(tokens[i]->value);
+		free(tokens[i]);
+		i++;
+	}
     free(tokens);
 }
+

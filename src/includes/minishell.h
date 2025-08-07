@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 13:39:23 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/07 14:12:48 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@
 #include "./lexer.h"
 #include "./env.h"
 #include "./expander.h"
-#include "./global.h"
 
 
 // Global flag to indicate if a child process is currently running.
@@ -57,7 +56,7 @@ void		error_msg_exit(const char *msg);
 t_env_var	*init_env(char **environ);
 void		free_env(t_env_var *env);
 char		*ft_strjoin_free(char *s1, char *s2);
-void print_array(char **array);
-void print_tokens(t_token **tokens);
+// void print_array(char **array);
+// void print_tokens(t_token **tokens);
 
 #endif
