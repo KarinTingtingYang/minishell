@@ -1,6 +1,6 @@
 # minishell
 
-# August 11  tiyang
+# August 11 - tiyang
 - fixed quote handling & argument splitting issues in the parser and expander
 - added redirection tokens to the parsing/tokenising logic to correctly handle redirection
 - centralised tokenising/parsing logic to parse_line (now tokenize_input calls parse_line)
