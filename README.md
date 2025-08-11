@@ -1,5 +1,13 @@
 # minishell
 
+# August 11  tiyang
+- fixed quote handling & argument splitting issues in the parser and expander
+- added redirection tokens to the parsing/tokenising logic to correctly handle redirection
+- centralised tokenising/parsing logic to parse_line (now tokenize_input calls parse_line)
+- fixed variable expansion issues when running pipeline commands
+## TO DO
+- check code redundancy in parser code
+
 # August 6 - tiyang
 - enhanced run_cd function to handle cd command with no argument (should return to home)
 - enhanced error handling in exit built-in and fixed exit code propagation issues
