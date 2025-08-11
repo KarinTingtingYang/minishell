@@ -5,6 +5,7 @@
 - added redirection tokens to the parsing/tokenising logic to correctly handle redirection
 - centralised tokenising/parsing logic to parse_line (now tokenize_input calls parse_line)
 - fixed variable expansion issues when running pipeline commands
+- created a more robust is_export_assignment checker function to better handle edge cases
 ## TO DO
 - check code redundancy in parser code
 
