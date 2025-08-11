@@ -67,25 +67,28 @@ char *append_char(char *str, char c)
  * @param count Pointer to the current count of tokens, which will be updated.
  * @return A new array of tokens with the new token added, or NULL on failure.
  */
-char **save_token(char **tokens, char *token, int *count)
-{
-	char	**new_tokens;
-	int		i = 0;
+// REDIRECTION DEBUGGING: we can reused the parse_line function
+// we don't need this function anymore
 
-	new_tokens = malloc(sizeof(char *) * (*count + 2));
-	if (new_tokens == NULL)
-		return (NULL);
-	while (i < *count)
-	{
-		new_tokens[i] = tokens[i];
-		i++;
-	}
-	new_tokens[i++] = token;
-	new_tokens[i] = NULL;
-	free(tokens);
-	(*count)++;
-	return (new_tokens);
-}
+// char **save_token(char **tokens, char *token, int *count)
+// {
+// 	char	**new_tokens;
+// 	int		i = 0;
+
+// 	new_tokens = malloc(sizeof(char *) * (*count + 2));
+// 	if (new_tokens == NULL)
+// 		return (NULL);
+// 	while (i < *count)
+// 	{
+// 		new_tokens[i] = tokens[i];
+// 		i++;
+// 	}
+// 	new_tokens[i++] = token;
+// 	new_tokens[i] = NULL;
+// 	free(tokens);
+// 	(*count)++;
+// 	return (new_tokens);
+// }
 
 /** @brief Appends a substring to an array of strings.
  * 

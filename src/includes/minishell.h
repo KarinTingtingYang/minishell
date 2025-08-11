@@ -56,7 +56,7 @@ void		error_msg_exit(const char *msg);
 t_env_var	*init_env(char **environ);
 void		free_env(t_env_var *env);
 char		*ft_strjoin_free(char *s1, char *s2);
-// void print_array(char **array);
-// void print_tokens(t_token **tokens);
+void print_array(char **array);
+void print_tokens(t_token **tokens);
 
 #endif

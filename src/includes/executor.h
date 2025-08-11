@@ -48,7 +48,7 @@ char		*find_full_cmd_path(char *cmd, char **path_dirs);
 void		execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list);
 void		free_commands_recursive(t_command **cmds, int index, int count);
 int			prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *data);
-t_command	**prepare_pipeline_commands(char *line, int *count, char ***parts, t_env_var *env_list);
+t_command   **prepare_pipeline_commands(char *line, int *count, char ***parts, t_process_data *process_data);
 char **ft_split_dup(char **args);
 
 #endif

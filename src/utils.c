@@ -51,32 +51,32 @@ char *ft_strjoin_free(char *s1, char *s2)
     return (joined);
 }
 
-// void print_array(char **array)
-// {
-// 	int i = 0;
-// 	if (!array)
-// 	{
-// 		ft_putstr_fd("NULL\n", STDOUT_FILENO);
-// 		return;
-// 	}
-// 	while (array[i])
-// 	{
-// 		printf("Array[%d]: %s\n", i, array[i]);
-// 		i++;
-// 	}
-// }
+void print_array(char **array)
+{
+	int i = 0;
+	if (!array)
+	{
+		ft_putstr_fd("NULL\n", STDOUT_FILENO);
+		return;
+	}
+	while (array[i])
+	{
+		printf("Array[%d]: %s\n", i, array[i]);
+		i++;
+	}
+}
 
-// void print_tokens(t_token **tokens)
-// {
-// 	int i = 0;
-// 	if (!tokens)
-// 	{
-// 		ft_putstr_fd("NULL\n", STDOUT_FILENO);
-// 		return;
-// 	}
-// 	while (tokens[i])
-// 	{
-// 		printf("Token %d: value='%s', quote=%d\n", i, tokens[i]->value, tokens[i]->quote);
-// 		i++;
-// 	}
-// }
+void print_tokens(t_token **tokens)
+{
+	int i = 0;
+	if (!tokens)
+	{
+		ft_putstr_fd("NULL\n", STDOUT_FILENO);
+		return;
+	}
+	while (tokens[i])
+	{
+		printf("Token %d: value='%s', quote=%d\n", i, tokens[i]->value, tokens[i]->quote);
+		i++;
+	}
+}

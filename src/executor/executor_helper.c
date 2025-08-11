@@ -167,14 +167,15 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
  * @return Returns 1 on success, or 0 if an error occurs (e.g., memory allocation
  *         failure).
  */
-static int build_commands_from_parts(t_command **cmds, char **parts, int index, int count, t_env_var *env_list)
+static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
+	int count, t_process_data *process_data)
 {
     char **path_dirs;
-    char **tokens;
+    // char **tokens;
 
     if (index == 0)
     {
-        path_dirs = find_path_dirs(env_list);
+        path_dirs = find_path_dirs(process_data->env_list);
         if (path_dirs == NULL)
         {
             ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO);
@@ -182,16 +183,28 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
         }
         while (index < count)
         {
-            tokens = tokenize_input(parts[index]);
+            t_token **tokens = parse_line(parts[index]);
             if (tokens == NULL)
 			{
-				ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO);
+				// parse_line will have already printed an error message
+				// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO);
 				free_split(path_dirs);
 				return (0);
 			}
 			
-            cmds[index] = create_command(tokens, path_dirs);
-            free_split(tokens);
+			// EXPANSION DEBUGGING: we need to call the expand_and_split_args function
+			char **expanded_args = expand_and_split_args(tokens, process_data->env_list,
+				process_data->last_exit_status);
+			free_tokens(tokens);
+			if (expanded_args == NULL)
+			{
+				free_split(path_dirs);
+				return (0); // error in expanding or splitting args
+			}
+			// ======== END EXPANSION DEBUGGING ========
+			
+            cmds[index] = create_command(expanded_args, path_dirs);
+            free_split(expanded_args);
 
             if (cmds[index] == NULL)
 			{
@@ -222,7 +235,8 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
  * @return An allocated array of `t_command*` pointers ready for execution,
  *         or `NULL` on failure (syntax error, allocation failure, etc.).
  */
-t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, t_env_var *env_list)
+t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, 
+	t_process_data *process_data)
 {
 	t_command **cmds;
 	
@@ -243,7 +257,7 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, t_e
 		return (NULL);
 	}
     ft_bzero(cmds, sizeof(t_command *) * (*count + 1));
-    if (!build_commands_from_parts(cmds, *parts, 0, *count, env_list))
+    if (!build_commands_from_parts(cmds, *parts, 0, *count, process_data))
     {
         free_commands_recursive(cmds, 0, *count);
         free(cmds);

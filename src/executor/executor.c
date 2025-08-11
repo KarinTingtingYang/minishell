@@ -271,9 +271,22 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
 	ft_bzero(&data, sizeof(t_execute_data));
 
 	// Use ft_split_dup to duplicate args
-	data.clean_args = ft_split_dup(args);
+	//data.clean_args = ft_split_dup(args);
+
+	// REDIRECTION DEBUG: Use handle_redirection to process args
+	// Handle redirection here to get clean arguments and redirection files.
+    data.clean_args = handle_redirection(args, &data.input_file, &data.output_file, &data.output_mode, &data.heredoc_file);
 	if (!data.clean_args)
-		return (1);
+		//return (1);
+	// REDIRECTION DEBUG: If handle_redirection fails, return error
+	{
+        if (data.heredoc_file)
+        {
+            unlink(data.heredoc_file);
+            free(data.heredoc_file);
+        }
+        return (1); // Error in redirection parsing
+    }
 	if (data.clean_args[0] && !is_builtin(data.clean_args[0]))
 	{
 		// BUG FIX: NEED TO POPULATE CMD PATH BEFORE PROCEEDING TO EXECUTION
@@ -330,7 +343,7 @@ static int prepare_and_run_pipeline(char *line,  t_env_var *env_list, t_process_
 
 	parts = NULL;
 	count = 0;			
-    cmds = prepare_pipeline_commands(line, &count, &parts, env_list);
+    cmds = prepare_pipeline_commands(line, &count, &parts, process_data);
     if (cmds == NULL)
         return (1);
     path_dirs = find_path_dirs(env_list);

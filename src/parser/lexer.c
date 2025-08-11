@@ -21,52 +21,113 @@
  * @param line The input line to tokenize.
  * @return An array of strings (tokens), or NULL on error.
  */
+// REDIRECTION DEBUGGING: we can reuse the parse_line function
+// as it already handles quoted tokens and spaces.
+// we need a helper function to convert t_token ** to char **
+// then we call the pase_line function in tokenize_input,
+// convert the result to char **, and free the t_token ** afterwards
+static char **tokens_to_str_array(t_token **tokens)
+{
+    int i = 0;
+    char **arr;
+    
+    if (!tokens)
+        return (NULL);
+    while(tokens[i])
+        i++;
+    arr = malloc(sizeof(char *) * (i + 1));
+    if (!arr)
+        return (NULL);
+    i = 0;
+    while(tokens[i])
+    {
+        arr[i] = ft_strdup(tokens[i]->value);
+        if (!arr[i])
+        {
+            // Cleanup on allocation failure
+            while (--i >= 0)
+                free(arr[i]);
+            free(arr);
+            return (NULL);
+        }
+        i++;
+    }
+    arr[i] = NULL;
+    return (arr);
+}
+
 char **tokenize_input(char *line)
 {
-	int		i = 0;
-	char	*token = NULL;
-	char	**tokens = NULL;
-	int		count = 0;
-	char	quote = 0;
+    t_token **tokens;
+    char    **args;
 
-	while (line[i] != '\0')
-	{
-		if (quote == 0 && (line[i] == '\'' || line[i] == '\"'))
-		{
-			quote = line[i];  // Enter quote mode
-			i++;              // Skip the quote itself (do not add to token)
-			continue;
-		}
-		else if (quote && line[i] == quote)
-		{
-			quote = 0;        // Exit quote mode
-			i++;              // Skip the quote itself (do not add to token)
-			continue;
-		}
-		else if (quote == 0  && line[i] == ' ')
-		{
-			if (token != NULL)
-			{
-				tokens = save_token(tokens, token, &count);
-				token = NULL;
-			}
-			i++;  // skip space
-			continue;
-		}
-		else
-		{
-			token = append_char(token, line[i]);
-		}
-		i++;
-	}
-	if (quote != 0)
-		return print_error("unclosed quote");
-	if (token != NULL)
-		tokens = save_token(tokens, token, &count);
-	if (tokens == NULL)
-		tokens[count] = NULL;
-	return tokens;
+    // Step 1: Reuse the improved parsing logic from parse_line
+    tokens = parse_line(line); 
+    
+    if (!tokens)
+    {
+        // If parsing fails (e.g., unclosed quote), parse_line handles the error message.
+        // We return an empty, allocated array to prevent crashes in the calling function.
+        args = malloc(sizeof(char *));
+        if (args)
+            args[0] = NULL;
+        return (args);
+    }
+
+    // Step 2: Convert the token structs to a simple string array
+    args = tokens_to_str_array(tokens); 
+    
+    // Step 3: Free the intermediate token structures to prevent memory leaks
+    free_tokens(tokens); 
+    
+    return (args);
 }
+// char **tokenize_input(char *line)
+// {
+// 	int		i = 0;
+// 	char	*token = NULL;
+// 	char	**tokens = NULL;
+// 	int		count = 0;
+// 	char	quote = 0;
+
+// 	while (line[i] != '\0')
+// 	{
+// 		if (quote == 0 && (line[i] == '\'' || line[i] == '\"'))
+// 		{
+// 			quote = line[i];  // Enter quote mode
+// 			i++;              // Skip the quote itself (do not add to token)
+// 			continue;
+// 		}
+// 		else if (quote && line[i] == quote)
+// 		{
+// 			quote = 0;        // Exit quote mode
+// 			i++;              // Skip the quote itself (do not add to token)
+// 			continue;
+// 		}
+// 		else if (quote == 0  && line[i] == ' ')
+// 		{
+// 			if (token != NULL)
+// 			{
+// 				tokens = save_token(tokens, token, &count);
+// 				token = NULL;
+// 			}
+// 			i++;  // skip space
+// 			continue;
+// 		}
+// 		else
+// 		{
+// 			token = append_char(token, line[i]);
+// 		}
+// 		i++;
+// 	}
+// 	if (quote != 0)
+// 		return print_error("unclosed quote");
+// 	if (token != NULL)
+// 		tokens = save_token(tokens, token, &count);
+// 	if (tokens == NULL)
+// 		tokens[count] = NULL;
+// 	return tokens;
+// }
 
 
 /**

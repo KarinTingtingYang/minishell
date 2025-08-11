@@ -12,6 +12,28 @@
 
 #include "../includes/minishell.h"
 
+// ADDED for quote handling debugging
+// ===== NEW HELPER FUNCTION =====
+/**
+ * @brief Strips the outermost quotes from a string, if they exist.
+ * e.g., "hello" becomes hello. Does nothing if quotes are not at the edges.
+ */
+static void strip_outer_quotes(char *str)
+{
+    int len;
+
+    if (!str)
+        return;
+    len = ft_strlen(str);
+    if (len >= 2 && ((str[0] == '"' && str[len - 1] == '"') ||
+                    (str[0] == '\'' && str[len - 1] == '\'')))
+    {
+        ft_memmove(str, str + 1, len - 2);
+        str[len - 2] = '\0';
+    }
+}
+// ===============================
+
 /**
  * @brief Checks if a token is an export assignment.
  * 
@@ -21,9 +43,40 @@
  * @param token The token to check.
  * @return 1 if the token is an export assignment, 0 otherwise.
  */
+// static int is_export_assignment(t_token *token)
+// {
+// 	return (ft_strchr(token->value, '=') != NULL);
+// }
+// DEBUG: adding a more robust check for export assignment
 static int is_export_assignment(t_token *token)
 {
-	return (ft_strchr(token->value, '=') != NULL);
+    char *equal_sign_pos;
+    char *key;
+    int  is_valid;
+
+    // Find the position of the first '=' sign.
+    equal_sign_pos = ft_strchr(token->value, '=');
+
+    // If there's no '=', it can't be an assignment.
+    if (equal_sign_pos == NULL)
+        return (0);
+
+    // If '=' is the very first character, it's invalid (e.g., "=value").
+    if (equal_sign_pos == token->value)
+        return (0);
+
+    // Extract the part before the '=' as the key.
+    key = ft_strndup(token->value, equal_sign_pos - token->value);
+    if (!key)
+        return (0); // Allocation failure
+
+    // Use your existing function to validate the key.
+    is_valid = is_valid_identifier(key);
+
+    // Clean up the temporary key string.
+    free(key);
+
+    return (is_valid);
 }
 
 /**
@@ -357,13 +410,15 @@ static char **handle_quoted_or_export_token(t_token *token, char *expanded)
 		free(expanded);
 		return NULL;
 	}
-    if (is_export_assignment(token) && token->quote != NO_QUOTE)
+    //if (is_export_assignment(token) && token->quote != NO_QUOTE)
+	if (is_export_assignment(token)) // <<< REMOVED: && token->quote != NO_QUOTE
     {
         split[0] = ft_strdup(token->value);  // raw unexpanded value
         free(expanded);
     }
     else
     {
+		strip_outer_quotes(expanded); // <<< ADDED: Strip quotes for echo etc.
         split[0] = expanded;  // expanded string, keep ownership
     }
     split[1] = NULL;
@@ -430,15 +485,20 @@ char **expand_and_split_args(t_token **tokens, t_env_var *env_list, int last_exi
     {
         char *expanded = expand_variables(tokens[i]->value, env_list, last_exit_status, tokens[i]->quote);
         char **split = NULL;
-        if (is_export_assignment(tokens[i]) && tokens[i]->quote != NO_QUOTE)
-            split = handle_quoted_or_export_token(tokens[i], expanded);
+
+		// ===== MODIFIED LOGIC HERE =====
+
+		//if (is_export_assignment(tokens[i]) && tokens[i]->quote != NO_QUOTE)
+		if (is_export_assignment(tokens[i])) // <<< REMOVED: && tokens[i]->quote != NO_QUOTE
+        	split = handle_quoted_or_export_token(tokens[i], expanded);
         else if (tokens[i]->quote == SINGLE_QUOTE || tokens[i]->quote == DOUBLE_QUOTE)
-            split = handle_quoted_or_export_token(tokens[i], expanded);
+			split = handle_quoted_or_export_token(tokens[i], expanded);
         else
         {
             split = ft_split_whitespace(expanded);
             free(expanded);
         }
+		// ====== MODIFIED LOGIC END =====
         if (split == NULL)
             return NULL;
         char **new_final = append_split_to_final(final_args, &final_count, split);
@@ -447,5 +507,6 @@ char **expand_and_split_args(t_token **tokens, t_env_var *env_list, int last_exi
         final_args = new_final;
         i++;
     }
+	print_array(final_args); // DEBUG: Print the final expanded arguments
     return final_args;
 }

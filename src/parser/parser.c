@@ -57,6 +57,7 @@ static char *substr_dup(const char *start, size_t len)
  * @param s The input string to count tokens in.
  * @return The number of tokens found in the string.
  */
+// REDIRECTION DEBUGGING: need to be able to handle redirection operators
 static int count_tokens(const char *s)
 {
     int count = 0;
@@ -67,15 +68,39 @@ static int count_tokens(const char *s)
         skip_spaces(&s);
         if (*s == '\0')
             break;
+		// ============ REDIRECTION DEBUGGING
+		// If we see a redirection operator, it's a token.
+        if (!quote && (*s == '<' || *s == '>'))
+        {
+            count++;
+            // Handle double operators like >> or <<
+            if ((*s == '>' && *(s + 1) == '>') || (*s == '<' && *(s + 1) == '<'))
+                s++;
+            s++;
+            continue;
+        }
+		// ================ END REDIRECTION DEBUGGING
         count++; // Found a token
-        while (*s != '\0' && ((*s != ' ' && *s != '\t') || quote != 0))
-		{
-			if (quote == 0 && (*s == '\'' || *s == '"'))
-				quote = *s; // Start of quoted token
-			else if (*s == quote)
-				quote = 0; // End of quoted token
-			s++;
-		}
+        // while (*s != '\0' && ((*s != ' ' && *s != '\t') || quote != 0))
+		// {
+		// 	if (quote == 0 && (*s == '\'' || *s == '"'))
+		// 		quote = *s; // Start of quoted token
+		// 	else if (*s == quote)
+		// 		quote = 0; // End of quoted token
+		// 	s++;
+		// }
+
+		// CLEANED UP VERSION: loop logic more clear
+		while (*s)
+        {
+            if (*s == quote)
+                quote = 0; // Exiting quote mode
+            else if (quote == 0 && (*s == '\'' || *s == '"'))
+                quote = *s; // Entering quote mode
+            else if (quote == 0 && (*s == ' ' || *s == '\t' || *s == '<' || *s == '>'))
+                break; // End of token if we hit a space outside of quotes
+            s++;
+        }
     }
     return count;
 }
@@ -108,6 +133,7 @@ static t_token *create_token(char *value, t_quote_type quote_type)
  * @param line The input line to parse.
  * @return An array of t_token pointers, NULL-terminated, or NULL on failure.
  */
+// REDIRECTION DEBUGGING: need to be able to handle redirection operators
 t_token **parse_line(char *line)
 {
 	int token_count;
@@ -129,17 +155,48 @@ t_token **parse_line(char *line)
             break ; // End of line
 		const char *start = s; // Start of the current token
         quote_char = 0; // Reset quote character for each token
-        while (*s != '\0' && ((*s != ' ' && *s != '\t') || quote_char))
-		{
-			if (quote_char == 0 && (*s == '\'' || *s == '"')) // Start of quoted token
-				quote_char = *s; // Set quote character
-			else if (*s == quote_char) // End of quoted token
-				quote_char = 0; // Reset quote character
-            s++;
+
+		// ADDED FOR QUOTE HANDLING & REDIRECTION DEBUGGING
+		t_quote_type token_quote_type = NO_QUOTE;
+		// Check for redirection operator as a token
+        if (*s == '<' || *s == '>')
+        {
+            if ((*s == '>' && *(s + 1) == '>') || (*s == '<' && *(s + 1) == '<'))
+                s += 2;
+            else
+                s++;
         }
+		else // It's a word or quoted string
+		{
+			if (*s == '\'')
+            	token_quote_type = SINGLE_QUOTE;
+       		else if (*s == '"')
+            	token_quote_type = DOUBLE_QUOTE;
+
+        // while (*s != '\0' && ((*s != ' ' && *s != '\t') || quote_char))
+		// {
+		// 	if (quote_char == 0 && (*s == '\'' || *s == '"')) // Start of quoted token
+		// 		quote_char = *s; // Set quote character
+		// 	else if (*s == quote_char) // End of quoted token
+		// 		quote_char = 0; // Reset quote character
+        //     s++;
+        // }
+		// CLEANED UP VERSION: loop logic more clear
+			while (*s)
+        	{
+            	if (*s == quote_char)
+                	quote_char = 0;
+            	else if (quote_char == 0 && (*s == '\'' || *s == '"'))
+                	quote_char = *s;
+            	else if (quote_char == 0 && (*s == ' ' || *s == '\t' || *s == '<' || *s == '>'))
+                	break;
+            	s++;
+        	}
+		}
         current_token_val = substr_dup(start, s - start);
-        tokens[i++] = create_token(current_token_val, NO_QUOTE); // Assuming no quotes for now
+        tokens[i++] = create_token(current_token_val, token_quote_type); // Assuming no quotes for now
     }
     tokens[i] = NULL;
+	print_tokens(tokens); // DEBUG: Print the parsed tokens
     return tokens;
 }
