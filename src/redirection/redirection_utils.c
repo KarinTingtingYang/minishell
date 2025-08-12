@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   redirection_utils.c                                :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 11:10:49 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/04 09:55:29 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   redirection_utils.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 11:10:49 by tiyang            #+#    #+#             */
+/*   Updated: 2025/08/12 11:25:54 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ int	process_output_file(char *output_file, int is_append)
 	if (fd_out < 0)
 	{
 		// Use perror to print a descriptive error message to STDERR
-		perror(output_file);
+		// perror(output_file); // DEBUG: Print error if open fails
+		ft_error_and_exit(output_file, strerror(errno), EXIT_FAILURE);
 		// Return -1 to signal an error to the caller
 		return (-1);
 	}
@@ -50,13 +51,15 @@ void	open_and_redirect_input(char *input_file)
     fd_in = open(input_file, O_RDONLY);
     if (fd_in == -1)
     {
-        perror(input_file);
-        exit(EXIT_FAILURE);
+        // perror(input_file); // DEBUG: Print error if open fails
+		ft_error_and_exit(input_file, strerror(errno), EXIT_FAILURE);
+        // exit(EXIT_FAILURE);
     }
     if (dup2(fd_in, STDIN_FILENO) == -1)
     {
-        perror("dup2");
-        exit(EXIT_FAILURE);
+        // perror("dup2"); // DEBUG: Print error if dup2 fails
+		ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
+        // exit(EXIT_FAILURE);
     }
     close(fd_in);
 }
@@ -75,13 +78,15 @@ void	open_and_redirect_output(char *output_file, int output_mode)
 	fd_out = open(output_file, flags, 0644);
 	if (fd_out == -1)
 	{
-		perror(output_file);
-		exit(EXIT_FAILURE);
+		// perror(output_file); // DEBUG: Print error if open fails
+		ft_error_and_exit(output_file, strerror(errno), EXIT_FAILURE);
+		// exit(EXIT_FAILURE);
 	}
 	if (dup2(fd_out, STDOUT_FILENO) == -1)
 	{
-		perror("dup2");
-		exit(EXIT_FAILURE);
+		// perror("dup2"); // DEBUG: Print error if dup2 fails
+		ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
+		// exit(EXIT_FAILURE);
 	}
 	close(fd_out);
 }

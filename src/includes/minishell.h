@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 14:12:48 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 10:51:28 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,10 @@
 extern volatile sig_atomic_t g_signal_received;
 
 void		free_split(char **array);
-void		error_exit(const char *msg);
-void		error_msg_exit(const char *msg);
+// void		error_exit(const char *msg);
+void ft_error_and_exit(char *command, char *message, int exit_status);
+// void		error_msg_exit(const char *msg);
+void ft_error(char *command, char *message);
 t_env_var	*init_env(char **environ);
 void		free_env(t_env_var *env);
 char		*ft_strjoin_free(char *s1, char *s2);

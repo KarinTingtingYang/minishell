@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   exit.c                                             :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/28 13:12:47 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/06 14:12:37 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   exit.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/28 13:12:47 by tiyang            #+#    #+#             */
+/*   Updated: 2025/08/12 11:37:23 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,15 +76,17 @@ int run_exit(char **args)
 		// try to convert the first argument to a number
 		if (ft_str_to_llong(args[1], &exit_code) == 0)
 		{
-			ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
-			ft_putstr_fd(args[1], STDERR_FILENO);
-			ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
-			exit(2); // Standard failure code for this error 
+			// ft_putstr_fd("minishell: exit: ", STDERR_FILENO); // DEBUG: Print error if conversion fails
+			// ft_putstr_fd(args[1], STDERR_FILENO); // DEBUG: Print the invalid argument
+			// ft_putstr_fd(": numeric argument required\n", STDERR_FILENO); // DEBUG: Print the error message
+			// exit(2); // Standard failure code for this error // DEBUG: Exit with status 2 if the argument is not a valid number
+			ft_error_and_exit("exit", "numeric argument required", 2);
 		}
 		// If the conversion is successful, check if there are more arguments
 		if (args[2] != NULL) // Case 2.1: "exit" with too many arguments
 		{
-			ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
+			// ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO); // DEBUG: Print error if too many arguments
+			ft_error("exit", "too many arguments");
 			return 1; // Return 1 to indicate an error, do not exit
 		}
 		else // Case 2.2: "exit" with one argument that is a valid number

@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:09:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/12 14:08:17 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/12 14:42:56 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,10 @@ int	main(int argc, char **argv, char **envp)
 		{
 			add_history(input);
 			if (execute_command(input, env_list, &process_data) == -1)
-				ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
+			{
+				// ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO); // DEBUG: Print error if execute_command fails
+				ft_error("execute_command", "failed to execute command");
+			}
 		}
 		free(input);
 	}

@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/12 13:31:37 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/12 14:41:47 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,23 +33,25 @@ extern volatile sig_atomic_t g_child_running; // Declare extern for global flag
  */
 static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
 {
-	int exit_status;
+	// int exit_status;
 	(void)args;
 	(void)path_dirs;
 
 	if (errno == ENOENT)
 	{
-		write(STDERR_FILENO, cmd_path, ft_strlen(cmd_path));
-		write(STDERR_FILENO, ": command not found\n", 20);
-		exit_status = 127;
+		// write(STDERR_FILENO, cmd_path, ft_strlen(cmd_path)); // DEBUG: Print the command path
+		// write(STDERR_FILENO, ": command not found\n", 20); // DEBUG: Print "command not found"
+		// exit_status = 127; // DEBUG: Set exit status to 127 for command not found
+    	ft_error_and_exit(cmd_path, "command not found", 127);
 	}
 	else
 	{
-		perror(cmd_path);
-		exit_status = 1;
+		// perror(cmd_path); // DEBUG: Print error if execve fails
+		ft_error_and_exit(cmd_path, strerror(errno), EXIT_FAILURE);
+		// exit_status = 1;
 	}
 	free(cmd_path);
-	exit(exit_status);
+	// exit(exit_status);
 }
 
 /**
@@ -119,9 +121,10 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_l
     {
         if (args && args[0])
         {
-             ft_putstr_fd("minishell: ", STDERR_FILENO);
-             ft_putstr_fd(args[0], STDERR_FILENO);
-             ft_putstr_fd(": command not found\n", STDERR_FILENO);
+            //  ft_putstr_fd("minishell: ", STDERR_FILENO); // DEBUG: Print error if cmd_path is NULL
+            //  ft_putstr_fd(args[0], STDERR_FILENO); // DEBUG: Print the command name
+            //  ft_putstr_fd(": command not found\n", STDERR_FILENO); // DEBUG: Print "command not found"
+			ft_error_and_exit(args[0], "command not found", 127);
         }
         if (envp)
             free_split(envp);

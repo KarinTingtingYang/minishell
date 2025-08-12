@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 10:20:17 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 11:47:28 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 11:11:26 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,8 @@ int create_all_pipes_recursively(int **pipes, int index, int max)
         return (-1);
     if (pipe(pipes[index]) == -1)
     {
-        perror("pipe");
+        // perror("pipe"); // DEBUG: Print error if pipe creation fails
+		ft_error_and_exit("pipe", strerror(errno), EXIT_FAILURE);
         return (-1);
     }
     if (create_all_pipes_recursively(pipes, index + 1, max) == -1)

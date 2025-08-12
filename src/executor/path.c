@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 09:34:52 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/12 12:13:46 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/12 14:42:32 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ char	*find_full_cmd_path(char *cmd, char **path_dirs)
 	{
 		full_cmd_path = combine_cmd_path(path_dirs[i], cmd);
 		if (full_cmd_path == NULL)
-			error_exit("malloc");
+			// error_exit("malloc"); // DEBUG: Print error if malloc fails
+			ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
 		if (access(full_cmd_path, X_OK) == 0)
 			return (full_cmd_path);
 		free(full_cmd_path);
