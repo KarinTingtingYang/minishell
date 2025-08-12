@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   export.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 13:15:38 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   export.c                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/30 13:03:36 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/12 13:31:59 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,6 +233,9 @@ static int	export_variable(const char *arg, t_env_var *env_list)
 	}
 
 	free(key);
+	free(value); // MEMORY LEAK FIX: Free the value after use
+	key	= NULL; // Avoid dangling pointer
+	value = NULL; // Avoid dangling pointer
 	return (0);
 }
 

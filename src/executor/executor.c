@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 14:09:22 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/12 13:31:37 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,7 +290,16 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
 	if (data.clean_args[0] && !is_builtin(data.clean_args[0]))
 	{
 		// BUG FIX: NEED TO POPULATE CMD PATH BEFORE PROCEEDING TO EXECUTION
-		data.cmd_path = find_full_cmd_path(data.clean_args[0], find_path_dirs(env_list));
+		char **path_dirs = find_path_dirs(env_list);
+		if (!path_dirs)
+		{
+			ft_putendl_fd("Error: PATH variable not found", 2);
+			free_execute_data(&data);
+			return (1); // Don't continue execution
+		}
+		data.cmd_path = find_full_cmd_path(data.clean_args[0], path_dirs);
+		free_split(path_dirs); // Memory leak fix: free path_dirs after use
+		path_dirs = NULL; // Avoid dangling pointer
 		exit_status = execute_prepared_command(&data, process_data);
 		process_data->last_exit_status = exit_status;
 		free_execute_data(&data);
