@@ -6,26 +6,26 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 10:44:35 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 15:04:57 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 12:03:21 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-/** @brief Prints an error message to stderr.
- * 
- * This function prints a formatted error message to the standard error output.
- * It prefixes the message with "minishell: " for clarity.
- * @param msg The error message to print.
- * @return A NULL pointer to indicate an error occurred.
- */
-char **print_error(const char *msg)
-{
-	ft_putstr_fd("minishell: ", STDERR_FILENO);
-	ft_putstr_fd(msg, STDERR_FILENO);
-	ft_putchar_fd('\n', STDERR_FILENO);
-	return (NULL);
-}
+// /** @brief Prints an error message to stderr.
+//  * 
+//  * This function prints a formatted error message to the standard error output.
+//  * It prefixes the message with "minishell: " for clarity.
+//  * @param msg The error message to print.
+//  * @return A NULL pointer to indicate an error occurred.
+//  */
+// char **print_error(const char *msg)
+// {
+// 	ft_putstr_fd("minishell: ", STDERR_FILENO);
+// 	ft_putstr_fd(msg, STDERR_FILENO);
+// 	ft_putchar_fd('\n', STDERR_FILENO);
+// 	return (NULL);
+// }
 
 /** @brief Appends a character to a dynamically allocated string.
  * 

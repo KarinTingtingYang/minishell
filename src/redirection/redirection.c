@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   redirection.c                                      :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 08:25:34 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/05 09:10:39 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   redirection.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 08:25:34 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/12 12:01:21 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,20 @@ static int	process_redirection_token(char **args, int i,
 	// KEY CHANGE HERE: Validate the token after the redirection operator.
     if (is_redirection(args[i + 1]))
     {
-        ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
-        ft_putstr_fd(args[i + 1], 2);
-        ft_putstr_fd("'\n", 2);
+        // ft_putstr_fd("minishell: syntax error near unexpected token `", 2); // DEBUG: Print error if next token is also a redirection
+        // ft_putstr_fd(args[i + 1], 2); // DEBUG: Print the next token
+        // ft_putstr_fd("'\n", 2); // DEBUG: Print the closing quote
+		// KEY CHANGE HERE: Use ft_error to print the error message
+
+		char *error_msg_prefix = "syntax error near unexpected token `";
+        char *error_msg_suffix = "'";
+        char *full_msg = ft_strjoin(error_msg_prefix, args[i + 1]);
+        char *final_msg = ft_strjoin(full_msg, error_msg_suffix);
+        
+        ft_error("minishell", final_msg);
+
+        free(full_msg);
+        free(final_msg);
         return (-1);
     }
 
@@ -91,7 +102,8 @@ static char	**build_clean_args(char **args, int argc)
     char	**clean_args = (char **)malloc(sizeof(char *) * (argc + 1));
     int		i = 0, j = 0;
     if (!clean_args)
-        error_exit("malloc");
+        // error_exit("malloc"); // DEBUG: Print error if malloc fails
+		ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
     while (args[i])
     {
         if (is_redirection(args[i]))

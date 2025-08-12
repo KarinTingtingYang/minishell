@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   pipes.c                                            :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/22 10:08:55 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/05 11:55:43 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   pipes.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/12 11:26:24 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ static int wait_all_children(pid_t *pids, int index, int max, int last_status)
         return (last_status);
     if (waitpid(pids[index], &status, 0) == -1)
     {
-        perror("waitpid");
+        // perror("waitpid"); // DEBUG: Print error if waitpid fails
+		ft_error_and_exit("waitpid", strerror(errno), EXIT_FAILURE);
         return (wait_all_children(pids, index + 1, max, -1));
     }
     if (WIFEXITED(status))
@@ -77,7 +78,8 @@ static int fork_all_processes_recursive(t_process_data *data, int i)
     data->pids[i] = fork();
     if (data->pids[i] == -1)
     {
-        perror("fork");
+        // perror("fork"); // DEBUG: Print error if fork fails
+		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
         return (-1);
     }
     if (data->pids[i] == 0)
@@ -98,8 +100,9 @@ static int fork_all_processes_recursive(t_process_data *data, int i)
         {
             execute_cmd(data->cmds[i]->cmd_path, data->cmds[i]->args, data->path_dirs, data->env_list);
         }
-        perror("execve");
-        exit(EXIT_FAILURE);
+        // perror("execve"); // DEBUG: Print error if execve fails
+		ft_error_and_exit("execve", strerror(errno), EXIT_FAILURE);
+        // exit(EXIT_FAILURE);
     }
     return fork_all_processes_recursive(data, i + 1);
 }

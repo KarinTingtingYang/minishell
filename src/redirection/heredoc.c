@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   heredoc.c                                          :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/08/04 10:15:34 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/05 09:53:31 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   heredoc.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/04 10:15:34 by tiyang            #+#    #+#             */
+/*   Updated: 2025/08/12 11:29:12 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,9 @@ char *handle_heredoc(const char *delimiter)
 	tmp_filename = generate_unique_heredoc_file(&fd);
 	if (!tmp_filename)
 	{
-		perror("minishell: heredoc");
-		return (NULL);
+		// perror("minishell: heredoc"); // DEBUG: Print error if file creation fails
+		ft_error_and_exit("heredoc", strerror(errno), EXIT_FAILURE);
+		// return (NULL);
 	}
 	 // Set the readline event hook. This function will be called
     // periodically by readline while it waits for input.

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/12 10:16:30 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 11:32:56 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,10 @@ int	main(int argc, char **argv, char **envp)
 		{
 			add_history(input);
 			if (execute_command(input, env_list, &process_data) == -1)
-				ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO);
+			{
+				// ft_putstr_fd("Error: failed to execute command\n", STDERR_FILENO); // DEBUG: Print error if execute_command fails
+				ft_error("execute_command", "failed to execute command");
+			}
 		}
 		free(input);
 	}

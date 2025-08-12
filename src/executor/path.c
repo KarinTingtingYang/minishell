@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:34:52 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 13:58:47 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 11:30:53 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ char	*find_full_cmd_path(char *cmd, char **path_dirs)
 	{
 		full_cmd_path = combine_cmd_path(path_dirs[i], cmd);
 		if (full_cmd_path == NULL)
-			error_exit("malloc");
+			// error_exit("malloc"); // DEBUG: Print error if malloc fails
+			ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
 		if (access(full_cmd_path, X_OK) == 0)
 			return (full_cmd_path);
 		free(full_cmd_path);

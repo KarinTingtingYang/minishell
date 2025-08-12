@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   cd_pwd.c                                           :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/28 10:45:26 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/06 14:11:47 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   cd_pwd.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/28 10:45:26 by tiyang            #+#    #+#             */
+/*   Updated: 2025/08/12 11:06:51 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,11 @@ int	run_cd(char **args, t_env_var *env_list)
 	// Case 1: If no path is provided, it changes to the home directory.
 	if (args[1] == NULL)
 	{
-		//ft_putstr_fd("minishell: cd: missing argument\n", STDERR_FILENO);
-		
 		home_var = find_env_var("HOME", env_list);
 		if (home_var == NULL || home_var->value == NULL || *(home_var->value) == '\0')
 		{
-			ft_putstr_fd("minishell: cd: HOME not set\n", STDERR_FILENO);
+			// ft_putstr_fd("minishell: cd: HOME not set\n", STDERR_FILENO); // DEBUG: Print error if HOME is not set
+			ft_error("cd", "HOME not set");
 			return (1);
 		}
 		path = home_var->value;
@@ -47,8 +46,9 @@ int	run_cd(char **args, t_env_var *env_list)
 	// Execute the change of directory
 	if (chdir(path) != 0)
 	{
-		ft_putstr_fd("minishell: cd: ", STDERR_FILENO);
-		perror(path);
+		// ft_putstr_fd("minishell: cd: ", STDERR_FILENO); // DEBUG: Print error if chdir fails
+		// perror(path);
+		ft_error("cd", strerror(errno));
 		return (1);
 	}
 	return (0);
@@ -70,7 +70,8 @@ int	run_pwd(void)
 	}
 	else
 	{
-		perror("minishell: pwd");
+		// perror("minishell: pwd"); // DEBUG: Print error if getcwd fails
+		ft_error("pwd", strerror(errno));
 		return (1);
 	}
 }

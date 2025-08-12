@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   env_utils.c                                        :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/31 11:47:23 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/06 12:15:44 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   env_utils.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/31 11:47:23 by tiyang            #+#    #+#             */
+/*   Updated: 2025/08/12 11:30:45 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,16 @@ void	add_env_var(const char *key, const char *value, t_env_var *env_list)
 
 	new_var = malloc(sizeof(t_env_var));
 	if (!new_var)
-		error_exit("malloc");
+		// error_exit("malloc"); // DEBUG: Print error if malloc fails
+		ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
 	new_var->key = ft_strdup(key);
 	printf("add_env_var: key = %s\n", new_var->key); // DEBUG: Print the key being added
 	new_var->value = ft_strdup(value);
 	printf("add_env_var: value = %s\n", new_var->value); // DEBUG: Print the value being added
 	new_var->next = NULL;
 	if (!new_var->key || !new_var->value)
-		error_exit("malloc");
+		// error_exit("malloc"); // DEBUG: Print error if strdup fails
+		ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
 	if (!env_list)
 		env_list = new_var;
 	else
@@ -142,11 +144,13 @@ t_env_var	*duplicate_env_list(t_env_var *env_list)
 	{
 		temp = malloc(sizeof(t_env_var));
 		if (!temp)
-			error_exit("malloc");
+			// error_exit("malloc"); // DEBUG: Print error if malloc fails
+			ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
 		temp->key = ft_strdup(env_list->key);
 		temp->value = ft_strdup(env_list->value);
 		if (!temp->key || !temp->value)
-			error_exit("malloc");
+			// error_exit("malloc"); // DEBUG: Print error if strdup fails
+			ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
 		temp->next = NULL;
 		if (new_head == NULL)
 		{

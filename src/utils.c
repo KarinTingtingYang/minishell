@@ -6,24 +6,41 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 14:12:56 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 11:34:21 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../src/includes/minishell.h"
 
-void	error_exit(const char *msg)
+// void	error_exit(const char *msg)
+// {
+// 	perror(msg);
+// 	exit(EXIT_FAILURE);
+// }
+
+// void	error_msg_exit(const char *msg)
+// {
+// 	ft_putstr_fd("minishell: ", STDERR_FILENO);
+// 	ft_putstr_fd((char *)msg, STDERR_FILENO);
+// 	ft_putstr_fd("\n", STDERR_FILENO);
+// 	exit(EXIT_FAILURE);
+// }
+
+// Exits with a specified status after printing an error.
+void ft_error_and_exit(char *command, char *message, int exit_status)
 {
-	perror(msg);
-	exit(EXIT_FAILURE);
+    ft_error(command, message);
+    exit(exit_status);
 }
 
-void	error_msg_exit(const char *msg)
+// A central function to print errors.
+void ft_error(char *command, char *message)
 {
-	ft_putstr_fd("minishell: ", STDERR_FILENO);
-	ft_putstr_fd((char *)msg, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
-	exit(EXIT_FAILURE);
+    ft_putstr_fd("minishell: ", STDERR_FILENO);
+    ft_putstr_fd(command, STDERR_FILENO);
+    ft_putstr_fd(": ", STDERR_FILENO);
+    ft_putstr_fd(message, STDERR_FILENO);
+    ft_putstr_fd("\n", STDERR_FILENO);
 }
 
 void	free_split(char **array)

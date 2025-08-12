@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 15:04:23 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 11:54:02 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
 	pid = fork();
 	if (pid < 0)
 	{
-		perror("fork");
+		// perror("fork"); // DEBUG: Print error if fork fails
+		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
 		free_execute_data(data);
 		return (-1);
 	}
@@ -98,9 +99,11 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
 	data->original_args = tokenize_input(line); // DEBUG: tokenize_input() should handle splitting by spaces
     if (!data->original_args || !data->original_args[0])
     {
-		ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: changed to a more generic error message
-        free_split(data->original_args);
-        return (0);		 // no command to execute
+		// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: changed to a more generic error message
+        ft_error("minishell", "syntax error (unclosed quote)");
+		free_split(data->original_args);
+        // return (0);		 // no command to execute // but we still want to return 1 to indicate success
+		return (1); // no command to execute, but we still want to return 1 to indicate success
     }
     data->clean_args = handle_redirection(data->original_args, &data->input_file, 
 		&data->output_file, &data->output_mode, &data->heredoc_file);
@@ -133,7 +136,8 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
     data->path_dirs = find_path_dirs(env_list);
     if (!data->path_dirs)
     {
-        printf("Error: PATH variable not found\n");
+		ft_error("minishell", "PATH variable not found"); // DEBUG: Print error if PATH not found
+        // printf("Error: PATH variable not found\n"); // DEBUG: Print error if PATH not found
         // free_split(data->original_args);
         // free_split(data->clean_args);
         return (1); // error in finding path directories
@@ -178,7 +182,8 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index,
         path_dirs = find_path_dirs(process_data->env_list);
         if (path_dirs == NULL)
         {
-            ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO);
+            // ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO); // DEBUG: Print error if PATH not found
+			ft_error("minishell", "PATH not found");
             return (0);
         }
         while (index < count)
@@ -208,7 +213,8 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index,
 
             if (cmds[index] == NULL)
 			{
-				ft_putstr_fd("minishell: command creation failed\n", STDERR_FILENO);
+				// ft_putstr_fd("minishell: command creation failed\n", STDERR_FILENO); // DEBUG: Print error if command creation fails
+				ft_error("minishell", "command creation failed");
 				free_split(path_dirs);
 				return (0);
 			}
@@ -243,7 +249,8 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
 	*parts = split_line_by_pipe(line);
     if (*parts == NULL || (*parts)[0] == NULL)
     {
-		ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO);
+		// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: Print error if split fails
+		ft_error("minishell", "syntax error (unclosed quote)");
         if (*parts != NULL)
             free_split(*parts);
         return (NULL);
@@ -252,9 +259,10 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
 	cmds = malloc(sizeof(t_command *) * (*count + 1));
     if (cmds == NULL)
 	{
-		ft_putstr_fd("Error: malloc failed\n", STDERR_FILENO);
-		free_split(*parts);
-		return (NULL);
+		// ft_putstr_fd("Error: malloc failed\n", STDERR_FILENO); // DEBUG: Print error if malloc fails
+		// free_split(*parts); // DEBUG: Free the parts array if malloc fails
+		// return (NULL); // DEBUG: Return NULL if malloc fails
+		ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
 	}
     ft_bzero(cmds, sizeof(t_command *) * (*count + 1));
     if (!build_commands_from_parts(cmds, *parts, 0, *count, process_data))

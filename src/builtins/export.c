@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/06 13:15:38 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 11:54:37 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,9 @@ static void	display_export(t_env_var *env_list)
 	// 1. Duplicate the list so we don't alter the original
 	sorted_list = duplicate_env_list(env_list);
 
+	// if (sorted_list == NULL) // DEBUG: Check if duplication failed
+    //     return (1);
+		
 	// 2. Sort the duplicated list
 	bubble_sort_env_list(sorted_list);
 
@@ -200,9 +203,10 @@ static int	export_variable(const char *arg, t_env_var *env_list)
 
 	if (!is_valid_identifier(key))
 	{
-		ft_putstr_fd("minishell: export: `", STDERR_FILENO);
-		ft_putstr_fd(arg, STDERR_FILENO);
-		ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
+		// ft_putstr_fd("minishell: export: `", STDERR_FILENO); // DEBUG: Print error if key is invalid
+		// ft_putstr_fd(arg, STDERR_FILENO); // DEBUG: Print the invalid argument
+		// ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO); // DEBUG: Print the error message
+		ft_error("export", "not a valid identifier");
 		free(key);
 		return (1); // Return error
 	}

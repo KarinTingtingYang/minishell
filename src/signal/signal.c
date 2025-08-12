@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   signal.c                                           :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/21 12:41:05 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/05 09:52:16 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   signal.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/21 12:41:05 by tiyang            #+#    #+#             */
+/*   Updated: 2025/08/12 11:24:52 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,11 @@ void setup_signal_handlers(void) { //
     sigemptyset(&sa_int.sa_mask);           // Clear the mask of signals to be blocked during handler execution
     sa_int.sa_flags = SA_RESTART;           // Restart functions interrupted by the signal (e.g., readline)
 
-    if (sigaction(SIGINT, &sa_int, NULL) == -1) { //
-        perror("sigaction SIGINT");
-        exit(EXIT_FAILURE);
+    if (sigaction(SIGINT, &sa_int, NULL) == -1)
+	{ //
+        // perror("sigaction SIGINT");  // DEBUG: Print error if sigaction fails
+		ft_error_and_exit("sigaction SIGINT", strerror(errno), EXIT_FAILURE);
+        // exit(EXIT_FAILURE);
     }
 
     // --- Configure SIGQUIT handler ---
@@ -44,9 +46,11 @@ void setup_signal_handlers(void) { //
     sigemptyset(&sa_quit.sa_mask);
     sa_quit.sa_flags = 0;                   // No special flags needed for ignoring
 
-    if (sigaction(SIGQUIT, &sa_quit, NULL) == -1) { //
-        perror("sigaction SIGQUIT");
-        exit(EXIT_FAILURE);
+    if (sigaction(SIGQUIT, &sa_quit, NULL) == -1)
+	{ //
+        // perror("sigaction SIGQUIT"); // DEBUG: Print error if sigaction fails
+		ft_error_and_exit("sigaction SIGQUIT", strerror(errno), EXIT_FAILURE);
+        // exit(EXIT_FAILURE);
     }
     // No need to print "Signal handlers set up..." here.
 }
@@ -67,9 +71,11 @@ void reset_child_signal_handlers(void) { //
     sigemptyset(&sa_int_dfl.sa_mask);
     sa_int_dfl.sa_flags = 0;
 
-    if (sigaction(SIGINT, &sa_int_dfl, NULL) == -1) { //
-        perror("sigaction SIGINT child");
-        exit(EXIT_FAILURE); // Child should exit on error
+    if (sigaction(SIGINT, &sa_int_dfl, NULL) == -1)
+	{ //
+        // perror("sigaction SIGINT child"); // DEBUG: Print error if sigaction fails
+        // exit(EXIT_FAILURE); // Child should exit on error
+		ft_error_and_exit("sigaction SIGINT child", strerror(errno), EXIT_FAILURE);
     }
 
     // --- Reset SIGQUIT to default behavior ---
@@ -77,9 +83,11 @@ void reset_child_signal_handlers(void) { //
     sigemptyset(&sa_quit_dfl.sa_mask);
     sa_quit_dfl.sa_flags = 0;
 
-    if (sigaction(SIGQUIT, &sa_quit_dfl, NULL) == -1) { //
-        perror("sigaction SIGQUIT child");
-        exit(EXIT_FAILURE); // Child should exit on error
+    if (sigaction(SIGQUIT, &sa_quit_dfl, NULL) == -1)
+	{ //
+        // perror("sigaction SIGQUIT child"); // DEBUG: Print error if sigaction fails
+        // exit(EXIT_FAILURE); // Child should exit on error
+		ft_error_and_exit("sigaction SIGQUIT child", strerror(errno), EXIT_FAILURE);
     }
 }
 
@@ -88,7 +96,8 @@ static int	wait_for_child(pid_t pid, int *status)
 {
     pid_t wpid;
 	wpid = waitpid(pid, status, 0); // Call waitpid once
-    while (wpid == -1 && errno == EINTR) {
+    while (wpid == -1 && errno == EINTR) 
+{
         // If waitpid returns -1 and errno is EINTR, it means it was interrupted
         // by a signal. We simply continue waiting.
         wpid = waitpid(pid, status, 0); // Call waitpid again inside the loop
@@ -131,7 +140,8 @@ int wait_for_child_and_handle_status(pid_t pid)
         print_signal_message(status);
     else if (wpid == -1)
     {
-        perror("waitpid");
+        // perror("waitpid"); // DEBUG: Print error if waitpid fails
+		ft_error("waitpid", strerror(errno));
         return -1;
     }
     return get_exit_status(status);
