@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 15:49:56 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   expander.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/12 10:46:55 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,49 @@
 
 // ADDED for quote handling debugging
 // ===== NEW HELPER FUNCTION =====
-/**
- * @brief Strips the outermost quotes from a string, if they exist.
- * e.g., "hello" becomes hello. Does nothing if quotes are not at the edges.
+/* * @brief Removes quotes from a string and joins the characters into a new string.
+ * 
+ * This function processes the input string, removing any single or double quotes
+ * and returning a new string with the remaining characters joined together.
+ * @param str The input string to process.
+ * @return A dynamically allocated string with quotes removed, or NULL on failure.
  */
-static void strip_outer_quotes(char *str)
+static char *remove_quotes_and_join(char *str)
 {
-    int len;
-
     if (!str)
-        return;
-    len = ft_strlen(str);
-    if (len >= 2 && ((str[0] == '"' && str[len - 1] == '"') ||
-                    (str[0] == '\'' && str[len - 1] == '\'')))
+        return (NULL);
+
+    // Allocate enough memory for the new string (at most the same size).
+    char *result = malloc(ft_strlen(str) + 1);
+    if (!result)
+        return (NULL);
+
+    int i = 0; // Index for the original string
+    int j = 0; // Index for the new string
+    char quote_char = 0; // Tracks if we are inside single ('') or double ("") quotes
+
+    while (str[i])
     {
-        ft_memmove(str, str + 1, len - 2);
-        str[len - 2] = '\0';
+        if (!quote_char && (str[i] == '\'' || str[i] == '"'))
+        {
+            // Entering a quoted section, just record the quote type.
+            quote_char = str[i];
+        }
+        else if (str[i] == quote_char)
+        {
+            // Exiting a quoted section.
+            quote_char = 0;
+        }
+        else
+        {
+            // This is a regular character, so copy it to the result.
+            result[j++] = str[i];
+        }
+        i++;
     }
+    result[j] = '\0'; // Null-terminate the new string.
+    
+    return (result);
 }
 // ===============================
 
@@ -418,8 +444,13 @@ static char **handle_quoted_or_export_token(t_token *token, char *expanded)
     }
     else
     {
-		strip_outer_quotes(expanded); // <<< ADDED: Strip quotes for echo etc.
-        split[0] = expanded;  // expanded string, keep ownership
+		// --- This is the change ---
+        // Replace the old, simple quote stripper with our new, smarter one.
+        char *joined_str = remove_quotes_and_join(expanded);
+        free(expanded); // Free the original string
+        expanded = joined_str; // Point to the new, clean string
+        
+        split[0] = expanded; // Keep ownership
     }
     split[1] = NULL;
     return split;
@@ -492,6 +523,8 @@ char **expand_and_split_args(t_token **tokens, t_env_var *env_list, int last_exi
 		if (is_export_assignment(tokens[i])) // <<< REMOVED: && tokens[i]->quote != NO_QUOTE
         	split = handle_quoted_or_export_token(tokens[i], expanded);
         else if (tokens[i]->quote == SINGLE_QUOTE || tokens[i]->quote == DOUBLE_QUOTE)
+			split = handle_quoted_or_export_token(tokens[i], expanded);
+		else if (ft_strchr(expanded, '\'') || ft_strchr(expanded, '\"'))
 			split = handle_quoted_or_export_token(tokens[i], expanded);
         else
         {
