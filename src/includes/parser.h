@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 10:54:01 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 14:53:49 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 10:11:33 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ typedef struct s_token
 }	t_token;
 
 t_token		**parse_line(char *line);
+void		skip_spaces(const char **s);
 void		free_command(t_command *cmd);
 char		**print_error(const char *msg);
 char		*append_char(char *str, char c);
