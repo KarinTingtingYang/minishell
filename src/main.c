@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 14:40:22 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 10:16:30 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,15 @@ int	main(int argc, char **argv, char **envp)
 			printf("exit\n");
 			break;
 		}
+		// --- DEBUGGING: skip leading spaces
+        const char *line_ptr = input;
+        skip_spaces(&line_ptr);
+        if (*line_ptr == '\0')
+        {
+            free(input);
+            continue;
+        }
+        // -----------------------------------------------------
 		if (*input && g_signal_received != SIGINT)
 		{
 			add_history(input);

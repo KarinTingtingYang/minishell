@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 12:23:10 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/12 10:11:12 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
  * It handles spaces and tabs, but does not use the isspace function.
  * @param s Pointer to the string to process.
  */
-static void skip_spaces(const char **s)
+void skip_spaces(const char **s)
 {
 	while (**s && (**s == ' ' || **s == '\t'))
         (*s)++;
