@@ -338,7 +338,10 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
     int             exit_status;
 
     ft_bzero(&data, sizeof(t_execute_data));
-
+	// ---> THIS IS THE FIX <---
+	// We must populate the data struct with the environment list.
+	data.env_list = env_list;
+	
     data.clean_args = handle_redirection(args, &data.input_file, &data.output_file, &data.output_mode, &data.heredoc_file);
     if (!data.clean_args)
     {

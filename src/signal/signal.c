@@ -28,7 +28,7 @@ void setup_signal_handlers(void) { //
     // rl_catch_signals = 0; // <--- This is the crucial line
 	// without setting the variable to 0, the '^C' is echoed in terminal
 	
-	rl_catch_signals = 0; // Disable readline's own signal handlers!
+	//rl_catch_signals = 0; // Disable readline's own signal handlers!
     // --- Configure SIGINT handler ---
     sa_int.sa_handler = handle_parent_sigint; // Set our custom handler
     sigemptyset(&sa_int.sa_mask);           // Clear the mask of signals to be blocked during handler execution

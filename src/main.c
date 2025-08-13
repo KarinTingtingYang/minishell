@@ -40,9 +40,9 @@ int	main(int argc, char **argv, char **envp)
 	{
 		printf("minishell pid: %d about to call readline\n", getpid());
 		g_signal_received = 0;
-		//rl_event_hook = signal_event_hook;
+		rl_event_hook = signal_event_hook;
 		input = readline("\001\033[1;32m\002minishell>\001\033[0m\002 ");
-		//rl_event_hook = NULL;
+		rl_event_hook = NULL;
 		printf("minishell pid: %d readline returned: %s\n", getpid(), 
                input ? input : "NULL");
 		if (g_signal_received == SIGINT)

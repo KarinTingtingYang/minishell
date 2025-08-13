@@ -36,10 +36,13 @@ t_env_var *init_env(char **environ)
         printf("DEBUG: init_env received a NULL environment array!\n");
         return (NULL);
     }
-
+	if (!environ[0]) {
+        printf("init_env: envp[0] is NULL (empty environment)\n");
+        return NULL;
+    }
     while (environ[i])
     {
-		 printf("DEBUG: init_env processing string [%d]: \"%s\"\n", i, environ[i]);
+		printf("DEBUG: init_env processing string [%d]: \"%s\"\n", i, environ[i]);
         char *equal = ft_strchr(environ[i], '=');
         if (!equal)
         {
@@ -60,12 +63,14 @@ t_env_var *init_env(char **environ)
         char *value = ft_strdup(equal + 1);
         if (!value)
         {
+			printf("DEBUG: init_env FAILED: strdup for value failed.\n");
             free(key);
             return (NULL);
         }
         t_env_var *node = new_env_var(key, value);
         if (!node)
         {
+			printf("DEBUG: init_env FAILED: new_env_var (malloc for node) failed.\n");
             free(key);
             free(value);
             return (NULL);
