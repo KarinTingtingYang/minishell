@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor_helper.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/12 11:54:02 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor_helper.c                                  :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/13 14:23:04 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
 	else
 	{
 		exit_code = wait_for_child_and_handle_status(pid);
+		printf("Child process %d finished, returning to shell %d\n", pid, getpid());
 		process_data->last_exit_status = exit_code; // Update the last exit status in process_data
 		free_execute_data(data);
 		return (exit_code);

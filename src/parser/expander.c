@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/12 10:46:55 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/13 14:27:39 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -540,6 +540,6 @@ char **expand_and_split_args(t_token **tokens, t_env_var *env_list, int last_exi
         final_args = new_final;
         i++;
     }
-	print_array(final_args); // DEBUG: Print the final expanded arguments
+	//print_array(final_args); // DEBUG: Print the final expanded arguments
     return final_args;
 }

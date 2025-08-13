@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/13 08:56:11 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   parser.c                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/21 11:05:27 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/13 14:27:36 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,6 +197,6 @@ t_token **parse_line(char *line)
         tokens[i++] = create_token(current_token_val, token_quote_type); // Assuming no quotes for now
     }
     tokens[i] = NULL;
-	print_tokens(tokens); // DEBUG: Print the parsed tokens
+	//print_tokens(tokens); // DEBUG: Print the parsed tokens
     return tokens;
 }
