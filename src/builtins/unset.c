@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 08:47:50 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/12 11:42:22 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/13 09:36:28 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,10 @@ static int is_valid_varname(const char *str)
 int run_unset(t_env_var **env_list, char **args)
 {
     int i;
+	int exit_status; //Debug: Track exit status
 	
 	i = 1;
+	exit_status = 0;
     while (args[i] != NULL)
     {
         if (!is_valid_varname(args[i]))
@@ -89,10 +91,11 @@ int run_unset(t_env_var **env_list, char **args)
 			// ft_putstr_fd(args[i], STDERR_FILENO); // DEBUG: Print the invalid variable name
 			// ft_putendl_fd("`: not a valid identifier", STDERR_FILENO); // DEBUG: Print the error message
 			ft_error("unset", "not a valid identifier");
+			exit_status = 1;
 		}
         else
             remove_env_var(env_list, args[i]);
         i++;
     }
-    return (0); // Return 0 on success
+    return (exit_status); // Debug: Return exit status
 }

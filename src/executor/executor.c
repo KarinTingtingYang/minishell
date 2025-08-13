@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor.c                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/12 14:41:47 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/13 09:44:13 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,71 +264,137 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_l
 // }
 
 
+// static int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data)
+// {
+// 	t_execute_data	data;
+// 	int				original_stdin;
+// 	int				original_stdout;
+// 	int				exit_status;
+
+// 	ft_bzero(&data, sizeof(t_execute_data));
+
+// 	// Use ft_split_dup to duplicate args
+// 	//data.clean_args = ft_split_dup(args);
+
+// 	// REDIRECTION DEBUG: Use handle_redirection to process args
+// 	// Handle redirection here to get clean arguments and redirection files.
+//     data.clean_args = handle_redirection(args, &data.input_file, &data.output_file, &data.output_mode, &data.heredoc_file);
+// 	if (!data.clean_args)
+// 		//return (1);
+// 	// REDIRECTION DEBUG: If handle_redirection fails, return error
+// 	{
+//         if (data.heredoc_file)
+//         {
+//             unlink(data.heredoc_file);
+//             free(data.heredoc_file);
+//         }
+//         return (1); // Error in redirection parsing
+//     }
+// 	if (data.clean_args[0] && !is_builtin(data.clean_args[0]))
+// 	{
+// 		// BUG FIX: NEED TO POPULATE CMD PATH BEFORE PROCEEDING TO EXECUTION
+// 		char **path_dirs = find_path_dirs(env_list);
+// 		if (!path_dirs)
+// 		{
+// 			ft_putendl_fd("Error: PATH variable not found", 2);
+// 			free_execute_data(&data);
+// 			return (1); // Don't continue execution
+// 		}
+// 		data.cmd_path = find_full_cmd_path(data.clean_args[0], path_dirs);
+// 		free_split(path_dirs); // Memory leak fix: free path_dirs after use
+// 		path_dirs = NULL; // Avoid dangling pointer
+// 		exit_status = execute_prepared_command(&data, process_data);
+// 		process_data->last_exit_status = exit_status;
+// 		free_execute_data(&data);
+// 		return (exit_status);
+// 	}
+
+// 	// Save STDIN and STDOUT (if you implement redirection manually, do that here)
+// 	original_stdin = dup(STDIN_FILENO);
+// 	original_stdout = dup(STDOUT_FILENO);
+
+// 	if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
+// 		exit_status = 1;
+// 	else
+// 		exit_status = run_builtin(data.clean_args, env_list);
+
+// 	// Restore STDIN and STDOUT
+// 	dup2(original_stdin, STDIN_FILENO);
+// 	dup2(original_stdout, STDOUT_FILENO);
+// 	close(original_stdin);
+// 	close(original_stdout);
+
+// 	process_data->last_exit_status = exit_status;
+// 	free_execute_data(&data);
+// 	return (exit_status);
+// }
+
+
 static int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data)
 {
-	t_execute_data	data;
-	int				original_stdin;
-	int				original_stdout;
-	int				exit_status;
+    t_execute_data  data;
+    int             original_stdin;
+    int             original_stdout;
+    int             exit_status;
 
-	ft_bzero(&data, sizeof(t_execute_data));
+    ft_bzero(&data, sizeof(t_execute_data));
 
-	// Use ft_split_dup to duplicate args
-	//data.clean_args = ft_split_dup(args);
-
-	// REDIRECTION DEBUG: Use handle_redirection to process args
-	// Handle redirection here to get clean arguments and redirection files.
     data.clean_args = handle_redirection(args, &data.input_file, &data.output_file, &data.output_mode, &data.heredoc_file);
-	if (!data.clean_args)
-		//return (1);
-	// REDIRECTION DEBUG: If handle_redirection fails, return error
-	{
+    if (!data.clean_args)
+    {
         if (data.heredoc_file)
         {
             unlink(data.heredoc_file);
             free(data.heredoc_file);
         }
-        return (1); // Error in redirection parsing
+        return (1);
     }
-	if (data.clean_args[0] && !is_builtin(data.clean_args[0]))
-	{
-		// BUG FIX: NEED TO POPULATE CMD PATH BEFORE PROCEEDING TO EXECUTION
-		char **path_dirs = find_path_dirs(env_list);
-		if (!path_dirs)
-		{
-			ft_putendl_fd("Error: PATH variable not found", 2);
-			free_execute_data(&data);
-			return (1); // Don't continue execution
-		}
-		data.cmd_path = find_full_cmd_path(data.clean_args[0], path_dirs);
-		free_split(path_dirs); // Memory leak fix: free path_dirs after use
-		path_dirs = NULL; // Avoid dangling pointer
-		exit_status = execute_prepared_command(&data, process_data);
-		process_data->last_exit_status = exit_status;
-		free_execute_data(&data);
-		return (exit_status);
-	}
+    
+    // Fix: Handle commands that are only redirections
+    if (!data.clean_args[0])
+    {
+        free_execute_data(&data);
+        return (0);
+    }
 
-	// Save STDIN and STDOUT (if you implement redirection manually, do that here)
-	original_stdin = dup(STDIN_FILENO);
-	original_stdout = dup(STDOUT_FILENO);
+    if (is_builtin(data.clean_args[0]))
+    {
+        original_stdin = dup(STDIN_FILENO);
+        original_stdout = dup(STDOUT_FILENO);
 
-	if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
-		exit_status = 1;
-	else
-		exit_status = run_builtin(data.clean_args, env_list);
+        if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
+            exit_status = 1;
+        else
+            exit_status = run_builtin(data.clean_args, env_list);
 
-	// Restore STDIN and STDOUT
-	dup2(original_stdin, STDIN_FILENO);
-	dup2(original_stdout, STDOUT_FILENO);
-	close(original_stdin);
-	close(original_stdout);
+        dup2(original_stdin, STDIN_FILENO);
+        dup2(original_stdout, STDOUT_FILENO);
+        close(original_stdin);
+        close(original_stdout);
+    }
+    else // Not a builtin
+    {
+        char **path_dirs = find_path_dirs(env_list);
+        
+        // Find command path, handle errors if not found
+        data.cmd_path = find_full_cmd_path(data.clean_args[0], path_dirs);
+        free_split(path_dirs);
 
-	process_data->last_exit_status = exit_status;
-	free_execute_data(&data);
-	return (exit_status);
+        if (!data.cmd_path)
+        {
+            ft_error(data.clean_args[0], "command not found");
+            exit_status = 127;
+        }
+        else
+        {
+            exit_status = execute_prepared_command(&data, process_data);
+        }
+    }
+
+    process_data->last_exit_status = exit_status;
+    free_execute_data(&data);
+    return (exit_status);
 }
-
 
 
 /**
