@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:09:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/14 10:44:59 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/14 13:41:29 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,5 +126,5 @@ int	main(int argc, char **argv, char **envp)
 	}
 	//printf("minishell pid: %d exiting main loop\n", getpid());
 	free_env(env_list);
-	return (0);
+	return (process_data.last_exit_status);
 }
