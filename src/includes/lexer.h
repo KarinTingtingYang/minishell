@@ -6,18 +6,24 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 08:42:04 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/12 12:03:11 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/14 11:09:24 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LEXER_H
-#define LEXER_H
+# define LEXER_H
+
+typedef struct s_append_info
+{
+	char	**array;
+	int		count;
+}	t_append_info;
 
 char	**tokenize_input(char *line);
 void	free_tokens(t_token **tokens);
-// char	**print_error(const char *msg);
+char	*append_char(char *str, char c);
 char	**split_line_by_pipe(char *line);
-void	append_to_token(char c, char **buffer);
-char	**save_token(char **tokens, char *token, int *count);
+char	**duplicate_tokens_to_array(t_token **tokens, int len);
+char	**append_str(t_append_info *info, char *line, int start, int end);
 
 #endif

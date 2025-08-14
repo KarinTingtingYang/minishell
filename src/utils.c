@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/12 11:34:21 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/14 10:58:03 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,13 @@ char *ft_strjoin_free(char *s1, char *s2)
     free(s1);
     free(s2);
     return (joined);
+}
+
+
+void	skip_spaces(const char **s)
+{
+	while (**s && (**s == ' ' || **s == '\t'))
+		(*s)++;
 }
 
 void print_array(char **array)

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/12 10:51:28 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/14 10:58:14 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,5 +60,6 @@ void		free_env(t_env_var *env);
 char		*ft_strjoin_free(char *s1, char *s2);
 void print_array(char **array);
 void print_tokens(t_token **tokens);
+void	skip_spaces(const char **s);
 
 #endif
