@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 13:23:39 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/13 10:11:35 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,23 +23,23 @@
  *                   environment variable.
  * @return           0 on success, -1 if the command was not found.
  */
-static int search_command_in_path(t_command *cmd, char **path_dirs)
+static int	search_command_in_path(t_command *cmd, char **path_dirs)
 {
-    cmd->cmd_path = find_full_cmd_path(cmd->args[0], path_dirs);
-    if (cmd->cmd_path == NULL)
-        return (-1);
-    return (0);
+	cmd->cmd_path = find_full_cmd_path(cmd->args[0], path_dirs);
+	if (cmd->cmd_path == NULL)
+		return (-1);
+	return (0);
 }
 
 /**
- * @brief Duplicates a NULL-terminated array of strings.
+ * @brief Frees the memory allocated for a command structure.
  * 
- * Allocates memory for a new array and copies each string from the original
- * array to the new one. The new array is also NULL-terminated.
- * @param split  The original array of strings to duplicate.
- * @return       A new NULL-terminated array of strings, or NULL on failure.
+ * This function frees all dynamically allocated fields in the `t_command`
+ * structure, including the command path, arguments, input/output files,
+ * and heredoc file. It does not free the structure itself.
+ * @param cmd Pointer to the command structure to free.
  */
-static char **duplicate_split(char **split)
+static char	**duplicate_split(char **split)
 {
 	int		i;
 	char	**copy;
@@ -56,12 +56,11 @@ static char **duplicate_split(char **split)
 	while (split[i])
 	{
 		copy[i] = strdup(split[i]);
-		if (!copy[i])
+		if (copy[i] == NULL)
 		{
 			while (--i >= 0)
 				free(copy[i]);
-			free(copy);
-			return (NULL);
+			return (free(copy), NULL);
 		}
 		i++;
 	}
@@ -70,49 +69,48 @@ static char **duplicate_split(char **split)
 }
 
 /**
- * @brief Parses the command arguments and handles redirection.
+ * @brief Parses command arguments and handles redirection.
  * 
- * This function takes a command structure and an array of tokens,
- * parses the tokens to extract command arguments, and handles any
- * input/output redirection specified in the tokens.
- * If parsing fails, it returns -1; if only redirection is present,
- * it returns 1; otherwise, it returns 0 on success.
- * @param cmd    Pointer to the command structure to fill.
+ * This function processes the provided tokens to extract command arguments
+ * and redirection information. It updates the `cmd` structure with the parsed
+ * arguments and redirection files.
+ * @param cmd    Pointer to the command structure to populate.
  * @param tokens Array of strings representing the command and its arguments.
- * @return       0 on success, -1 on failure, 1 if only redirection is present.
+ * @return       0 on success, -1 if an error occurs (e.g., memory
+ *               allocation failure).
  */
-static int parse_args_and_redirection(t_command *cmd, char **tokens)
+static int	parse_args_and_redirection(t_command *cmd, char **tokens)
 {
-    char **original_args;
-	
-	if (tokens == NULL || tokens[0] == NULL) // no command to execute
-        return (-1);
-    original_args = duplicate_split(tokens);
-    if (original_args == NULL)
-        return (-1);
-    cmd->args = handle_redirection(original_args, &cmd->input_file, 
-		&cmd->output_file, &cmd->output_mode, &cmd->heredoc_file);
-    free_split(original_args);
-    if (cmd->args == NULL)
-        return (-1);
-    if (cmd->args[0] == NULL)
-        return (1);
-    return (0);
+	char	**original_args;
+
+	if (tokens == NULL || tokens[0] == NULL)
+		return (-1);
+	original_args = duplicate_split(tokens);
+	if (original_args == NULL)
+		return (-1);
+	cmd->args = handle_redirection(original_args, &cmd->input_file,
+			&cmd->output_file, &cmd->output_mode, &cmd->heredoc_file);
+	free_split(original_args);
+	if (cmd->args == NULL)
+		return (-1);
+	if (cmd->args[0] == NULL)
+		return (1);
+	return (0);
 }
 
 /**
- * @brief Allocates and initializes a new t_command structure.
+ * @brief Creates an empty command structure.
  * 
- * This function allocates memory for a t_command struct and initializes all
- * of its fields (`args`, `cmd_path`, `input_file`, and `output_file`) to NULL.
- * It is typically used as the first step in preparing a command for execution.
- * @return A pointer to the newly allocated and initialized t_command structure,
- *         or NULL if memory allocation fails.
+ * Allocates memory for a new `t_command` structure and initializes its fields
+ * to NULL or default values. This is used as a starting point for creating
+ * commands from parsed input.
+ * @return A pointer to the newly created `t_command` structure,
+ *         or NULL on failure.
  */
-static t_command *create_empty_command(void)
+static t_command	*create_empty_command(void)
 {
-	t_command *cmd;
-	
+	t_command	*cmd;
+
 	cmd = malloc(sizeof(t_command));
 	if (cmd == NULL)
 		return (NULL);
@@ -126,38 +124,40 @@ static t_command *create_empty_command(void)
 }
 
 /**
- * @brief Creates a t_command structure from an array of tokens.
+ * @brief Creates a new command structure from the provided tokens.
  * 
- * This function initializes a new t_command structure, parses the tokens
- * to extract command arguments and redirection information, and resolves
- * the command path using the provided PATH directories.
- * If any step fails, it cleans up and returns NULL.
- * @param tokens    Array of strings representing the command and its arguments.
- * @param path_dirs NULL-terminated array of directories from the PATH environment variable.
- * @return A pointer to the newly created t_command structure, or NULL on failure.
+ * This function initializes a new `t_command` structure, parses the provided
+ * tokens to extract command arguments and redirection information, and searches
+ * for the command in the PATH directories. If successful, it returns the command
+ * structure; otherwise, it returns NULL.
+ * @param tokens     Array of strings representing the command and its arguments.
+ * @param path_dirs  NULL-terminated array of directories from the PATH
+ *                   environment variable.
+ * @return           A pointer to the newly created t_command structure,
+ *                   or NULL on failure.
  */
-t_command *create_command(char **tokens, char **path_dirs)
+t_command	*create_command(char **tokens, char **path_dirs)
 {
-    t_command *cmd;
-	int redir_parse_result;
-	
+	t_command	*cmd;
+	int			redir_parse_result;
+
 	cmd = create_empty_command();
-    if (cmd == NULL)
+	if (cmd == NULL)
 	{
-        return (NULL);
+		return (NULL);
 	}
 	redir_parse_result = parse_args_and_redirection(cmd, tokens);
-    if (redir_parse_result == -1)
-    {
-        free(cmd);
-        return (NULL);
-    }
-    if (redir_parse_result == 1) // no executable command, just redirection
-        return (cmd);
-    if (search_command_in_path(cmd, path_dirs) == -1)
-    {
-        free_command(cmd);
-        return (NULL);
-    }
-    return (cmd);
+	if (redir_parse_result == -1)
+	{
+		free(cmd);
+		return (NULL);
+	}
+	if (redir_parse_result == 1)
+		return (cmd);
+	if (search_command_in_path(cmd, path_dirs) == -1)
+	{
+		free_command(cmd);
+		return (NULL);
+	}
+	return (cmd);
 }

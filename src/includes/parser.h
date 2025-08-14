@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 10:54:01 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/12 12:03:16 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/14 11:02:35 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,10 @@ typedef struct s_token
 }	t_token;
 
 t_token		**parse_line(char *line);
-void		skip_spaces(const char **s);
+int			count_tokens(const char *s);
 void		free_command(t_command *cmd);
-// char		**print_error(const char *msg);
-char		*append_char(char *str, char c);
-char		**split_line_by_pipe(char *line);
+char		*substr_dup(const char *start, size_t len);
 t_command	*create_command(char **tokens, char **path_dirs);
-char		**append_str(char **arr, char *line, int start, int end, int *count);
+t_token		*create_token(char *value, t_quote_type quote_type);
 
 #endif

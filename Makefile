@@ -26,12 +26,16 @@ SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/pipes/pipes.c \
              $(SRC_DIR)/pipes/pipes_helper.c \
              $(SRC_DIR)/parser/parser.c \
+			 $(SRC_DIR)/parser/parser_helper.c \
              $(SRC_DIR)/parser/command_create.c \
              $(SRC_DIR)/parser/command_free.c \
 			 $(SRC_DIR)/parser/lexer.c \
 			 $(SRC_DIR)/parser/lexer_helper.c \
 			 $(SRC_DIR)/parser/expander.c \
-			 $(SRC_DIR)/parser/expander_helper.c \
+			 $(SRC_DIR)/parser/expander_helper_1.c \
+			 $(SRC_DIR)/parser/expander_helper_2.c \
+			 $(SRC_DIR)/parser/expander_helper_3.c \
+			 $(SRC_DIR)/parser/expander_helper_4.c \
              $(SRC_DIR)/utils.c \
              $(SRC_DIR)/signal/signal.c \
              $(SRC_DIR)/signal/signal_utils.c \

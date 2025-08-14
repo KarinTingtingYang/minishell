@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/13 09:44:13 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/14 08:28:32 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -338,6 +338,8 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
     int             exit_status;
 
     ft_bzero(&data, sizeof(t_execute_data));
+
+	data.env_list = env_list;
 
     data.clean_args = handle_redirection(args, &data.input_file, &data.output_file, &data.output_mode, &data.heredoc_file);
     if (!data.clean_args)
