@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 10:58:03 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/14 13:53:20 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,13 @@ void ft_error_and_exit(char *command, char *message, int exit_status)
 void ft_error(char *command, char *message)
 {
     ft_putstr_fd("minishell: ", STDERR_FILENO);
-    ft_putstr_fd(command, STDERR_FILENO);
-    ft_putstr_fd(": ", STDERR_FILENO);
+	if (command && *command) // Only print if cmd is not empty
+    {
+        ft_putstr_fd(command, STDERR_FILENO);
+        ft_putstr_fd(": ", STDERR_FILENO);
+    }
+    // ft_putstr_fd(command, STDERR_FILENO);
+    // ft_putstr_fd(": ", STDERR_FILENO);
     ft_putstr_fd(message, STDERR_FILENO);
     ft_putstr_fd("\n", STDERR_FILENO);
 }

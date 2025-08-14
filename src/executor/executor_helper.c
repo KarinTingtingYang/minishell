@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor_helper.c                                  :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/14 10:46:38 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor_helper.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/14 13:52:09 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
     if (!data->original_args || !data->original_args[0])
     {
 		// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: changed to a more generic error message
-        ft_error("minishell", "syntax error (unclosed quote)");
+		ft_error("", "syntax error (unclosed quote)");
 		free_split(data->original_args);
         // return (0);		 // no command to execute // but we still want to return 1 to indicate success
 		return (1); // no command to execute, but we still want to return 1 to indicate success
@@ -137,7 +137,7 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
     data->path_dirs = find_path_dirs(env_list);
     if (!data->path_dirs)
     {
-		ft_error("minishell", "PATH variable not found"); // DEBUG: Print error if PATH not found
+		ft_error("", "PATH variable not found"); // DEBUG: Print error if PATH not found
         // printf("Error: PATH variable not found\n"); // DEBUG: Print error if PATH not found
         // free_split(data->original_args);
         // free_split(data->clean_args);
@@ -184,7 +184,7 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index,
         if (path_dirs == NULL)
         {
             // ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO); // DEBUG: Print error if PATH not found
-			ft_error("minishell", "PATH not found");
+			ft_error("", "PATH not found");
             return (0);
         }
         while (index < count)
@@ -215,7 +215,7 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index,
             if (cmds[index] == NULL)
 			{
 				// ft_putstr_fd("minishell: command creation failed\n", STDERR_FILENO); // DEBUG: Print error if command creation fails
-				ft_error("minishell", "command creation failed");
+				ft_error("", "command creation failed");
 				free_split(path_dirs);
 				return (0);
 			}
@@ -251,7 +251,7 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
     if (*parts == NULL || (*parts)[0] == NULL)
     {
 		// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: Print error if split fails
-		ft_error("minishell", "syntax error (unclosed quote)");
+		ft_error("", "syntax error (unclosed quote)");
         if (*parts != NULL)
             free_split(*parts);
         return (NULL);

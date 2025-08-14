@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 10:27:49 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/12 11:07:40 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/14 13:40:26 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ static int	redirect_builtin_input(char *input_file)
     if (fd == -1)
     {
         // perror("minishell"); // DEBUG: Print error if open fails
-		ft_error_and_exit("minishell", strerror(errno), EXIT_FAILURE);
+		// ft_error_and_exit("minishell", strerror(errno), EXIT_FAILURE);
+		ft_error_and_exit(input_file, strerror(errno), EXIT_FAILURE);
         return (-1);
     }
     if (dup2(fd, STDIN_FILENO) == -1)
@@ -71,7 +72,8 @@ static int	redirect_builtin_output(char *output_file, int output_mode)
     if (fd == -1)
     {
         // perror("minishell"); // DEBUG: Print error if open fails
-		ft_error_and_exit("minishell", strerror(errno), EXIT_FAILURE);
+		// ft_error_and_exit("minishell", strerror(errno), EXIT_FAILURE);
+		ft_error_and_exit(output_file, strerror(errno), EXIT_FAILURE);
         return (-1);
     }
     if (dup2(fd, STDOUT_FILENO) == -1)
