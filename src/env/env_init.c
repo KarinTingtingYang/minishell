@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/31 11:45:37 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/13 15:14:05 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/14 10:46:00 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,16 +33,16 @@ t_env_var *init_env(char **environ)
 
 	if (!environ)
     {
-        printf("DEBUG: init_env received a NULL environment array!\n");
+        //printf("DEBUG: init_env received a NULL environment array!\n");
         return (NULL);
     }
 	if (!environ[0]) {
-        printf("init_env: envp[0] is NULL (empty environment)\n");
+        //printf("init_env: envp[0] is NULL (empty environment)\n");
         return NULL;
     }
     while (environ[i])
     {
-		printf("DEBUG: init_env processing string [%d]: \"%s\"\n", i, environ[i]);
+		//printf("DEBUG: init_env processing string [%d]: \"%s\"\n", i, environ[i]);
         char *equal = ft_strchr(environ[i], '=');
         if (!equal)
         {
@@ -53,7 +53,7 @@ t_env_var *init_env(char **environ)
         char *key = malloc(key_len + 1);
         if (!key)
 		{
-			printf("DEBUG: init_env FAILED: malloc for key failed.\n");
+			//printf("DEBUG: init_env FAILED: malloc for key failed.\n");
 			return (NULL); // handle cleanup in real code
 		}
             
@@ -63,14 +63,14 @@ t_env_var *init_env(char **environ)
         char *value = ft_strdup(equal + 1);
         if (!value)
         {
-			printf("DEBUG: init_env FAILED: strdup for value failed.\n");
+			//printf("DEBUG: init_env FAILED: strdup for value failed.\n");
             free(key);
             return (NULL);
         }
         t_env_var *node = new_env_var(key, value);
         if (!node)
         {
-			printf("DEBUG: init_env FAILED: new_env_var (malloc for node) failed.\n");
+			//printf("DEBUG: init_env FAILED: new_env_var (malloc for node) failed.\n");
             free(key);
             free(value);
             return (NULL);
