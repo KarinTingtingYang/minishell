@@ -6,12 +6,48 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 13:52:09 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/14 14:13:13 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
+// Add this new helper function at the top of src/executor/executor_helper.c
+static int is_empty_or_whitespace(const char *str)
+{
+    if (!str)
+        return (1);
+    while (*str && (*str == ' ' || *str == '\t'))
+        str++;
+    return (*str == '\0');
+}
+
+/**
+ * @brief Validates the segments of a command pipeline after splitting by '|'.
+ * Checks for empty segments which are syntax errors.
+ * @param parts The array of command strings.
+ * @param count The number of command strings in the array.
+ * @return 1 on successful validation, 0 on syntax error.
+ */
+static int validate_pipeline_parts(char **parts, int count)
+{
+    int i;
+
+	if (count <= 1)
+		return (1); // No pipes, or single command, no pipe syntax to check.
+
+	i = 0;
+	while (i < count)
+	{
+		if (is_empty_or_whitespace(parts[i]))
+        {
+            ft_error("minishell", "syntax error near unexpected token `|'");
+            return (0); // Validation failed.
+        }
+		i++;
+	}
+    return (1); // All parts are valid.
+}
 /**
  * @brief Executes a previously prepared command in a child process.
  * 
@@ -256,7 +292,22 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
             free_split(*parts);
         return (NULL);
     }
+
+	// ---> FIX: VALIDATE THE COMMAND PARTS <---
     *count = count_command_parts(*parts);
+    if (!validate_pipeline_parts(*parts, *count))
+    {
+        free_split(*parts);
+        return (NULL);
+    }
+	// If a single command is empty (e.g., user just hits enter), it's not a pipe error.
+    if (*count == 1 && is_empty_or_whitespace((*parts)[0]))
+    {
+        free_split(*parts);
+        return (NULL);
+    }
+	// ---> END OF FIX <---
+	
 	cmds = malloc(sizeof(t_command *) * (*count + 1));
     if (cmds == NULL)
 	{
