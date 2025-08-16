@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/16 12:18:09 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:07:37 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,9 +129,18 @@ static int	export_variable(const char *arg, t_env_var *env_list)
 
 	append = 0;
 	equal_sign = ft_strchr(arg, '=');
-	if (!equal_sign) // No '=' found
+	if (!equal_sign)
+	{
+		if (!is_valid_identifier(arg))
+		{
+			ft_error("export", "not a valid identifier");
+			return (1);
+		}
+		existing_var = find_env_var(arg, env_list);
+		if (!existing_var)
+			add_env_var(ft_strdup(arg), ft_strdup(""), env_list);
 		return (0);
-
+	}
 	// Detect '+=' syntax
 	if (*(equal_sign - 1) == '+') // DEBUGGING
 	{
@@ -151,9 +160,18 @@ static int	export_variable(const char *arg, t_env_var *env_list)
 	value = ft_strdup(equal_sign + 1);
 
 	// Strip surrounding quotes if both first and last chars are matching quotes
-	if (value && ((value[0] == '"' || value[0] == '\'') && value[ft_strlen(value) - 1] == value[0]))
+	// if (value && ((value[0] == '"' || value[0] == '\'') && value[ft_strlen(value) - 1] == value[0]))
+	// {
+	// 	char *unquoted = ft_substr(value, 1, ft_strlen(value) - 2);
+	// 	free(value);
+	// 	value = unquoted;
+	// }
+	size_t len = ft_strlen(value);
+	if (value && len >= 2
+		&& ((value[0] == '\'' && value[len - 1] == '\'')
+			|| (value[0] == '"' && value[len - 1] == '"')))
 	{
-		char *unquoted = ft_substr(value, 1, ft_strlen(value) - 2);
+		char *unquoted = ft_substr(value, 1, len - 2);
 		free(value);
 		value = unquoted;
 	}
