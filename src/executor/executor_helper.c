@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 14:13:13 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/16 12:52:12 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,43 +64,82 @@ static int validate_pipeline_parts(char **parts, int count)
  *         - -1 if `fork()` fails.
  */
 // int execute_prepared_command(t_execute_data *data)
+// int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
+// {
+// 	pid_t pid;
+// 	int exit_code;
+// 	int has_redirection = (data->input_file || data->output_file);
+
+// 	if (is_builtin(data->clean_args[0]) && !has_redirection)
+// 	{
+// 		run_builtin(data->clean_args, data->env_list);
+// 		free_execute_data(data);
+// 		return (0);
+// 	}
+// 	pid = fork();
+// 	if (pid < 0)
+// 	{
+// 		// perror("fork"); // DEBUG: Print error if fork fails
+// 		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
+// 		free_execute_data(data);
+// 		return (-1);
+// 	}
+// 	else if (pid == 0)
+// 	{
+// 		redirect_io(data->input_file, data->output_file, data->output_mode);
+// 		if (is_builtin(data->clean_args[0]))
+// 			run_builtin(data->clean_args, data->env_list);
+// 		else
+// 			execute_cmd(data->cmd_path, data->clean_args, data->path_dirs, data->env_list);
+// 		exit(0);
+// 	}
+// 	else
+// 	{
+// 		exit_code = wait_for_child_and_handle_status(pid);
+// 		//printf("Child process %d finished, returning to shell %d\n", pid, getpid());
+// 		process_data->last_exit_status = exit_code; // Update the last exit status in process_data
+// 		free_execute_data(data);
+// 		return (exit_code);
+// 	}
+// }
+
+
 int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
 {
-	pid_t pid;
-	int exit_code;
-	int has_redirection = (data->input_file || data->output_file);
+    pid_t pid;
+    int exit_code;
+    int has_redirection = (data->input_file || data->output_file);
 
-	if (is_builtin(data->clean_args[0]) && !has_redirection)
-	{
-		run_builtin(data->clean_args, data->env_list);
-		free_execute_data(data);
-		return (0);
-	}
-	pid = fork();
-	if (pid < 0)
-	{
-		// perror("fork"); // DEBUG: Print error if fork fails
-		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
-		free_execute_data(data);
-		return (-1);
-	}
-	else if (pid == 0)
-	{
-		redirect_io(data->input_file, data->output_file, data->output_mode);
-		if (is_builtin(data->clean_args[0]))
-			run_builtin(data->clean_args, data->env_list);
-		else
-			execute_cmd(data->cmd_path, data->clean_args, data->path_dirs, data->env_list);
-		exit(0);
-	}
-	else
-	{
-		exit_code = wait_for_child_and_handle_status(pid);
-		//printf("Child process %d finished, returning to shell %d\n", pid, getpid());
-		process_data->last_exit_status = exit_code; // Update the last exit status in process_data
-		free_execute_data(data);
-		return (exit_code);
-	}
+    if (is_builtin(data->clean_args[0]) && !has_redirection && !process_data->in_pipeline) // DEBUG
+    {
+        run_builtin(data->clean_args, data->env_list);
+        free_execute_data(data);
+        return (0);
+    }
+
+    pid = fork();
+    if (pid < 0)
+    {
+        ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
+        free_execute_data(data);
+        return (-1);
+    }
+    else if (pid == 0)
+    {
+        redirect_io(data->input_file, data->output_file, data->output_mode);
+        if (is_builtin(data->clean_args[0]))
+            run_builtin(data->clean_args, data->env_list);
+        else
+            execute_cmd(data->cmd_path, data->clean_args, data->path_dirs, data->env_list);
+        exit(0);
+    }
+    else
+    {
+        exit_code = wait_for_child_and_handle_status(pid);
+        process_data->last_exit_status = exit_code;
+        free_execute_data(data);
+        return (exit_code);
+    }
 }
 
 /**
@@ -324,6 +363,12 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
         free_split(*parts);
         return (NULL);
     }
+	int i = 0;
+	while (i < *count)
+	{
+		process_data[i].in_pipeline = (*count > 1);  // DEBUG
+		i++;
+	}
     return (cmds);
 }
 

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 08:58:09 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/07 15:08:22 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/16 11:34:09 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ void free_execute_data(t_execute_data *data)
     free_split(data->original_args);
     free_split(data->clean_args);
     free(data->cmd_path);
-    // Set pointers to NULL after freeing to prevent dangling pointers.
     data->path_dirs = NULL;
     data->original_args = NULL;
     data->clean_args = NULL;

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/13 10:11:35 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/16 12:16:05 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,10 +154,15 @@ t_command	*create_command(char **tokens, char **path_dirs)
 	}
 	if (redir_parse_result == 1)
 		return (cmd);
-	if (search_command_in_path(cmd, path_dirs) == -1)
-	{
-		free_command(cmd);
-		return (NULL);
-	}
+	// if (search_command_in_path(cmd, path_dirs) == -1)
+	// {
+	// 	free_command(cmd);
+	// 	return (NULL);
+	// }
+	if (!is_builtin(cmd->args[0]) && search_command_in_path(cmd, path_dirs) == -1) // DEBUGGING
+    {
+        free_command(cmd);
+        return (NULL);
+    }
 	return (cmd);
 }
