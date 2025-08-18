@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 11:30:32 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/05 08:33:43 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/16 12:36:00 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ typedef struct s_process_data
 	// char    **envp;       // Environment variables for the child processes
 	t_env_var *env_list;
 	int			last_exit_status; // Last exit status of the executed command
+	int in_pipeline;
 } t_process_data;
 
 int		**prepare_pipe_fds(int cmd_count);

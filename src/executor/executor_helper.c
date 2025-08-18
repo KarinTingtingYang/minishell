@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor_helper.c                                  :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/14 14:02:33 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor_helper.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/16 12:52:12 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,43 +64,82 @@ static int validate_pipeline_parts(char **parts, int count)
  *         - -1 if `fork()` fails.
  */
 // int execute_prepared_command(t_execute_data *data)
+// int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
+// {
+// 	pid_t pid;
+// 	int exit_code;
+// 	int has_redirection = (data->input_file || data->output_file);
+
+// 	if (is_builtin(data->clean_args[0]) && !has_redirection)
+// 	{
+// 		run_builtin(data->clean_args, data->env_list);
+// 		free_execute_data(data);
+// 		return (0);
+// 	}
+// 	pid = fork();
+// 	if (pid < 0)
+// 	{
+// 		// perror("fork"); // DEBUG: Print error if fork fails
+// 		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
+// 		free_execute_data(data);
+// 		return (-1);
+// 	}
+// 	else if (pid == 0)
+// 	{
+// 		redirect_io(data->input_file, data->output_file, data->output_mode);
+// 		if (is_builtin(data->clean_args[0]))
+// 			run_builtin(data->clean_args, data->env_list);
+// 		else
+// 			execute_cmd(data->cmd_path, data->clean_args, data->path_dirs, data->env_list);
+// 		exit(0);
+// 	}
+// 	else
+// 	{
+// 		exit_code = wait_for_child_and_handle_status(pid);
+// 		//printf("Child process %d finished, returning to shell %d\n", pid, getpid());
+// 		process_data->last_exit_status = exit_code; // Update the last exit status in process_data
+// 		free_execute_data(data);
+// 		return (exit_code);
+// 	}
+// }
+
+
 int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
 {
-	pid_t pid;
-	int exit_code;
-	int has_redirection = (data->input_file || data->output_file);
+    pid_t pid;
+    int exit_code;
+    int has_redirection = (data->input_file || data->output_file);
 
-	if (is_builtin(data->clean_args[0]) && !has_redirection)
-	{
-		run_builtin(data->clean_args, data->env_list);
-		free_execute_data(data);
-		return (0);
-	}
-	pid = fork();
-	if (pid < 0)
-	{
-		// perror("fork"); // DEBUG: Print error if fork fails
-		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
-		free_execute_data(data);
-		return (-1);
-	}
-	else if (pid == 0)
-	{
-		redirect_io(data->input_file, data->output_file, data->output_mode);
-		if (is_builtin(data->clean_args[0]))
-			run_builtin(data->clean_args, data->env_list);
-		else
-			execute_cmd(data->cmd_path, data->clean_args, data->path_dirs, data->env_list);
-		exit(0);
-	}
-	else
-	{
-		exit_code = wait_for_child_and_handle_status(pid);
-		//printf("Child process %d finished, returning to shell %d\n", pid, getpid());
-		process_data->last_exit_status = exit_code; // Update the last exit status in process_data
-		free_execute_data(data);
-		return (exit_code);
-	}
+    if (is_builtin(data->clean_args[0]) && !has_redirection && !process_data->in_pipeline) // DEBUG
+    {
+        run_builtin(data->clean_args, data->env_list);
+        free_execute_data(data);
+        return (0);
+    }
+
+    pid = fork();
+    if (pid < 0)
+    {
+        ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
+        free_execute_data(data);
+        return (-1);
+    }
+    else if (pid == 0)
+    {
+        redirect_io(data->input_file, data->output_file, data->output_mode);
+        if (is_builtin(data->clean_args[0]))
+            run_builtin(data->clean_args, data->env_list);
+        else
+            execute_cmd(data->cmd_path, data->clean_args, data->path_dirs, data->env_list);
+        exit(0);
+    }
+    else
+    {
+        exit_code = wait_for_child_and_handle_status(pid);
+        process_data->last_exit_status = exit_code;
+        free_execute_data(data);
+        return (exit_code);
+    }
 }
 
 /**
@@ -137,7 +176,7 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
     if (!data->original_args || !data->original_args[0])
     {
 		// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: changed to a more generic error message
-        ft_error("minishell", "syntax error (unclosed quote)");
+		ft_error("", "syntax error (unclosed quote)");
 		free_split(data->original_args);
         // return (0);		 // no command to execute // but we still want to return 1 to indicate success
 		return (1); // no command to execute, but we still want to return 1 to indicate success
@@ -173,7 +212,7 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
     data->path_dirs = find_path_dirs(env_list);
     if (!data->path_dirs)
     {
-		ft_error("minishell", "PATH variable not found"); // DEBUG: Print error if PATH not found
+		ft_error("", "PATH variable not found"); // DEBUG: Print error if PATH not found
         // printf("Error: PATH variable not found\n"); // DEBUG: Print error if PATH not found
         // free_split(data->original_args);
         // free_split(data->clean_args);
@@ -220,7 +259,7 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index,
         if (path_dirs == NULL)
         {
             // ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO); // DEBUG: Print error if PATH not found
-			ft_error("minishell", "PATH not found");
+			ft_error("", "PATH not found");
             return (0);
         }
         while (index < count)
@@ -251,7 +290,7 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index,
             if (cmds[index] == NULL)
 			{
 				// ft_putstr_fd("minishell: command creation failed\n", STDERR_FILENO); // DEBUG: Print error if command creation fails
-				ft_error("minishell", "command creation failed");
+				ft_error("", "command creation failed");
 				free_split(path_dirs);
 				return (0);
 			}
@@ -287,7 +326,7 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
     if (*parts == NULL || (*parts)[0] == NULL)
     {
 		// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: Print error if split fails
-		ft_error("minishell", "syntax error (unclosed quote)");
+		ft_error("", "syntax error (unclosed quote)");
         if (*parts != NULL)
             free_split(*parts);
         return (NULL);
@@ -324,6 +363,12 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
         free_split(*parts);
         return (NULL);
     }
+	int i = 0;
+	while (i < *count)
+	{
+		process_data[i].in_pipeline = (*count > 1);  // DEBUG
+		i++;
+	}
     return (cmds);
 }
 

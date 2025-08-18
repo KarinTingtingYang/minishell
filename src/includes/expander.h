@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:14:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 11:10:04 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/18 09:57:36 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,5 +39,7 @@ int		handle_standard_var(const char *input, size_t start,
 			char **result, t_expand_data *data);
 char	**handle_quoted_or_export_token(t_token *token, char *expanded);
 int		handle_default_case(const char *input, size_t i, char **result);
+char	*expand_variables(char *input, t_env_var *env_list,
+								int last_exit_status, t_quote_type quote);
 
 #endif

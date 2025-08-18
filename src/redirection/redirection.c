@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 08:25:34 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/12 12:01:21 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/14 13:48:17 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ static int	process_redirection_token(char **args, int i,
         char *full_msg = ft_strjoin(error_msg_prefix, args[i + 1]);
         char *final_msg = ft_strjoin(full_msg, error_msg_suffix);
         
-        ft_error("minishell", final_msg);
+        ft_error("", final_msg);
 
         free(full_msg);
         free(final_msg);
