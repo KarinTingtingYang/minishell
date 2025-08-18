@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 09:01:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/16 11:23:12 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/18 09:54:30 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ int		run_builtin(char **args, t_env_var *env_list);
 
 int		run_pwd(void);
 int		run_cd(char **args, t_env_var *env_list);
-void	run_echo(char **args);
+// void	run_echo(char **args);
+void run_echo(char **args, t_env_var *env_list);
 int		run_exit(char **args);
 void 	run_env(t_env_var *env_list);
 int 	run_export(t_env_var *env_list, char **args);

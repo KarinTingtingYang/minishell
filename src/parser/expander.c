@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/16 10:27:35 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/18 09:57:22 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static size_t	handle_variable_expansion(const char *input, size_t i,
 		return (expand_simple_variable(input, i, result, data));
 }
 
-static char	*expand_variables(char *input, t_env_var *env_list,
+char	*expand_variables(char *input, t_env_var *env_list,
 								int last_exit_status, t_quote_type quote)
 {
 	char			*result;

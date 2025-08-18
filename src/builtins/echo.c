@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 11:21:01 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/14 14:07:52 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/18 10:03:40 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,13 +55,15 @@ static int is_valid_n_flag(char *s)
     return (0);
 }
 
-void    run_echo(char **args)
+// void    run_echo(char **args)
+void run_echo(char **args, t_env_var *env_list)
 {
     int i;
     int newline;
     
     i = 1;
     newline = 1;
+	t_quote_type quote = NO_QUOTE; 
 
     // A standard echo built-in should handle multiple -n flags (e.g., echo -n -n -n).
     // This loop checks for and skips all valid -n flags at the beginning of the arguments.
@@ -71,13 +73,24 @@ void    run_echo(char **args)
         i++;
     }
     // Print the remaining arguments, separated by a space.
-    while (args[i] != NULL)
-    {
-        ft_putstr_fd(args[i], STDOUT_FILENO);
-        if (args[i + 1] != NULL)
-            ft_putchar_fd(' ', STDOUT_FILENO);
-        i++;
-    }
+    // while (args[i] != NULL)
+    // {
+    //     ft_putstr_fd(args[i], STDOUT_FILENO);
+    //     if (args[i + 1] != NULL)
+    //         ft_putchar_fd(' ', STDOUT_FILENO);
+    //     i++;
+    // }
+
+	while (args[i] != NULL)
+	{
+		char *expanded = expand_variables(args[i], env_list, 0, quote);
+		ft_putstr_fd(expanded, STDOUT_FILENO);
+		free(expanded);
+
+		if (args[i + 1] != NULL)
+			ft_putchar_fd(' ', STDOUT_FILENO);
+		i++;
+	}
     
     // Add a newline unless the -n flag(s) was/were present.
     if (newline)

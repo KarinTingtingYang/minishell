@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/16 14:07:37 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/18 09:45:51 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,10 +167,13 @@ static int	export_variable(const char *arg, t_env_var *env_list)
 	// 	value = unquoted;
 	// }
 	size_t len = ft_strlen(value);
+	// printf("value before = [%s], value[0] = [%c] (%d), last = [%c] (%d)\n",
+	// value, value[0], value[0], value[len - 1], value[len - 1]);
 	if (value && len >= 2
-		&& ((value[0] == '\'' && value[len - 1] == '\'')
-			|| (value[0] == '"' && value[len - 1] == '"')))
+    && ((value[0] == '"' && value[len - 1] == '"')
+        || (value[0] == '\'' && value[len - 1] == '\'')))
 	{
+		// ensure only one pair of same quotes
 		char *unquoted = ft_substr(value, 1, len - 2);
 		free(value);
 		value = unquoted;

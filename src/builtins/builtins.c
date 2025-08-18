@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 09:00:14 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/16 11:23:04 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/18 09:55:18 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ int run_builtin(char **args, t_env_var *env_list)
 	if (args == NULL || args[0] == NULL)
 		return (1);
 	if (ft_strncmp(args[0], "echo", 5) == 0)
-		return (run_echo(args), 0);
+		// return (run_echo(args), 0);
+		return (run_echo(args, env_list), 0);
 	if (ft_strncmp(args[0], "cd", 3) == 0)
 		return (run_cd(args, env_list));
 	if (ft_strncmp(args[0], "pwd", 4) == 0)
