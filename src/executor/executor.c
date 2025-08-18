@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/18 10:19:57 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/18 10:58:15 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,10 +147,44 @@ static int prepare_and_run_pipeline(char *line,  t_env_var *env_list, t_process_
     return (status);
 }
 
+/**
+ * @brief Checks for the presence of an unquoted pipe character.
+ *
+ * This function iterates through the command line, respecting single and
+ * double quotes. It returns 1 if it finds a '|' character that is not
+ * enclosed within any quotes, and 0 otherwise.
+ * @param line The command line string to check.
+ * @return 1 if an unquoted pipe is found, 0 otherwise.
+ */
+int	is_unquoted_pipe_present(const char *line)
+{
+	char	quote_char;
+
+	quote_char = 0;
+	while (*line)
+	{
+		// If we are not inside quotes and we see a quote, enter quote mode
+		if (quote_char == 0 && (*line == '\'' || *line == '"'))
+			quote_char = *line;
+		// If we are inside quotes and we see the matching quote, exit quote mode
+		else if (*line == quote_char)
+			quote_char = 0;
+		// If we are NOT inside quotes and we see a pipe, we found it!
+		else if (quote_char == 0 && *line == '|')
+			return (1);
+		line++;
+	}
+	// No unquoted pipe was found
+	return (0);
+}
+
+
 int	execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
 {
-	if (ft_strchr(line, '|'))
+	//if (ft_strchr(line, '|'))
+	if (is_unquoted_pipe_present(line))
 	{
+		printf("pipe is found, calling prepare_and_run_pipeline\n");
 		return prepare_and_run_pipeline(line, env_list, process_data);
 	}
 	else
