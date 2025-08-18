@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/14 11:18:01 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/18 10:16:17 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -469,6 +469,9 @@ int	execute_command(char *line, t_env_var *env_list, t_process_data *process_dat
 		if (tokens == NULL)
 			return (1);
 		char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
+		// debug
+		printf("expand_and_split_args returns: \n");
+		print_array(args);
 		free_tokens(tokens);
 		if (args == NULL || args[0] == NULL)
 		{

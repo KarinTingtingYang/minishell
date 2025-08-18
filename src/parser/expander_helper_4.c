@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander_helper_4.c                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/05 10:39:19 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 09:34:25 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   expander_helper_4.c                                :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/05 10:39:19 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/18 10:16:54 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ static size_t	calculate_unquoted_length(const char *str)
 	char	quote_char;
 	int		i;
 
+	// debug 
+	printf("calculate_unquoted_length receives [%s]\n", str);
 	len = 0;
 	quote_char = 0;
 	i = 0;
@@ -79,6 +81,8 @@ static size_t	calculate_unquoted_length(const char *str)
 			len++;
 		i++;
 	}
+	// DEBUG
+	printf("calculate_unquoted_length returns %zu\n", len);
 	return (len);
 }
 
@@ -94,5 +98,7 @@ char	*remove_quotes_and_join(char *str)
 	if (result == NULL)
 		return (NULL);
 	copy_string_without_quotes(result, str);
+	// DEBUG
+	printf("remove_quotes_and_join returns [%s]\n", result);
 	return (result);
 }

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser.h                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 10:54:01 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 11:02:35 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   parser.h                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/26 10:54:01 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/18 10:01:38 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,5 +37,6 @@ void		free_command(t_command *cmd);
 char		*substr_dup(const char *start, size_t len);
 t_command	*create_command(char **tokens, char **path_dirs);
 t_token		*create_token(char *value, t_quote_type quote_type);
+int			quotes_are_closed(const char *line);
 
 #endif

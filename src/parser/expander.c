@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/14 11:18:57 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/18 10:16:38 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,19 @@ static char	**process_token(t_token *token, char *expanded)
 	char	**split;
 
 	if (is_export_assignment(token) || token->quote != NO_QUOTE
-		|| ft_strchr(expanded, '\'') || ft_strchr(expanded, '\"'))
+		//|| ft_strchr(expanded, '\'') || ft_strchr(expanded, '\"'))
+		|| ft_strchr(token->value, '\'') || ft_strchr(token->value, '\"')) // DEBUG
 	{
+		// debug
+		printf("process_token triggered condition #1\n");
 		split = handle_quoted_or_export_token(token, expanded);
 	}
 	else
+	{
+		printf("process_token triggered condition #2\n"); // debug
 		split = handle_whitespace_splitting(expanded);
+	}
+		
 	return (split);
 }
 
@@ -100,11 +107,14 @@ char	**expand_and_split_args(t_token **tokens,
 	{
 		expanded = expand_variables(tokens[i]->value, env_list,
 				last_exit_status, tokens[i]->quote);
+		printf("expand_variables returns [%s]\n", expanded); // DEBUG
 		if (expanded == NULL)
 			return (NULL);
 		split = process_token(tokens[i], expanded);
 		if (split == NULL)
 			return (NULL);
+		printf("process_token returns:\n");
+		print_array(split);
 		final_args = append_split_to_final(final_args, &final_count, split);
 		if (final_args == NULL)
 			return (NULL);

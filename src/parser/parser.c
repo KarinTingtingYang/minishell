@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/21 11:05:27 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/14 11:19:11 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/18 10:03:13 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,9 @@ t_token	**parse_line(char *line)
 
 	if (line == NULL || *line == '\0')
 		return (NULL);
+	// 1. Validate the input line first.
+	if (!quotes_are_closed(line))
+		return (NULL); // Return NULL if quotes are not closed.
 	token_count = count_tokens(line);
 	tokens = malloc(sizeof(t_token *) * (token_count + 1));
 	if (tokens == NULL)

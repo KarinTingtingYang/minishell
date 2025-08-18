@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser_helper.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 11:05:49 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   parser_helper.c                                    :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/21 11:05:27 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/18 10:05:59 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,4 +82,35 @@ t_token	*create_token(char *value, t_quote_type quote_type)
 	token->value = value;
 	token->quote = quote_type;
 	return (token);
+}
+
+/**
+ * @brief Checks if all quotes in a line are properly closed.
+ *
+ * This function iterates through the input string to ensure that every
+ * single and double quote is part of a matching pair.
+ * @param line The command line string to validate.
+ * @return 1 if all quotes are closed, 0 otherwise.
+ */
+int	quotes_are_closed(const char *line)
+{
+	char	quote_char;
+
+	quote_char = 0;
+	while (*line)
+	{
+		if (quote_char == 0 && (*line == '\'' || *line == '"'))
+			quote_char = *line;
+		else if (*line == quote_char)
+			quote_char = 0;
+		line++;
+	}
+	if (quote_char != 0)
+	{
+		// You can use your project's error printing function.
+		// Using a standard library function here for simplicity.
+		ft_error("", "syntax error (unclosed quote)");
+		return (0);
+	}
+	return (1);
 }
