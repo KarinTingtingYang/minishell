@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   expander_helper_3.c                                :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/08/05 10:39:19 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/18 10:20:24 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   expander_helper_3.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/05 10:39:19 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/18 13:02:34 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,13 +61,38 @@ int	is_export_assignment(t_token *token)
  * @return A dynamically allocated array of strings representing
  *         the processed token, or NULL on failure.
  */
+// char	**handle_quoted_or_export_token(t_token *token, char *expanded)
+// {
+// 	char	**split;
+// 	char	*joined_str;
+
+// 	split = malloc(sizeof(char *) * 2);
+// 	if (split == NULL)
+// 	{
+// 		free(expanded);
+// 		return (NULL);
+// 	}
+// 	if (is_export_assignment(token))
+// 	{
+// 		split[0] = ft_strdup(token->value);
+// 		free(expanded);
+// 	}
+// 	else
+// 	{
+// 		joined_str = remove_quotes_and_join(expanded);
+// 		free(expanded);
+// 		expanded = joined_str;
+// 		split[0] = expanded;
+// 	}
+// 	split[1] = NULL;
+// 	return (split);
+// }
 char	**handle_quoted_or_export_token(t_token *token, char *expanded)
 {
 	char	**split;
-	char	*joined_str;
 
 	split = malloc(sizeof(char *) * 2);
-	if (split == NULL)
+	if (!split)
 	{
 		free(expanded);
 		return (NULL);
@@ -76,17 +101,23 @@ char	**handle_quoted_or_export_token(t_token *token, char *expanded)
 	{
 		split[0] = ft_strdup(token->value);
 		free(expanded);
+		if (!split[0]) { free(split); return (NULL); }
+	}
+	else if (token->quote != NO_QUOTE)
+	{
+		split[0] = expanded;
 	}
 	else
 	{
-		joined_str = remove_quotes_and_join(expanded);
+		char *joined = remove_quotes_and_join(expanded);
 		free(expanded);
-		expanded = joined_str;
-		split[0] = expanded;
+		if (!joined) { free(split); return (NULL); }
+		split[0] = joined;
 	}
 	split[1] = NULL;
 	return (split);
 }
+
 
 int	handle_default_case(const char *input, size_t i, char **result)
 {

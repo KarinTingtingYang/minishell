@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/18 12:47:33 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/18 13:48:55 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,26 +33,78 @@ static char	**append_split_to_final(char **final_args,
 	return (new_final);
 }
 
-static char	**process_token(t_token *token, char *expanded)
-{
-	char	**split;
+// static char	**process_token(t_token *token, char *expanded)
+// {
+// 	char	**split;
 
-	if (is_export_assignment(token) || token->quote != NO_QUOTE
-		//|| ft_strchr(expanded, '\'') || ft_strchr(expanded, '\"'))
-		|| ft_strchr(token->value, '\'') || ft_strchr(token->value, '\"')) // DEBUG
-	{
-		// debug
-		printf("process_token triggered condition #1\n");
-		split = handle_quoted_or_export_token(token, expanded);
-	}
-	else
-	{
-		printf("process_token triggered condition #2\n"); // debug
-		split = handle_whitespace_splitting(expanded);
-	}
+// 	if (is_export_assignment(token) || token->quote != NO_QUOTE
+// 		//|| ft_strchr(expanded, '\'') || ft_strchr(expanded, '\"'))
+// 		|| ft_strchr(token->value, '\'') || ft_strchr(token->value, '\"')) // DEBUG
+// 	{
+// 		// debug
+// 		printf("process_token triggered condition #1\n");
+// 		split = handle_quoted_or_export_token(token, expanded);
+// 	}
+// 	else
+// 	{
+// 		printf("process_token triggered condition #2\n"); // debug
+// 		split = handle_whitespace_splitting(expanded);
+// 	}
 		
-	return (split);
+// 	return (split);
+// }
+
+static int had_original_quotes(const t_token *token)
+{
+    const char *s;
+
+    if (!token || !token->value)
+        return (0);
+    s = token->value;
+    while (*s)
+    {
+        if (*s == '\'' || *s == '"')
+            return (1);
+        s++;
+    }
+    return (0);
 }
+
+static char **process_token(t_token *token, char *expanded)
+{
+    char **split;
+
+    if (is_export_assignment(token))
+        return handle_quoted_or_export_token(token, expanded);
+
+    if (token->quote != NO_QUOTE)
+    {
+        expanded = remove_outer_quotes(expanded);
+        if (!expanded)
+            return (NULL);
+        return handle_quoted_or_export_token(token, expanded);
+    }
+    else
+    {
+        if (had_original_quotes(token))
+        {
+            char *joined = remove_quotes_and_join(expanded);
+            if (!joined)
+            {
+                free(expanded);
+                return (NULL);
+            }
+            free(expanded);
+            split = handle_whitespace_splitting(joined);
+        }
+        else
+        {
+            split = handle_whitespace_splitting(expanded);
+        }
+    }
+    return (split);
+}
+
 
 static size_t	handle_variable_expansion(const char *input, size_t i,
 											char **result, t_expand_data *data)
