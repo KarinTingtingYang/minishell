@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   command_create.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/16 12:16:05 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   command_create.c                                   :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/26 10:49:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/18 12:34:45 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ static char	**duplicate_split(char **split)
  * @return       0 on success, -1 if an error occurs (e.g., memory
  *               allocation failure).
  */
-static int	parse_args_and_redirection(t_command *cmd, char **tokens)
+static int	parse_args_and_redirection(t_command *cmd, char **tokens, t_process_data *process_data)
 {
 	char	**original_args;
 
@@ -89,7 +89,8 @@ static int	parse_args_and_redirection(t_command *cmd, char **tokens)
 	if (original_args == NULL)
 		return (-1);
 	cmd->args = handle_redirection(original_args, &cmd->input_file,
-			&cmd->output_file, &cmd->output_mode, &cmd->heredoc_file);
+			&cmd->output_file, &cmd->output_mode, &cmd->heredoc_file, 
+			process_data->env_list, process_data->last_exit_status);
 	free_split(original_args);
 	if (cmd->args == NULL)
 		return (-1);
@@ -136,7 +137,7 @@ static t_command	*create_empty_command(void)
  * @return           A pointer to the newly created t_command structure,
  *                   or NULL on failure.
  */
-t_command	*create_command(char **tokens, char **path_dirs)
+t_command	*create_command(char **tokens, char **path_dirs, t_process_data *process_data)
 {
 	t_command	*cmd;
 	int			redir_parse_result;
@@ -146,7 +147,7 @@ t_command	*create_command(char **tokens, char **path_dirs)
 	{
 		return (NULL);
 	}
-	redir_parse_result = parse_args_and_redirection(cmd, tokens);
+	redir_parse_result = parse_args_and_redirection(cmd, tokens, process_data);
 	if (redir_parse_result == -1)
 	{
 		free(cmd);

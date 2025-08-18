@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 11:11:42 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/04 10:30:33 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/18 12:30:57 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,12 @@ int		count_clean_args(char **args);
 int		is_redirection(const char *token);
 
 // heredoc:
-char	*handle_heredoc(const char *delimiter);
+char *handle_heredoc(const char *delimiter, t_env_var *env_list, int last_exit_status);
 
 
 // main functions:
 void	redirect_io(char *input_file, char *output_file, int output_mode);
-char	**handle_redirection(char **args, char **final_input_file, 
-	char **final_output_file, int *output_mode, char **heredoc_file);
+char	**handle_redirection(char **args, char **final_input_file, char **final_output_file,
+							int *output_mode, char **heredoc_file, t_env_var *env_list, int last_exit_status);
 
 #endif

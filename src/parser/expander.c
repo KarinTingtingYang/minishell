@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/18 10:20:05 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/18 12:47:33 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,16 +105,30 @@ char	**expand_and_split_args(t_token **tokens,
 	i = 0;
 	while (tokens[i] != NULL)
 	{
-		expanded = expand_variables(tokens[i]->value, env_list,
+		// FIX: Prevent expansion of the heredoc delimiter
+		if (i > 0 && ft_strncmp(tokens[i - 1]->value, "<<", 3) == 0)
+		{
+			// For the delimiter, we do NOT expand variables and we do NOT remove quotes here.
+			// We just create a simple "split" array containing the raw delimiter.
+			split = malloc(sizeof(char *) * 2);
+			if (!split)
+				return (NULL);
+			split[0] = ft_strdup(tokens[i]->value);
+			split[1] = NULL;
+		}
+		else
+		{
+			expanded = expand_variables(tokens[i]->value, env_list,
 				last_exit_status, tokens[i]->quote);
-		printf("expand_variables returns [%s]\n", expanded); // DEBUG
-		if (expanded == NULL)
-			return (NULL);
-		split = process_token(tokens[i], expanded);
-		if (split == NULL)
-			return (NULL);
-		printf("process_token returns:\n");
-		print_array(split);
+			printf("expand_variables returns [%s]\n", expanded); // DEBUG
+			if (expanded == NULL)
+				return (NULL);
+			split = process_token(tokens[i], expanded);
+			if (split == NULL)
+				return (NULL);
+			printf("process_token returns:\n");
+			print_array(split);
+		}
 		final_args = append_split_to_final(final_args, &final_count, split);
 		if (final_args == NULL)
 			return (NULL);

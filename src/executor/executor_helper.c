@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor_helper.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/16 12:52:12 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor_helper.c                                  :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/18 12:39:00 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@ int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
  *         - 2 if there is a redirection syntax or file error.
  *         - 127 if the command was not found in PATH.
  */
-int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *data)
+int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *data, t_process_data *process_data)
 {
 	data->heredoc_file = NULL;
     if (line == NULL || *line == '\0')
@@ -182,7 +182,7 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
 		return (1); // no command to execute, but we still want to return 1 to indicate success
     }
     data->clean_args = handle_redirection(data->original_args, &data->input_file, 
-		&data->output_file, &data->output_mode, &data->heredoc_file);
+		&data->output_file, &data->output_mode, &data->heredoc_file, env_list, process_data->last_exit_status);
     if (!data->clean_args)
     {
 		// DEBUG FIX: centralise freeing of resources in the caller function 
@@ -284,7 +284,7 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index,
 			}
 			// ======== END EXPANSION DEBUGGING ========
 			
-            cmds[index] = create_command(expanded_args, path_dirs);
+            cmds[index] = create_command(expanded_args, path_dirs, process_data);
             free_split(expanded_args);
 
             if (cmds[index] == NULL)

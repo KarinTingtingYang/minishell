@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   redirection.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 08:25:34 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 13:48:17 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   redirection.c                                      :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 08:25:34 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/18 12:30:35 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	redirect_io(char *input_file, char *output_file, int output_mode)
 }
 
 // handle_redirection() Helper: Process a single redirection and update input/output file pointers
-static int	process_redirection_token(char **args, int i, 
+static int	process_redirection_token(char **args, int i, t_env_var *env_list, int last_exit_status,
 			char **final_input_file, char **final_output_file, int *output_mode, char **heredoc_file)
 {
     if (!args[i + 1])
@@ -66,7 +66,7 @@ static int	process_redirection_token(char **args, int i,
 			free(*heredoc_file);
 			*heredoc_file = NULL; // Ensure it's set to NULL after freeing
 		}
-		*heredoc_file = handle_heredoc(args[i + 1]);
+		*heredoc_file = handle_heredoc(args[i + 1], env_list, last_exit_status);
 		if (!*heredoc_file)
 			return (-1);
 		free(*final_input_file);
@@ -124,7 +124,7 @@ static char	**build_clean_args(char **args, int argc)
  */
 // Main function split into helpers
 char	**handle_redirection(char **args, char **final_input_file, char **final_output_file,
-							int *output_mode, char **heredoc_file)
+							int *output_mode, char **heredoc_file, t_env_var *env_list, int last_exit_status)
 {
     int		i = 0;
     int		argc;
@@ -139,7 +139,7 @@ char	**handle_redirection(char **args, char **final_input_file, char **final_out
     {
         if (is_redirection(args[i]))
         {
-            if (process_redirection_token(args, i, final_input_file, final_output_file,
+            if (process_redirection_token(args, i, env_list, last_exit_status, final_input_file, final_output_file,
 											output_mode, heredoc_file) != 0)
             {
 				if (*heredoc_file)

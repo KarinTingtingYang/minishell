@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/18 10:58:15 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/18 12:32:07 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,8 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
 	// We must populate the data struct with the environment list.
 	data.env_list = env_list;
 	
-    data.clean_args = handle_redirection(args, &data.input_file, &data.output_file, &data.output_mode, &data.heredoc_file);
+    data.clean_args = handle_redirection(args, &data.input_file, &data.output_file, &data.output_mode, &data.heredoc_file,
+							env_list, process_data->last_exit_status);
     if (!data.clean_args)
     {
         if (data.heredoc_file)
