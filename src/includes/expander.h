@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander.h                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/04 12:14:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/18 12:25:08 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   expander.h                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/04 12:14:24 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/19 11:33:53 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,5 +42,6 @@ int		handle_default_case(const char *input, size_t i, char **result);
 char	*expand_variables(char *input, t_env_var *env_list,
 								int last_exit_status, t_quote_type quote);
 char	*remove_outer_quotes(char *str);
-
+size_t	handle_variable_expansion(const char *input, size_t i,
+											char **result, t_expand_data *data);
 #endif

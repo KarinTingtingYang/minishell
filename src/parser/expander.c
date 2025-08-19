@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/18 13:48:55 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/19 11:33:45 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ static char **process_token(t_token *token, char *expanded)
 }
 
 
-static size_t	handle_variable_expansion(const char *input, size_t i,
+size_t	handle_variable_expansion(const char *input, size_t i,
 											char **result, t_expand_data *data)
 {
 	if (input[i + 1] == '{')
@@ -121,19 +121,47 @@ char	*expand_variables(char *input, t_env_var *env_list,
 	char			*result;
 	size_t			i;
 	t_expand_data	expand_data;
+	char			quote_char;
 
-	if (quote == SINGLE_QUOTE)
-		return (ft_strdup(input));
+	// if (quote == SINGLE_QUOTE)
+	// 	return (ft_strdup(input));
+	(void)quote;
 	expand_data.env_list = env_list;
 	expand_data.last_exit_status = last_exit_status;
 	result = ft_strdup("");
 	if (result == NULL)
 		return (NULL);
 	i = 0;
+	quote_char = 0;
 	while (input[i] != '\0')
 	{
-		if (input[i] == '$' && input[i + 1])
-			i = handle_variable_expansion(input, i, &result, &expand_data);
+		// Update quote state
+		if (quote_char == 0 && (input[i] == '\'' || input[i] == '"'))
+			quote_char = input[i];
+		else if (input[i] == quote_char)
+			quote_char = 0;
+		
+		//if (input[i] == '$' && input[i + 1])
+		if (input[i] == '$' && input[i + 1] && quote_char != '\'')
+			//i = handle_variable_expansion(input, i, &result, &expand_data);
+		{
+			// A '$' followed by something that isn't a valid variable
+			// (e.g., a quote, space, or null) is treated as a literal '$'.
+			char next_char = input[i + 1];
+			// FIX: If '$' is followed by a quote, skip the '$' entirely.
+			if (next_char == '\'' || next_char == '"')
+			{
+				i++; // Skips the '$'
+				continue; // The loop will then process the quote
+			}
+			if (ft_isalnum(next_char) || next_char == '_' || next_char == '?')
+				i = handle_variable_expansion(input, i, &result, &expand_data);
+			else
+			{
+				result = append_char(result, input[i]);
+				i++;
+			}
+		}
 		else
 		{
 			result = append_char(result, input[i]);

@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/04 10:15:34 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/19 08:38:47 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/19 11:31:03 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,43 @@ static char *generate_unique_heredoc_file(int *out_fd)
 	}
 	return (NULL);
 }
+/**
+ * @brief Expands variables in a line of heredoc input.
+ *
+ * This is a special version of the expander that ignores quotes and expands
+ * any valid variable it finds. This matches bash's heredoc behavior when
+ * the delimiter is not quoted.
+ */
+static char	*expand_heredoc_line(char *line, t_expand_data *data)
+{
+	char	*result;
+	size_t	i;
 
+	result = ft_strdup("");
+	if (!result)
+		return (NULL);
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] == '$')
+		{
+			char next_char = line[i + 1];
+			if (ft_isalnum(next_char) || next_char == '_' || next_char == '?')
+				i = handle_variable_expansion(line, i, &result, data);
+			else
+			{
+				result = append_char(result, line[i]);
+				i++;
+			}
+		}
+		else
+		{
+			result = append_char(result, line[i]);
+			i++;
+		}
+	}
+	return (result);
+}
 /**
  * @brief Handles heredoc (<<) input by reading from stdin.
  *
@@ -71,7 +107,14 @@ char *handle_heredoc(const char *delimiter, t_env_var *env_list, int last_exit_s
 	// FIX: Add logic for expansion and quoted delimiters
 	int		expand_content;
 	char	*actual_delimiter;
+	t_expand_data	expand_data; // Create a data struct to pass to the helper
 
+	expand_data.env_list = env_list;
+	expand_data.last_exit_status = last_exit_status;
+
+	expand_content = (ft_strchr(delimiter, '\'') == NULL && ft_strchr(delimiter, '"') == NULL);
+	actual_delimiter = remove_quotes_and_join((char *)delimiter);
+	
 	expand_content = 1;
 	// Check if the delimiter was quoted. If so, don't expand content.
 	if (ft_strchr(delimiter, '\'') || ft_strchr(delimiter, '"'))
@@ -127,7 +170,7 @@ char *handle_heredoc(const char *delimiter, t_env_var *env_list, int last_exit_s
 		// FIX: Expand the line if needed before writing to the file
 		if (expand_content)
 		{
-			char *expanded_line = expand_variables(line, env_list, last_exit_status, NO_QUOTE);
+			char *expanded_line = expand_heredoc_line(line, &expand_data);
 			ft_putstr_fd(expanded_line, fd);
 			free(expanded_line);
 		}

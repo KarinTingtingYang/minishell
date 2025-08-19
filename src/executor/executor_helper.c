@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor_helper.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 09:07:33 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor_helper.c                                  :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/19 11:38:11 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ static int validate_pipeline_parts(char **parts, int count)
 	{
 		if (is_empty_or_whitespace(parts[i]))
         {
-            ft_error("minishell", "syntax error near unexpected token `|'");
+            ft_error("", "syntax error near unexpected token `|'");
             return (0); // Validation failed.
         }
 		i++;
