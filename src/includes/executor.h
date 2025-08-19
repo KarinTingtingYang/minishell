@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor.h                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/21 09:39:33 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/18 12:40:07 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/19 09:44:17 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,5 +50,6 @@ void		free_commands_recursive(t_command **cmds, int index, int count);
 int			prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *data, t_process_data *process_data);
 t_command   **prepare_pipeline_commands(char *line, int *count, char ***parts, t_process_data *process_data);
 char **ft_split_dup(char **args);
+// int precheck_pipe_syntax(const char *line);
 
 #endif

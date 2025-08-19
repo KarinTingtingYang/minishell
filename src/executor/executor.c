@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 09:00:50 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/19 09:44:01 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,12 @@ static int prepare_and_run_pipeline(char *line,  t_env_var *env_list, t_process_
     int count = 0;
 
 	parts = NULL;
-	count = 0;			
+	count = 0;	
+	// if (!precheck_pipe_syntax(line))
+	// {
+	// 	process_data->last_exit_status = 2;
+	// 	return (2);
+	// }		
     cmds = prepare_pipeline_commands(line, &count, &parts, process_data);
     if (cmds == NULL)
 	{
