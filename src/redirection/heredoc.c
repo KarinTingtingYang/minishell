@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/04 10:15:34 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/19 11:31:03 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/19 14:27:56 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,9 +111,6 @@ char *handle_heredoc(const char *delimiter, t_env_var *env_list, int last_exit_s
 
 	expand_data.env_list = env_list;
 	expand_data.last_exit_status = last_exit_status;
-
-	expand_content = (ft_strchr(delimiter, '\'') == NULL && ft_strchr(delimiter, '"') == NULL);
-	actual_delimiter = remove_quotes_and_join((char *)delimiter);
 	
 	expand_content = 1;
 	// Check if the delimiter was quoted. If so, don't expand content.
