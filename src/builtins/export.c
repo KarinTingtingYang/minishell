@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 10:49:21 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/19 13:18:07 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -319,7 +319,7 @@ static int export_variable(const char *arg, t_env_var *env_list)
     {
         add_env_var(key, clean, env_list);
         /* if add_env_var duplicates internally, uncomment: */
-        /* free(clean); */
+        free(clean);
     }
 
     free(key);
