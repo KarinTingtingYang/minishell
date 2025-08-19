@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/04 10:15:34 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/18 13:04:33 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/19 08:38:47 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ char *handle_heredoc(const char *delimiter, t_env_var *env_list, int last_exit_s
             ft_putstr_fd("')\n", 2);
 			break ;
 		}
-		if (ft_strncmp(line, actual_delimiter, ft_strlen(delimiter) + 1) == 0)
+		if (ft_strncmp(line, actual_delimiter, ft_strlen(actual_delimiter) + 1) == 0)
 		{
 			free(line);
 			break ;

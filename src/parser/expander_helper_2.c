@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander_helper_2.c                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/05 10:39:19 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 09:33:25 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   expander_helper_2.c                                :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/05 10:39:19 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/19 08:51:51 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ static char	*get_special_var_value(const char *var_name, int last_exit_status)
 {
 	if (ft_strncmp(var_name, "?", 2) == 0)
 		return (ft_itoa(last_exit_status));
-	if (ft_strncmp(var_name, "$", 2) == 0)
-		return (ft_itoa(getpid()));
+	// if (ft_strncmp(var_name, "$", 2) == 0)
+	// 	return (ft_itoa(getpid())); // not required by subject, also getpid() function not allowed 
 	if (ft_strncmp(var_name, "0", 2) == 0)
 		return (ft_strdup("minishell"));
 	return (NULL);
