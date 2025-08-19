@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 11:21:01 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/18 10:32:40 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   echo.c                                             :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/28 11:21:01 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/19 10:18:36 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,8 @@ void run_echo(char **args, t_env_var *env_list)
     
     i = 1;
     newline = 1;
-	t_quote_type quote = NO_QUOTE; 
+	(void)env_list;
+	//t_quote_type quote = NO_QUOTE; 
 
     // A standard echo built-in should handle multiple -n flags (e.g., echo -n -n -n).
     // This loop checks for and skips all valid -n flags at the beginning of the arguments.
@@ -83,9 +84,10 @@ void run_echo(char **args, t_env_var *env_list)
 
 	while (args[i] != NULL)
 	{
-		char *expanded = expand_variables(args[i], env_list, 0, quote);
-		ft_putstr_fd(expanded, STDOUT_FILENO);
-		free(expanded);
+		//char *expanded = expand_variables(args[i], env_list, 0, quote);
+		//ft_putstr_fd(expanded, STDOUT_FILENO);
+		//free(expanded); // let the expander handle expansion
+		ft_putstr_fd(args[i], STDOUT_FILENO);
 
 		if (args[i + 1] != NULL)
 			ft_putchar_fd(' ', STDOUT_FILENO);

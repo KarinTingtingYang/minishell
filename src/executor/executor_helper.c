@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 11:25:50 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/19 12:12:48 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,73 +304,56 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
 //     return (1);
 // }
 
-static int build_commands_from_parts(t_command **cmds, char **parts, int index, int count,
-										t_process_data *process_data)
-{
-    char        **path_dirs;
-    t_token     **tokens;
-    int         i;
 
-    if (index != 0)
-        return (1);
+int build_commands_from_parts(t_command **cmds, char **parts, int index, int count,
+                              t_process_data *process_data)
+{
+    char      **path_dirs;
+    t_token   **tokens;
+    char      **expanded_args;
+
     path_dirs = find_path_dirs(process_data->env_list);
     if (path_dirs == NULL)
     {
-        ft_error(NULL, "PATH not found");
-        return (0);
+        ft_error(NULL, "PATH variable not found");
+        return 0;
     }
-    i = 0;
-    while (i < count)
-    {
-        tokens = parse_line(parts[i]);
-        if (tokens == NULL)
-        {
-            free_split(path_dirs);
-            return (0);
-        }
-        if (!validate_redirect_syntax(tokens))
-        {
-            free_tokens(tokens);
-            free_split(path_dirs);
-            return (0);
-        }
-        free_tokens(tokens);
-        i++;
-    }
+
+    process_data->in_pipeline = (count > 1);
+
     while (index < count)
     {
-        char    **expanded_args;
-
         tokens = parse_line(parts[index]);
         if (tokens == NULL)
         {
             free_split(path_dirs);
-            return (0);
+            return 0;
         }
-        expanded_args = expand_and_split_args(tokens, process_data->env_list,
+
+        expanded_args = expand_and_split_args(tokens,
+                                              process_data->env_list,
                                               process_data->last_exit_status);
         free_tokens(tokens);
         if (expanded_args == NULL)
         {
             free_split(path_dirs);
-            return (0);
+            return 0;
         }
-        cmds[index] = create_command(expanded_args, path_dirs, &process_data[index]);
-        free_split(expanded_args);
 
+        /*real arg instead of comment; same process_data pointer */
+        cmds[index] = create_command(expanded_args, path_dirs, process_data);
+        free_split(expanded_args);
         if (cmds[index] == NULL)
         {
             ft_error(NULL, "command creation failed");
             free_split(path_dirs);
-            return (0);
+            return 0;
         }
-
-        process_data[index].in_pipeline = (count > 1);
         index++;
     }
 
     free_split(path_dirs);
-    return (1);
+    return 1;
 }
 
 /**
@@ -388,59 +371,154 @@ static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
  * @return An allocated array of `t_command*` pointers ready for execution,
  *         or `NULL` on failure (syntax error, allocation failure, etc.).
  */
-t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, 
-	t_process_data *process_data)
-{
-	t_command **cmds;
+// t_command **prepare_pipeline_commands(char *line, int *count, char ***parts, 
+// 	t_process_data *process_data)
+// {
+// 	t_command **cmds;
 	
-	*parts = split_line_by_pipe(line);
-    if (*parts == NULL || (*parts)[0] == NULL)
-    {
-		// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: Print error if split fails
-		ft_error("", "syntax error (unclosed quote)");
-        if (*parts != NULL)
-            free_split(*parts);
-        return (NULL);
-    }
+// 	*parts = split_line_by_pipe(line);
+//     if (*parts == NULL || (*parts)[0] == NULL)
+//     {
+// 		// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO); // DEBUG: Print error if split fails
+// 		ft_error("", "syntax error (unclosed quote)");
+//         if (*parts != NULL)
+//             free_split(*parts);
+//         return (NULL);
+//     }
 
-	// ---> FIX: VALIDATE THE COMMAND PARTS <---
+// 	// ---> FIX: VALIDATE THE COMMAND PARTS <---
+//     *count = count_command_parts(*parts);
+//     if (!validate_pipeline_parts(*parts, *count))
+//     {
+//         free_split(*parts);
+//         return (NULL);
+//     }
+// 	// If a single command is empty (e.g., user just hits enter), it's not a pipe error.
+//     if (*count == 1 && is_empty_or_whitespace((*parts)[0]))
+//     {
+//         free_split(*parts);
+//         return (NULL);
+//     }
+// 	// ---> END OF FIX <---
+	
+// 	cmds = malloc(sizeof(t_command *) * (*count + 1));
+//     if (cmds == NULL)
+// 	{
+// 		// ft_putstr_fd("Error: malloc failed\n", STDERR_FILENO); // DEBUG: Print error if malloc fails
+// 		// free_split(*parts); // DEBUG: Free the parts array if malloc fails
+// 		// return (NULL); // DEBUG: Return NULL if malloc fails
+// 		ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
+// 	}
+//     ft_bzero(cmds, sizeof(t_command *) * (*count + 1));
+//     if (!build_commands_from_parts(cmds, *parts, 0, *count, process_data))
+//     {
+//         free_commands_recursive(cmds, 0, *count);
+//         free(cmds);
+//         free_split(*parts);
+//         return (NULL);
+//     }
+// 	int i = 0;
+// 	while (i < *count)
+// 	{
+// 		process_data[i].in_pipeline = (*count > 1);  // DEBUG
+// 		i++;
+// 	}
+//     return (cmds);
+// }
+
+t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
+                                      t_process_data *process_data)
+{
+    t_command **cmds;
+    char      **path_dirs;
+    int         i;
+
+    *parts = split_line_by_pipe(line);
+    if (*parts == NULL || (*parts)[0] == NULL)
+        return (NULL);
+
     *count = count_command_parts(*parts);
     if (!validate_pipeline_parts(*parts, *count))
     {
         free_split(*parts);
+        *parts = NULL;
         return (NULL);
     }
-	// If a single command is empty (e.g., user just hits enter), it's not a pipe error.
-    if (*count == 1 && is_empty_or_whitespace((*parts)[0]))
+
+    cmds = malloc(sizeof(t_command *) * ((size_t)(*count) + 1));
+    if (cmds == NULL)
     {
         free_split(*parts);
+        *parts = NULL;
         return (NULL);
     }
-	// ---> END OF FIX <---
-	
-	cmds = malloc(sizeof(t_command *) * (*count + 1));
-    if (cmds == NULL)
-	{
-		// ft_putstr_fd("Error: malloc failed\n", STDERR_FILENO); // DEBUG: Print error if malloc fails
-		// free_split(*parts); // DEBUG: Free the parts array if malloc fails
-		// return (NULL); // DEBUG: Return NULL if malloc fails
-		ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
-	}
-    ft_bzero(cmds, sizeof(t_command *) * (*count + 1));
-    if (!build_commands_from_parts(cmds, *parts, 0, *count, process_data))
+    ft_bzero(cmds, sizeof(t_command *) * ((size_t)(*count) + 1));
+
+    /* set once for the whole pipeline */
+    if (process_data)
+        process_data->in_pipeline = (*count > 1);
+
+    /* get PATH dirs once for the whole pipeline */
+    path_dirs = find_path_dirs(process_data->env_list);
+    if (path_dirs == NULL)
     {
-        free_commands_recursive(cmds, 0, *count);
+        ft_error(NULL, "PATH variable not found");
         free(cmds);
         free_split(*parts);
+        *parts = NULL;
         return (NULL);
     }
-	int i = 0;
-	while (i < *count)
-	{
-		process_data[i].in_pipeline = (*count > 1);  // DEBUG
-		i++;
-	}
-    return (cmds);
+
+    /* build each command with the SAME process_data pointer */
+    i = 0;
+    while (i < *count)
+    {
+        t_token **tokens = parse_line((*parts)[i]);
+        char    **expanded;
+
+        if (tokens == NULL)
+        {
+            free_split(path_dirs);
+            free_commands_recursive(cmds, 0, i);
+            free(cmds);
+            free_split(*parts);
+            *parts = NULL;
+            return (NULL);
+        }
+
+        expanded = expand_and_split_args(tokens,
+                                         process_data->env_list,
+                                         process_data->last_exit_status);
+        free_tokens(tokens);
+        if (expanded == NULL)
+        {
+            free_split(path_dirs);
+            free_commands_recursive(cmds, 0, i);
+            free(cmds);
+            free_split(*parts);
+            *parts = NULL;
+            return (NULL);
+        }
+
+        /* real call: pass path_dirs and the SAME process_data (no indexing) */
+        cmds[i] = create_command(expanded, path_dirs, process_data);
+        free_split(expanded);
+        if (cmds[i] == NULL)
+        {
+            ft_error(NULL, "command creation failed");
+            free_split(path_dirs);
+            free_commands_recursive(cmds, 0, i);
+            free(cmds);
+            free_split(*parts);
+            *parts = NULL;
+            return (NULL);
+        }
+        i++;
+    }
+
+    free_split(path_dirs);      /* path_dirs no longer needed */
+    cmds[*count] = NULL;
+    return cmds;
 }
 
 /**
