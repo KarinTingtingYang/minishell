@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor_helper.c                                  :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/18 12:39:00 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor_helper.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/19 09:07:33 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,58 +247,129 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
  * @return Returns 1 on success, or 0 if an error occurs (e.g., memory allocation
  *         failure).
  */
-static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
-	int count, t_process_data *process_data)
-{
-    char **path_dirs;
-    // char **tokens;
+// static int build_commands_from_parts(t_command **cmds, char **parts, int index, 
+// 	int count, t_process_data *process_data)
+// {
+//     char **path_dirs;
+//     // char **tokens;
 
-    if (index == 0)
+//     if (index == 0)
+//     {
+//         path_dirs = find_path_dirs(process_data->env_list);
+//         if (path_dirs == NULL)
+//         {
+//             // ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO); // DEBUG: Print error if PATH not found
+// 			ft_error("", "PATH not found");
+//             return (0);
+//         }
+//         while (index < count)
+//         {
+//             t_token **tokens = parse_line(parts[index]);
+//             if (tokens == NULL || !validate_redirect_syntax(tokens))
+// 			{
+// 				// parse_line will have already printed an error message
+// 				// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO);
+// 				free_tokens(tokens);
+// 				free_split(path_dirs);
+// 				return (0);
+// 			}
+			
+// 			// EXPANSION DEBUGGING: we need to call the expand_and_split_args function
+// 			char **expanded_args = expand_and_split_args(tokens, process_data->env_list,
+// 				process_data->last_exit_status);
+// 			free_tokens(tokens);
+// 			if (expanded_args == NULL)
+// 			{
+// 				free_split(path_dirs);
+// 				return (0); // error in expanding or splitting args
+// 			}
+// 			// ======== END EXPANSION DEBUGGING ========
+			
+//             cmds[index] = create_command(expanded_args, path_dirs, process_data);
+//             free_split(expanded_args);
+
+//             if (cmds[index] == NULL)
+// 			{
+// 				// ft_putstr_fd("minishell: command creation failed\n", STDERR_FILENO); // DEBUG: Print error if command creation fails
+// 				ft_error("", "command creation failed");
+// 				free_split(path_dirs);
+// 				return (0);
+// 			}
+// 			process_data[index].in_pipeline = (count > 1); // DEBUGGING
+//             index++;
+//         }
+//         free_split(path_dirs);
+//         return (1);
+//     }
+//     return (1);
+// }
+
+static int build_commands_from_parts(t_command **cmds, char **parts, int index, int count,
+										t_process_data *process_data)
+{
+    char        **path_dirs;
+    t_token     **tokens;
+    int         i;
+
+    if (index != 0)
+        return (1);
+    path_dirs = find_path_dirs(process_data->env_list);
+    if (path_dirs == NULL)
     {
-        path_dirs = find_path_dirs(process_data->env_list);
-        if (path_dirs == NULL)
+        ft_error(NULL, "PATH not found");
+        return (0);
+    }
+    i = 0;
+    while (i < count)
+    {
+        tokens = parse_line(parts[i]);
+        if (tokens == NULL)
         {
-            // ft_putstr_fd("minishell: PATH not found\n", STDERR_FILENO); // DEBUG: Print error if PATH not found
-			ft_error("", "PATH not found");
+            free_split(path_dirs);
             return (0);
         }
-        while (index < count)
+        if (!validate_redirect_syntax(tokens))
         {
-            t_token **tokens = parse_line(parts[index]);
-            if (tokens == NULL)
-			{
-				// parse_line will have already printed an error message
-				// ft_putstr_fd("minishell: syntax error (unclosed quote)\n", STDERR_FILENO);
-				free_split(path_dirs);
-				return (0);
-			}
-			
-			// EXPANSION DEBUGGING: we need to call the expand_and_split_args function
-			char **expanded_args = expand_and_split_args(tokens, process_data->env_list,
-				process_data->last_exit_status);
-			free_tokens(tokens);
-			if (expanded_args == NULL)
-			{
-				free_split(path_dirs);
-				return (0); // error in expanding or splitting args
-			}
-			// ======== END EXPANSION DEBUGGING ========
-			
-            cmds[index] = create_command(expanded_args, path_dirs, process_data);
-            free_split(expanded_args);
-
-            if (cmds[index] == NULL)
-			{
-				// ft_putstr_fd("minishell: command creation failed\n", STDERR_FILENO); // DEBUG: Print error if command creation fails
-				ft_error("", "command creation failed");
-				free_split(path_dirs);
-				return (0);
-			}
-            index++;
+            free_tokens(tokens);
+            free_split(path_dirs);
+            return (0);
         }
-        free_split(path_dirs);
-        return (1);
+        free_tokens(tokens);
+        i++;
     }
+    while (index < count)
+    {
+        char    **expanded_args;
+
+        tokens = parse_line(parts[index]);
+        if (tokens == NULL)
+        {
+            free_split(path_dirs);
+            return (0);
+        }
+        expanded_args = expand_and_split_args(tokens, process_data->env_list,
+                                              process_data->last_exit_status);
+        free_tokens(tokens);
+        if (expanded_args == NULL)
+        {
+            free_split(path_dirs);
+            return (0);
+        }
+        cmds[index] = create_command(expanded_args, path_dirs, &process_data[index]);
+        free_split(expanded_args);
+
+        if (cmds[index] == NULL)
+        {
+            ft_error(NULL, "command creation failed");
+            free_split(path_dirs);
+            return (0);
+        }
+
+        process_data[index].in_pipeline = (count > 1);
+        index++;
+    }
+
+    free_split(path_dirs);
     return (1);
 }
 

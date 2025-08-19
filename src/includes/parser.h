@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   parser.h                                           :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/26 10:54:01 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/18 13:48:32 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   parser.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/26 10:54:01 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/19 09:08:18 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,5 +38,7 @@ char		*substr_dup(const char *start, size_t len);
 t_command	*create_command(char **tokens, char **path_dirs, t_process_data *process_data);
 t_token		*create_token(char *value, t_quote_type quote_type);
 int			quotes_are_closed(const char *line);
+int			validate_redirect_syntax(t_token **tokens);
+int is_redirect(const char *s);
 
 #endif

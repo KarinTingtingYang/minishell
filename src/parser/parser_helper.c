@@ -1,16 +1,65 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   parser_helper.c                                    :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/21 11:05:27 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/18 10:05:59 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   parser_helper.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/19 09:30:22 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+
+int is_redirect(const char *s)
+{
+    if (ft_strncmp(s, ">>", 3) == 0)
+        return (1);
+    if (ft_strncmp(s, "<<", 3) == 0)
+        return (1);
+    if (ft_strncmp(s, ">", 2) == 0)
+        return (1);
+    if (ft_strncmp(s, "<", 2) == 0)
+        return (1);
+    return (0);
+}
+
+int validate_redirect_syntax(t_token **tokens)
+{
+    int     i;
+    char    *unexpected;
+    char    *tmp;
+    char    *msg;
+
+    i = 0;
+    while (tokens && tokens[i])
+    {
+        if (is_redirect(tokens[i]->value))
+        {
+            if (tokens[i + 1] == NULL || is_redirect(tokens[i + 1]->value))
+            {
+                if (tokens[i + 1] != NULL)
+                    unexpected = tokens[i + 1]->value;
+                else
+                    unexpected = "newline";
+                tmp = ft_strjoin("syntax error near unexpected token `", unexpected);
+                if (tmp == NULL)
+                    return (0);
+                msg = ft_strjoin(tmp, "'");
+                free(tmp);
+                if (msg == NULL)
+                    return (0);
+                ft_error(NULL, msg);
+                free(msg);
+                return (0);
+            }
+        }
+        i++;
+    }
+    return (1);
+}
+
 
 char	*substr_dup(const char *start, size_t len)
 {
