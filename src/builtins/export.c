@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/18 09:45:51 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/19 10:49:21 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,90 +119,211 @@ static void	display_export(t_env_var *env_list)
 	free_env(sorted_list);
 }
 
-static int	export_variable(const char *arg, t_env_var *env_list)
+/* remove syntactic quotes (' and ") from a string; keep inner data */
+static char *strip_syntactic_quotes(const char *s)
 {
-	char		*key;
-	char		*value;
-	char		*equal_sign;
-	t_env_var	*existing_var;
-	int			append;
+    size_t i, w, len;
+    char   quote;
+    char  *out;
 
-	append = 0;
-	equal_sign = ft_strchr(arg, '=');
-	if (!equal_sign)
-	{
-		if (!is_valid_identifier(arg))
-		{
-			ft_error("export", "not a valid identifier");
-			return (1);
-		}
-		existing_var = find_env_var(arg, env_list);
-		if (!existing_var)
-			add_env_var(ft_strdup(arg), ft_strdup(""), env_list);
-		return (0);
-	}
-	// Detect '+=' syntax
-	if (*(equal_sign - 1) == '+') // DEBUGGING
-	{
-		append = 1;
-		key = ft_substr(arg, 0, equal_sign - arg - 1); // Exclude '+'
-	}
-	else
-		key = ft_substr(arg, 0, equal_sign - arg);
+    if (!s) return NULL;
+    len = ft_strlen(s);
+    out = (char *)malloc(len + 1);
+    if (!out) return NULL;
 
-	if (!is_valid_identifier(key))
-	{
-		ft_error("export", "not a valid identifier");
-		free(key);
-		return (1);
-	}
+    i = 0; w = 0; quote = 0;
+    while (s[i])
+    {
+        if (s[i] == '\'' || s[i] == '"')
+        {
+            if (quote == 0) { quote = s[i++]; continue; }
+            if (quote == s[i]) { quote = 0; i++; continue; }
+        }
+        out[w++] = s[i++];
+    }
+    out[w] = '\0';
+    return out;
+}
 
-	value = ft_strdup(equal_sign + 1);
+// static int	export_variable(const char *arg, t_env_var *env_list)
+// {
+// 	char		*key;
+// 	char		*value;
+// 	char		*equal_sign;
+// 	t_env_var	*existing_var;
+// 	int			append;
 
-	// Strip surrounding quotes if both first and last chars are matching quotes
-	// if (value && ((value[0] == '"' || value[0] == '\'') && value[ft_strlen(value) - 1] == value[0]))
-	// {
-	// 	char *unquoted = ft_substr(value, 1, ft_strlen(value) - 2);
-	// 	free(value);
-	// 	value = unquoted;
-	// }
-	size_t len = ft_strlen(value);
-	// printf("value before = [%s], value[0] = [%c] (%d), last = [%c] (%d)\n",
-	// value, value[0], value[0], value[len - 1], value[len - 1]);
-	if (value && len >= 2
-    && ((value[0] == '"' && value[len - 1] == '"')
-        || (value[0] == '\'' && value[len - 1] == '\'')))
-	{
-		// ensure only one pair of same quotes
-		char *unquoted = ft_substr(value, 1, len - 2);
-		free(value);
-		value = unquoted;
-	}
+// 	append = 0;
+// 	equal_sign = ft_strchr(arg, '=');
+// 	if (!equal_sign)
+// 	{
+// 		if (!is_valid_identifier(arg))
+// 		{
+// 			ft_error("export", "not a valid identifier");
+// 			return (1);
+// 		}
+// 		existing_var = find_env_var(arg, env_list);
+// 		if (!existing_var)
+// 			add_env_var(ft_strdup(arg), ft_strdup(""), env_list);
+// 		return (0);
+// 	}
+// 	// Detect '+=' syntax
+// 	if (*(equal_sign - 1) == '+') // DEBUGGING
+// 	{
+// 		append = 1;
+// 		key = ft_substr(arg, 0, equal_sign - arg - 1); // Exclude '+'
+// 	}
+// 	else
+// 		key = ft_substr(arg, 0, equal_sign - arg);
 
-	existing_var = find_env_var(key, env_list);
-	if (existing_var)
-	{
-		if (append && existing_var->value)
-		{
-			char *new_val = ft_strjoin(existing_var->value, value);
-			free(existing_var->value);
-			existing_var->value = new_val;
-		}
-		else
-		{
-			free(existing_var->value);
-			existing_var->value = value;
-		}
-	}
-	else
-	{
-		add_env_var(key, value, env_list);
-		if (!append)
-			free(value); // Only free if we added normally (value copied in add_env_var)
-	}
+// 	if (!is_valid_identifier(key))
+// 	{
+// 		ft_error("export", "not a valid identifier");
+// 		free(key);
+// 		return (1);
+// 	}
 
-	free(key);
-	return (0);
+// 	value = ft_strdup(equal_sign + 1);
+
+// 	// Strip surrounding quotes if both first and last chars are matching quotes
+// 	// if (value && ((value[0] == '"' || value[0] == '\'') && value[ft_strlen(value) - 1] == value[0]))
+// 	// {
+// 	// 	char *unquoted = ft_substr(value, 1, ft_strlen(value) - 2);
+// 	// 	free(value);
+// 	// 	value = unquoted;
+// 	// }
+// 	size_t len = ft_strlen(value);
+// 	// printf("value before = [%s], value[0] = [%c] (%d), last = [%c] (%d)\n",
+// 	// value, value[0], value[0], value[len - 1], value[len - 1]);
+// 	if (value && len >= 2
+//     && ((value[0] == '"' && value[len - 1] == '"')
+//         || (value[0] == '\'' && value[len - 1] == '\'')))
+// 	{
+// 		// ensure only one pair of same quotes
+// 		char *unquoted = ft_substr(value, 1, len - 2);
+// 		free(value);
+// 		value = unquoted;
+// 	}
+
+// 	existing_var = find_env_var(key, env_list);
+// 	if (existing_var)
+// 	{
+// 		if (append && existing_var->value)
+// 		{
+// 			char *new_val = ft_strjoin(existing_var->value, value);
+// 			free(existing_var->value);
+// 			existing_var->value = new_val;
+// 		}
+// 		else
+// 		{
+// 			free(existing_var->value);
+// 			existing_var->value = value;
+// 		}
+// 	}
+// 	else
+// 	{
+// 		add_env_var(key, value, env_list);
+// 		if (!append)
+// 			free(value); // Only free if we added normally (value copied in add_env_var)
+// 	}
+
+// 	free(key);
+// 	return (0);
+// }
+
+
+static int export_variable(const char *arg, t_env_var *env_list)
+{
+    char        *key;
+    char        *equal_sign;
+    char        *raw;        /* text after '=' as typed (with quotes) */
+    char        *expanded;
+    char        *clean;
+    t_env_var   *existing_var;
+    int         append;
+
+    append = 0;
+    equal_sign = ft_strchr(arg, '=');
+
+    /* -------- case: export NAME (no assignment) -------- */
+    if (equal_sign == NULL)
+    {
+        if (!is_valid_identifier((char *)arg))
+        {
+            ft_error("export", "not a valid identifier");
+            return 1;
+        }
+        existing_var = find_env_var((char *)arg, env_list);
+        if (existing_var == NULL)
+        {
+            key = ft_strdup(arg);
+            if (!key) return 1;
+
+            /* If add_env_var is NULL-safe, prefer NULL; otherwise "" avoids segfaults */
+            /* add_env_var(key, NULL, env_list); */
+            add_env_var(key, "", env_list);
+
+            free(key);
+        }
+        return 0;
+    }
+
+    /* -------- parse key and detect NAME+= -------- */
+    if (equal_sign > arg && *(equal_sign - 1) == '+')
+    {
+        append = 1;
+        key = ft_substr(arg, 0, (size_t)(equal_sign - arg - 1));
+    }
+    else
+        key = ft_substr(arg, 0, (size_t)(equal_sign - arg));
+
+    if (!key || !is_valid_identifier(key))
+    {
+        ft_error("export", "not a valid identifier");
+        if (key) free(key);
+        return 1;
+    }
+
+    /* -------- expand RHS and strip syntactic quotes -------- */
+    raw = ft_strdup(equal_sign + 1);
+    if (!raw) { free(key); return 1; }
+
+    /* Use 0 for last_exit_status to keep signature 2-arg and compile everywhere */
+    expanded = expand_variables(raw, env_list, 0, NO_QUOTE);
+    free(raw);
+    if (!expanded) { free(key); return 1; }
+
+    clean = strip_syntactic_quotes(expanded);
+    free(expanded);
+    if (!clean) { free(key); return 1; }
+
+    /* -------- store/append -------- */
+    existing_var = find_env_var(key, env_list);
+    if (existing_var)
+    {
+        if (append && existing_var->value)
+        {
+            char *joined = ft_strjoin(existing_var->value, clean);
+            if (!joined) { free(clean); free(key); return 1; }
+            free(existing_var->value);
+            existing_var->value = joined;
+            free(clean);
+        }
+        else
+        {
+            free(existing_var->value);
+            existing_var->value = clean;  /* take ownership */
+        }
+    }
+    else
+    {
+        add_env_var(key, clean, env_list);
+        /* if add_env_var duplicates internally, uncomment: */
+        /* free(clean); */
+    }
+
+    free(key);
+    return 0;
 }
 
 int	run_export(t_env_var *env_list, char **args)
