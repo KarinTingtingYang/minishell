@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exit.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 13:12:47 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/12 11:37:23 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   exit.c                                             :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/28 13:12:47 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/22 09:45:02 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,13 +64,13 @@ static int	ft_str_to_llong(const char *str, long long *out_val)
  * It prints a message indicating the exit status and terminates the program.
  * @param status The exit status to return to the operating system.
  */
-int run_exit(char **args)
+int run_exit(char **args, int last_exit_status)
 {
 	long long exit_code;
 
 	ft_putstr_fd("exit\n", STDOUT_FILENO);
 	if (args[1] == NULL) // Case 1: Just "exit"
-		exit(0); // default: Exit with status 0 if no argument is provided
+		exit((unsigned char)last_exit_status); // EXIT CODE DEBUG: Exit with last exit status if no argument is provided
 	else // Case 2: exit with argument(s)
 	{
 		// try to convert the first argument to a number
