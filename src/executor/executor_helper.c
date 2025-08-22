@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor_helper.c                                  :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/22 09:56:45 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor_helper.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/22 12:06:55 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -512,7 +512,12 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
         free_split(expanded);
         if (cmds[i] == NULL)
         {
-            ft_error(NULL, "command creation failed");
+            // ft_error(NULL, "command creation failed");
+			    // heredoc interrupted or other command creation failure
+			if (process_data)
+				process_data->last_exit_status = 130; // like bash on Ctrl-C heredoc
+			else
+				; // fallback: do nothing
             free_split(path_dirs);
             free_commands_recursive(cmds, 0, i);
             free(cmds);

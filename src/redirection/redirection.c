@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 08:25:34 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/22 11:40:23 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/22 14:14:14 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,26 @@ void	redirect_io(char *input_file, char *output_file, int output_mode)
 {
 	if (input_file)
 		open_and_redirect_input(input_file);
+			
 	if (output_file)
 		open_and_redirect_output(output_file, output_mode);
 }
+
+/* 0 ok, -1 error */
+// int redirect_io(char *input_file, char *output_file, int output_mode)
+// {
+//     if (input_file)
+// 	{
+//         if (open_and_redirect_input(input_file) < 0)
+//             return -1;                 /*  stop: don't touch output */
+//     }
+//     if (output_file)
+// 	{
+//         if (open_and_redirect_output(output_file, output_mode) < 0)
+//             return -1;
+//     }
+//     return 0;
+// }
 
 // handle_redirection() Helper: Process a single redirection and update input/output file pointers
 // static int	process_redirection_token(char **args, int i, t_env_var *env_list, int last_exit_status,

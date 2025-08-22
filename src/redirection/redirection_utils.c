@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 11:10:49 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/12 11:25:54 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/22 14:13:59 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,38 @@ void	open_and_redirect_output(char *output_file, int output_mode)
 	}
 	close(fd_out);
 }
+
+
+// /* 0 ok, -1 error (errno is set) */
+// int open_and_redirect_input(const char *input_file)
+// {
+//     int fd = open(input_file, O_RDONLY);
+//     if (fd < 0)
+//         return -1;
+//     if (dup2(fd, STDIN_FILENO) < 0)
+// 	{
+//         close(fd);
+//         return -1;
+//     }
+//     close(fd);
+//     return 0;
+// }
+
+// /* output_mode: 2 = append (>>), else truncate (>) */
+// int open_and_redirect_output(const char *output_file, int output_mode)
+// {
+//     int flags = O_WRONLY | O_CREAT | (output_mode == 2 ? O_APPEND : O_TRUNC);
+//     int fd = open(output_file, flags, 0644);
+//     if (fd < 0)
+//         return -1;
+//     if (dup2(fd, STDOUT_FILENO) < 0)
+// 	{
+//         close(fd);
+//         return -1;
+//     }
+//     close(fd);
+//     return 0;
+// }
 
 // Helper: Count non-redirection arguments
 int	count_clean_args(char **args)

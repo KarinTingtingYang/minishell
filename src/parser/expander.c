@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/22 08:58:03 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/22 13:45:03 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,41 +70,68 @@ static int had_original_quotes(const t_token *token)
     return (0);
 }
 
+// static char **process_token(t_token *token, char *expanded)
+// {
+//     char **split;
+
+//     if (is_export_assignment(token))
+//         return handle_quoted_or_export_token(token, expanded);
+
+//     if (token->quote != NO_QUOTE)
+//     {
+//         expanded = remove_outer_quotes(expanded);
+//         if (!expanded)
+//             return (NULL);
+//         return handle_quoted_or_export_token(token, expanded);
+//     }
+//     else
+//     {
+//         if (had_original_quotes(token))
+//         {
+//             char *joined = remove_quotes_and_join(expanded);
+//             if (!joined)
+//             {
+//                 free(expanded);
+//                 return (NULL);
+//             }
+//             free(expanded);
+//             split = handle_whitespace_splitting(joined);
+//         }
+//         else
+//         {
+//             split = handle_whitespace_splitting(expanded);
+//         }
+//     }
+//     return (split);
+// }
+
 static char **process_token(t_token *token, char *expanded)
 {
     char **split;
 
-    if (is_export_assignment(token))
-        return handle_quoted_or_export_token(token, expanded);
+    /* If original token had ANY quotes, keep it as ONE field:
+       remove the quotes after expansion, no whitespace splitting. */
+    if (had_original_quotes(token))
+    {
+        char *unquoted = remove_quotes_and_join(expanded);
+        if (!unquoted)
+            return NULL;
 
-    if (token->quote != NO_QUOTE)
-    {
-        expanded = remove_outer_quotes(expanded);
-        if (!expanded)
-            return (NULL);
-        return handle_quoted_or_export_token(token, expanded);
+        split = (char **)malloc(sizeof(char *) * 2);
+        if (!split) 
+		{
+			free(unquoted);
+			return NULL;
+		}
+        split[0] = unquoted;
+        split[1] = NULL;
+        return split;
     }
-    else
-    {
-        if (had_original_quotes(token))
-        {
-            char *joined = remove_quotes_and_join(expanded);
-            if (!joined)
-            {
-                free(expanded);
-                return (NULL);
-            }
-            free(expanded);
-            split = handle_whitespace_splitting(joined);
-        }
-        else
-        {
-            split = handle_whitespace_splitting(expanded);
-        }
-    }
-    return (split);
+
+    /* No quotes originally -> normal field splitting on unquoted spaces */
+    split = handle_whitespace_splitting(expanded);
+    return split;
 }
-
 
 size_t	handle_variable_expansion(const char *input, size_t i,
 											char **result, t_expand_data *data)
@@ -204,6 +231,7 @@ char	**expand_and_split_args(t_token **tokens,
 			if (expanded == NULL)
 				return (NULL);
 			split = process_token(tokens[i], expanded);
+			
 			if (split == NULL)
 				return (NULL);
 			printf("process_token returns:\n");
@@ -216,3 +244,4 @@ char	**expand_and_split_args(t_token **tokens,
 	}
 	return (final_args);
 }
+
