@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/22 11:28:28 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/22 14:06:10 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 extern char **environ;
-extern volatile sig_atomic_t g_child_running; // Declare extern for global flag
+//extern volatile sig_atomic_t g_child_running; // Declare extern for global flag
 
 // static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
 // {
@@ -139,19 +139,47 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
 	
     data.clean_args = handle_redirection(args, &data.input_file, &data.output_file, &data.output_mode, &data.heredoc_file,
 							env_list, process_data->last_exit_status);
+	// FIX FOR CASE 1: Syntax error in redirection (e.g., "echo >")
     if (!data.clean_args)
     {
-        if (data.heredoc_file)
+         // ** THE FIX IS HERE **
+        // First, check if the failure was due to a signal (e.g., Ctrl+C in heredoc).
+        if (g_signal_received == SIGINT)
         {
-            unlink(data.heredoc_file);
-            free(data.heredoc_file);
+            process_data->last_exit_status = 130;
+            return (130);
         }
-        return (1);
+        
+        // // If not a signal, handle it as a syntax or file error.
+        // if (args[1] == NULL && is_redirection(args[0]))
+        // {
+             process_data->last_exit_status = 2; // Syntax error like ">"
+             return (2);
+        // }
+        // process_data->last_exit_status = 1; // File error like "> /noperm"
+        // return (1);
     }
     
     // Fix: Handle commands that are only redirections
+	 // FIX FOR CASE 2: Redirection-only command (e.g., "< nofile" or "> newfile")
     if (!data.clean_args[0])
     {
+		 exit_status = 0;
+        // Check input file for existence and permissions
+        if (data.input_file)
+        {
+            int fd = open(data.input_file, O_RDONLY);
+            if (fd == -1) {
+                ft_error(data.input_file, strerror(errno));
+                exit_status = 1;
+            } else {
+                close(fd);
+            }
+        }
+        // Output files are already created/checked in handle_redirection.
+        // If an output file failed, data.clean_args would be NULL and we wouldn't be here.
+        
+        process_data->last_exit_status = exit_status;
         free_execute_data(&data);
         return (0);
     }
@@ -213,6 +241,12 @@ static int prepare_and_run_pipeline(char *line,  t_env_var *env_list, t_process_
     cmds = prepare_pipeline_commands(line, &count, &parts, process_data);
     if (cmds == NULL)
 	{
+		// If command preparation failed, check if it was due to a signal.
+		if (g_signal_received == SIGINT)
+		{
+			process_data->last_exit_status = 130;
+			return (130);
+		}
 		process_data->last_exit_status = 2;
 		return (2);
 	}

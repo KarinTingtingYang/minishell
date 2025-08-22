@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/22 09:56:45 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/22 14:02:00 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -352,6 +352,12 @@ int build_commands_from_parts(t_command **cmds, char **parts, int index, int cou
         free_split(expanded_args);
         if (cmds[index] == NULL)
         {
+			 // If creation failed due to Ctrl+C in a heredoc, fail silently.
+            if (g_signal_received == SIGINT)
+            {
+                free_split(path_dirs);
+                return (0);
+            }
             ft_error(NULL, "command creation failed");
             free_split(path_dirs);
             return 0;
@@ -512,7 +518,9 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
         free_split(expanded);
         if (cmds[i] == NULL)
         {
-            ft_error(NULL, "command creation failed");
+			 // If creation failed but a signal was received, do not print an error.
+            if (g_signal_received != SIGINT)
+                ft_error(NULL, "command creation failed");
             free_split(path_dirs);
             free_commands_recursive(cmds, 0, i);
             free(cmds);

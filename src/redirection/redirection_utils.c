@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   redirection_utils.c                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 11:10:49 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/12 11:25:54 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   redirection_utils.c                                :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 11:10:49 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/22 12:47:31 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,10 @@ int	process_output_file(char *output_file, int is_append)
 	{
 		// Use perror to print a descriptive error message to STDERR
 		// perror(output_file); // DEBUG: Print error if open fails
-		ft_error_and_exit(output_file, strerror(errno), EXIT_FAILURE);
+		//ft_error_and_exit(output_file, strerror(errno), EXIT_FAILURE);
 		// Return -1 to signal an error to the caller
+		// FIX: Report the error but do not exit the whole shell.
+		ft_error(output_file, strerror(errno));
 		return (-1);
 	}
 	// Immediately close the file descriptor. We're done with it for now.

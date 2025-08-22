@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   redirection.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 08:25:34 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/22 11:40:23 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   redirection.c                                      :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 08:25:34 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/22 13:03:53 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,16 +137,18 @@ static int	process_redirection_token(char **args, int i, t_env_var *env_list, in
 	{
 		free(*final_input_file);
 		*final_input_file = ft_strdup(args[i + 1]);
-		if (access(*final_input_file, F_OK) != 0)
-		{
-			ft_error(args[i + 1], "No such file or directory");
-			return (-1);
-		}
-		if (access(*final_input_file, R_OK) != 0)
-		{
-			ft_error(args[i + 1], "Permission denied");
-			return (-1);
-		}
+		// EXIT CODE BUG FIX
+		// 
+		// if (access(*final_input_file, F_OK) != 0)
+		// {
+		// 	ft_error(args[i + 1], "No such file or directory");
+		// 	return (-1);
+		// }
+		// if (access(*final_input_file, R_OK) != 0)
+		// {
+		// 	ft_error(args[i + 1], "Permission denied");
+		// 	return (-1);
+		// }
 	}
 	// 5️⃣ Handle output truncation
 	else if (ft_strncmp(args[i], ">", 2) == 0)
@@ -222,6 +224,11 @@ char	**handle_redirection(char **args, char **final_input_file, char **final_out
 					free(*heredoc_file);
 					*heredoc_file = NULL; // Ensure it's set to NULL after freeing
 				}
+				// Free any filenames that might have been allocated before the error
+				free(*final_input_file);
+				free(*final_output_file);
+				*final_input_file = NULL;
+				*final_output_file = NULL;
 				return (NULL);
 			}
             i += 2;
