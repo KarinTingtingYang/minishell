@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor_helper.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 12:12:48 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor_helper.c                                  :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/22 09:56:45 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,10 +112,14 @@ int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
 
     if (is_builtin(data->clean_args[0]) && !has_redirection && !process_data->in_pipeline) // DEBUG
     {
-        run_builtin(data->clean_args, data->env_list);
+        run_builtin(data->clean_args, process_data);
         free_execute_data(data);
         return (0);
     }
+
+	// EXIT CODE DEBUG
+	 // Ignore SIGINT in the parent shell before forking
+    signal(SIGINT, SIG_IGN);
 
     pid = fork();
     if (pid < 0)
@@ -128,7 +132,7 @@ int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
     {
         redirect_io(data->input_file, data->output_file, data->output_mode);
         if (is_builtin(data->clean_args[0]))
-            run_builtin(data->clean_args, data->env_list);
+            run_builtin(data->clean_args, process_data);
         else
             execute_cmd(data->cmd_path, data->clean_args, data->path_dirs, data->env_list);
         exit(0);
@@ -136,6 +140,9 @@ int execute_prepared_command(t_execute_data *data, t_process_data *process_data)
     else
     {
         exit_code = wait_for_child_and_handle_status(pid);
+		// EXIT CODE DEBUG
+		 // Restore the parent's signal handlers
+        setup_signal_handlers();
         process_data->last_exit_status = exit_code;
         free_execute_data(data);
         return (exit_code);

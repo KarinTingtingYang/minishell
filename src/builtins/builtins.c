@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 09:00:14 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/18 09:55:18 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   builtins.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/28 09:00:14 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/22 09:44:09 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,25 +24,26 @@
  * @param env_list The environment variable linked list.
  * @return Returns 0 on success, or an error code on failure.
  */
-int run_builtin(char **args, t_env_var *env_list)
+//int run_builtin(char **args, t_env_var *env_list)
+int run_builtin(char **args, t_process_data *process_data)
 {
 	if (args == NULL || args[0] == NULL)
 		return (1);
 	if (ft_strncmp(args[0], "echo", 5) == 0)
 		// return (run_echo(args), 0);
-		return (run_echo(args, env_list), 0);
+		return (run_echo(args, process_data->env_list), 0);
 	if (ft_strncmp(args[0], "cd", 3) == 0)
-		return (run_cd(args, env_list));
+		return (run_cd(args, process_data->env_list));
 	if (ft_strncmp(args[0], "pwd", 4) == 0)
 		return (run_pwd());
 	if (ft_strncmp(args[0], "exit", 5) == 0)
-		return (run_exit(args));
+		return (run_exit(args, process_data->last_exit_status));
 	if (ft_strncmp(args[0], "env", 4) == 0)
-		return (run_env(env_list), 0);
+		return (run_env(process_data->env_list), 0);
 	if (ft_strncmp(args[0], "export", 7) == 0)
-		return (run_export(env_list, args));
+		return (run_export(process_data->env_list, args));
 	if (ft_strncmp(args[0], "unset", 6) == 0)
-		return (run_unset(&env_list, args));
+		return (run_unset(&(process_data->env_list), args));
 	return (0);
 }
 

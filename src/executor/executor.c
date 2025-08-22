@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 09:44:01 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/22 09:48:38 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
         if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
             exit_status = 1;
         else
-            exit_status = run_builtin(data.clean_args, env_list);
+            exit_status = run_builtin(data.clean_args, process_data);
 
         dup2(original_stdin, STDIN_FILENO);
         dup2(original_stdout, STDOUT_FILENO);
