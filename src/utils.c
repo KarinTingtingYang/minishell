@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 13:53:20 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/22 08:36:48 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,23 @@ void ft_error(char *command, char *message)
     // ft_putstr_fd(": ", STDERR_FILENO);
     ft_putstr_fd(message, STDERR_FILENO);
     ft_putstr_fd("\n", STDERR_FILENO);
+}
+
+void	ft_error_with_arg(char *command, char *arg, char *message)
+{
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	if (command && *command)
+	{
+		ft_putstr_fd(command, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+	}
+	if (arg && *arg)
+	{
+		ft_putstr_fd(arg, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+	}
+	ft_putstr_fd(message, STDERR_FILENO);
+	ft_putstr_fd("\n", STDERR_FILENO);
 }
 
 void	free_split(char **array)

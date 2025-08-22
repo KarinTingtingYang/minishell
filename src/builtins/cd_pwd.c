@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 10:45:26 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/14 13:40:03 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/22 08:37:46 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,8 @@ int	run_cd(char **args, t_env_var *env_list)
 	{
 		// ft_putstr_fd("minishell: cd: ", STDERR_FILENO); // DEBUG: Print error if chdir fails
 		// perror(path);
-		ft_error("cd", strerror(errno));
+		// ft_error("cd", strerror(errno));
+		ft_error_with_arg("cd", path, strerror(errno));
 		return (1);
 	}
 	return (0);

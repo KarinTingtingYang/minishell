@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 09:44:01 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/22 11:15:01 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,40 +15,115 @@
 extern char **environ;
 extern volatile sig_atomic_t g_child_running; // Declare extern for global flag
 
+// static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
+// {
+// 	(void)args;
+// 	(void)path_dirs;
+
+// 	if (errno == ENOENT)
+// 	{
+//     	ft_error_and_exit(cmd_path, "command not found", 127);
+// 	}
+// 	else
+// 	{
+// 		ft_error_and_exit(cmd_path, strerror(errno), EXIT_FAILURE);
+// 	}
+// 	free(cmd_path);
+// }
+
 static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
 {
-	(void)args;
-	(void)path_dirs;
+    (void)path_dirs;
 
-	if (errno == ENOENT)
-	{
-    	ft_error_and_exit(cmd_path, "command not found", 127);
-	}
-	else
-	{
-		ft_error_and_exit(cmd_path, strerror(errno), EXIT_FAILURE);
-	}
-	free(cmd_path);
+    if (!cmd_path || !args || !args[0])
+    {
+        // Safety fallback
+        ft_error_and_exit("minishell", "Unknown execution error", 126);
+    }
+
+    if (errno == ENOENT)
+        ft_error_and_exit(args[0], "No such file or directory", 127);
+    else if (errno == EACCES)
+        ft_error_and_exit(args[0], "Permission denied", 126);
+    else if (errno == ENOEXEC)
+        ft_error_and_exit(args[0], "Exec format error", 126);
+    else
+        ft_error_and_exit(args[0], strerror(errno), 126);
+
+    free(cmd_path); // cmd_path is now properly used
 }
+
+
+// void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
+// {
+// 	char **envp;
+
+//     reset_child_signal_handlers();
+//     envp = env_list_to_array(env_list);
+//     if (cmd_path == NULL)
+//     {
+//         if (args && args[0])
+// 			ft_error_and_exit(args[0], "command not found", 127);
+//         if (envp)
+//             free_split(envp);
+//         exit(127);
+//     }
+//     execve(cmd_path, args, envp);
+//     free_split(envp);
+//     handle_execve_error(cmd_path, args, path_dirs);
+// }
 
 void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
 {
-	char **envp;
+    char        **envp;
+    struct stat   st;
+
+    (void)path_dirs;
 
     reset_child_signal_handlers();
     envp = env_list_to_array(env_list);
+
+    /* Resolver failed: choose correct message based on args[0] */
     if (cmd_path == NULL)
     {
         if (args && args[0])
-			ft_error_and_exit(args[0], "command not found", 127);
-        if (envp)
-            free_split(envp);
+        {
+            if (ft_strchr(args[0], '/'))
+            {
+                if (envp) free_split(envp);
+                ft_error_and_exit(args[0], "No such file or directory", 127);
+            }
+            else
+            {
+                if (envp) free_split(envp);
+                ft_error_and_exit(args[0], "command not found", 127);
+            }
+        }
+        if (envp) free_split(envp);
         exit(127);
     }
+
+    /* Pre-checks to match bash */
+    if (stat(cmd_path, &st) == 0 && S_ISDIR(st.st_mode))
+    {
+        if (envp) free_split(envp);
+        ft_error_and_exit(args[0], "Is a directory", 126);
+    }
+    if (access(cmd_path, X_OK) != 0)
+    {
+        if (envp) free_split(envp);
+        ft_error_and_exit(args[0], "Permission denied", 126);
+    }
+
+    /* Try to exec */
     execve(cmd_path, args, envp);
+
+    /* If we’re here, execve failed → map errno (ENOEXEC, etc.) */
     free_split(envp);
-    handle_execve_error(cmd_path, args, path_dirs);
+    handle_execve_error(cmd_path, args, NULL);
 }
+
+
 
 static int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data)
 {
@@ -104,15 +179,15 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
         data.cmd_path = find_full_cmd_path(data.clean_args[0], path_dirs);
         free_split(path_dirs);
 
-        if (!data.cmd_path)
-        {
-            ft_error(data.clean_args[0], "command not found");
-            exit_status = 127;
-        }
-        else
-        {
-            exit_status = execute_prepared_command(&data, process_data);
-        }
+        // if (!data.cmd_path)
+        // {
+        //     // ft_error(data.clean_args[0], "command not found");
+        //     exit_status = 127;
+        // }
+        // else
+        // {
+        exit_status = execute_prepared_command(&data, process_data);
+        // }
     }
 
     process_data->last_exit_status = exit_status;
