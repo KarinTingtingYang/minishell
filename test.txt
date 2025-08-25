@@ -1,8 +1,0 @@
-Makefile
-README.md
-libft
-minishell
-objs
-src
-test.txt
-testdir
