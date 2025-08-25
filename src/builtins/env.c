@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   env.c                                              :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/30 11:42:52 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/06 14:12:07 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   env.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/30 11:42:52 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/25 10:10:28 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,18 +22,18 @@
  * @return Returns a pointer to the head of the linked list of environment
  *         variables.
  */
-char *get_env_value(t_env_var *env_list, char *key)
+char	*get_env_value(t_env_var *env_list, char *key)
 {
-    t_env_var *current;
-	
+	t_env_var	*current;
+
 	current = env_list;
-    while (current != NULL)
-    {
-        if (ft_strncmp(current->key, key, ft_strlen(key) + 1) == 0)
-            return (current->value);
-        current = current->next;
-    }
-    return (NULL);
+	while (current != NULL)
+	{
+		if (ft_strncmp(current->key, key, ft_strlen(key) + 1) == 0)
+			return (current->value);
+		current = current->next;
+	}
+	return (NULL);
 }
 
 /**
@@ -43,17 +43,17 @@ char *get_env_value(t_env_var *env_list, char *key)
  * and prints each key-value pair in the format "KEY=VALUE".
  * @param env_list The head of the environment linked list.
  */
-void run_env(t_env_var *env_list)
+void	run_env(t_env_var *env_list)
 {
-    while (env_list != NULL)
-    {
-        if (env_list->value) 
-        {
-            ft_putstr_fd(env_list->key, STDOUT_FILENO);
-            ft_putstr_fd("=", STDOUT_FILENO);
-            ft_putstr_fd(env_list->value, STDOUT_FILENO);
-            ft_putstr_fd("\n", STDOUT_FILENO);
-        }
-        env_list = env_list->next;
-    }
+	while (env_list != NULL)
+	{
+		if (env_list->value)
+		{
+			ft_putstr_fd(env_list->key, STDOUT_FILENO);
+			ft_putstr_fd("=", STDOUT_FILENO);
+			ft_putstr_fd(env_list->value, STDOUT_FILENO);
+			ft_putstr_fd("\n", STDOUT_FILENO);
+		}
+		env_list = env_list->next;
+	}
 }

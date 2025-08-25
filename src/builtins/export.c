@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 13:18:07 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/25 10:18:19 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,6 @@ static void	bubble_sort_env_list(t_env_var *start)
 			n = (len1 > len2) ? len1 : len2;
 			if (ft_strncmp(ptr1->key, ptr1->next->key, n) > 0)
 			{
-				// Swap the data of the two nodes
 				temp_key = ptr1->key;
 				temp_value = ptr1->value;
 				ptr1->key = ptr1->next->key;
@@ -90,16 +89,8 @@ static void	display_export(t_env_var *env_list)
 	t_env_var	*sorted_list;
 	t_env_var	*current;
 
-	// 1. Duplicate the list so we don't alter the original
 	sorted_list = duplicate_env_list(env_list);
-
-	// if (sorted_list == NULL) // DEBUG: Check if duplication failed
-    //     return (1);
-		
-	// 2. Sort the duplicated list
 	bubble_sort_env_list(sorted_list);
-
-	// 3. Print the sorted list in the required format
 	current = sorted_list;
 	while (current)
 	{
@@ -114,17 +105,16 @@ static void	display_export(t_env_var *env_list)
 		ft_putstr_fd("\n", STDOUT_FILENO);
 		current = current->next;
 	}
-
-	// 4. Free the duplicated list to prevent memory leaks
 	free_env(sorted_list);
 }
 
-/* remove syntactic quotes (' and ") from a string; keep inner data */
-static char *strip_syntactic_quotes(const char *s)
+static char	*strip_syntactic_quotes(const char *s)
 {
-    size_t i, w, len;
-    char   quote;
-    char  *out;
+	size_t	i;
+	size_t	w;
+	size_t	len;
+	char	quote;
+	char 	*out;
 
     if (!s) return NULL;
     len = ft_strlen(s);
@@ -144,93 +134,6 @@ static char *strip_syntactic_quotes(const char *s)
     out[w] = '\0';
     return out;
 }
-
-// static int	export_variable(const char *arg, t_env_var *env_list)
-// {
-// 	char		*key;
-// 	char		*value;
-// 	char		*equal_sign;
-// 	t_env_var	*existing_var;
-// 	int			append;
-
-// 	append = 0;
-// 	equal_sign = ft_strchr(arg, '=');
-// 	if (!equal_sign)
-// 	{
-// 		if (!is_valid_identifier(arg))
-// 		{
-// 			ft_error("export", "not a valid identifier");
-// 			return (1);
-// 		}
-// 		existing_var = find_env_var(arg, env_list);
-// 		if (!existing_var)
-// 			add_env_var(ft_strdup(arg), ft_strdup(""), env_list);
-// 		return (0);
-// 	}
-// 	// Detect '+=' syntax
-// 	if (*(equal_sign - 1) == '+') // DEBUGGING
-// 	{
-// 		append = 1;
-// 		key = ft_substr(arg, 0, equal_sign - arg - 1); // Exclude '+'
-// 	}
-// 	else
-// 		key = ft_substr(arg, 0, equal_sign - arg);
-
-// 	if (!is_valid_identifier(key))
-// 	{
-// 		ft_error("export", "not a valid identifier");
-// 		free(key);
-// 		return (1);
-// 	}
-
-// 	value = ft_strdup(equal_sign + 1);
-
-// 	// Strip surrounding quotes if both first and last chars are matching quotes
-// 	// if (value && ((value[0] == '"' || value[0] == '\'') && value[ft_strlen(value) - 1] == value[0]))
-// 	// {
-// 	// 	char *unquoted = ft_substr(value, 1, ft_strlen(value) - 2);
-// 	// 	free(value);
-// 	// 	value = unquoted;
-// 	// }
-// 	size_t len = ft_strlen(value);
-// 	// printf("value before = [%s], value[0] = [%c] (%d), last = [%c] (%d)\n",
-// 	// value, value[0], value[0], value[len - 1], value[len - 1]);
-// 	if (value && len >= 2
-//     && ((value[0] == '"' && value[len - 1] == '"')
-//         || (value[0] == '\'' && value[len - 1] == '\'')))
-// 	{
-// 		// ensure only one pair of same quotes
-// 		char *unquoted = ft_substr(value, 1, len - 2);
-// 		free(value);
-// 		value = unquoted;
-// 	}
-
-// 	existing_var = find_env_var(key, env_list);
-// 	if (existing_var)
-// 	{
-// 		if (append && existing_var->value)
-// 		{
-// 			char *new_val = ft_strjoin(existing_var->value, value);
-// 			free(existing_var->value);
-// 			existing_var->value = new_val;
-// 		}
-// 		else
-// 		{
-// 			free(existing_var->value);
-// 			existing_var->value = value;
-// 		}
-// 	}
-// 	else
-// 	{
-// 		add_env_var(key, value, env_list);
-// 		if (!append)
-// 			free(value); // Only free if we added normally (value copied in add_env_var)
-// 	}
-
-// 	free(key);
-// 	return (0);
-// }
-
 
 static int export_variable(const char *arg, t_env_var *env_list)
 {
