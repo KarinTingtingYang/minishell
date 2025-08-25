@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor_helper.c                                  :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 09:26:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/22 14:57:13 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor_helper.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/25 11:18:25 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -439,6 +439,103 @@ int build_commands_from_parts(t_command **cmds, char **parts, int index, int cou
 //     return (cmds);
 // }
 
+// t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
+//                                       t_process_data *process_data)
+// {
+//     t_command **cmds;
+//     char      **path_dirs;
+//     int         i;
+
+//     *parts = split_line_by_pipe(line);
+//     if (*parts == NULL || (*parts)[0] == NULL)
+//         return (NULL);
+
+//     *count = count_command_parts(*parts);
+//     if (!validate_pipeline_parts(*parts, *count))
+//     {
+//         free_split(*parts);
+//         *parts = NULL;
+//         return (NULL);
+//     }
+
+//     cmds = malloc(sizeof(t_command *) * ((size_t)(*count) + 1));
+//     if (cmds == NULL)
+//     {
+//         free_split(*parts);
+//         *parts = NULL;
+//         return (NULL);
+//     }
+//     ft_bzero(cmds, sizeof(t_command *) * ((size_t)(*count) + 1));
+
+//     /* set once for the whole pipeline */
+//     if (process_data)
+//         process_data->in_pipeline = (*count > 1);
+
+//     /* get PATH dirs once for the whole pipeline */
+//     path_dirs = find_path_dirs(process_data->env_list);
+//     if (path_dirs == NULL)
+//     {
+//         ft_error(NULL, "PATH variable not found");
+//         free(cmds);
+//         free_split(*parts);
+//         *parts = NULL;
+//         return (NULL);
+//     }
+
+//     /* build each command with the SAME process_data pointer */
+//     i = 0;
+//     while (i < *count)
+//     {
+//         t_token **tokens = parse_line((*parts)[i]);
+//         char    **expanded;
+
+//         if (tokens == NULL)
+//         {
+//             free_split(path_dirs);
+//             free_commands_recursive(cmds, 0, i);
+//             free(cmds);
+//             free_split(*parts);
+//             *parts = NULL;
+//             return (NULL);
+//         }
+
+//         expanded = expand_and_split_args(tokens,
+//                                          process_data->env_list,
+//                                          process_data->last_exit_status);
+//         free_tokens(tokens);
+//         if (expanded == NULL)
+//         {
+//             free_split(path_dirs);
+//             free_commands_recursive(cmds, 0, i);
+//             free(cmds);
+//             free_split(*parts);
+//             *parts = NULL;
+//             return (NULL);
+//         }
+
+//         /* real call: pass path_dirs and the SAME process_data (no indexing) */
+//         cmds[i] = create_command(expanded, path_dirs, process_data);
+//         free_split(expanded);
+//         if (cmds[i] == NULL)
+//         {
+// 			 // If creation failed but a signal was received, do not print an error.
+//             if (g_signal_received != SIGINT)
+//                 ft_error(NULL, "command creation failed");
+//             free_split(path_dirs);
+//             free_commands_recursive(cmds, 0, i);
+//             free(cmds);
+//             free_split(*parts);
+//             *parts = NULL;
+//             return (NULL);
+//         }
+//         i++;
+//     }
+
+//     free_split(path_dirs);      /* path_dirs no longer needed */
+//     cmds[*count] = NULL;
+//     return cmds;
+// }
+
 t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
                                       t_process_data *process_data)
 {
@@ -451,6 +548,11 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
         return (NULL);
 
     *count = count_command_parts(*parts);
+
+    /* optional: reset if you have this field; ignore if not */
+    if (process_data)
+        process_data->syntax_error = 0;
+
     if (!validate_pipeline_parts(*parts, *count))
     {
         free_split(*parts);
@@ -518,9 +620,7 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
         free_split(expanded);
         if (cmds[i] == NULL)
         {
-			 // If creation failed but a signal was received, do not print an error.
-            if (g_signal_received != SIGINT)
-                ft_error(NULL, "command creation failed");
+            /* IMPORTANT: do NOT print here; a syntax error (if any) was already printed upstream */
             free_split(path_dirs);
             free_commands_recursive(cmds, 0, i);
             free(cmds);
@@ -535,7 +635,6 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
     cmds[*count] = NULL;
     return cmds;
 }
-
 /**
  * @brief Duplicates an array of strings (e.g., command arguments).
  * 
