@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   pipe.c                                             :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/22 10:08:55 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/22 14:30:54 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   pipes.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/25 08:52:32 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,43 +77,101 @@ static int wait_all_children(pid_t *pids, int index, int max, int last_status, i
  * @param i The current index of the command being forked.
  * @return 0 on success, -1 on fork failure.
  */
+// static int fork_all_processes_recursive(t_process_data *data, int i)
+// {
+//     if (i >= data->cmd_count)
+//         return (0);
+//     data->pids[i] = fork();
+//     if (data->pids[i] == -1)
+//     {
+//         // perror("fork"); // DEBUG: Print error if fork fails
+// 		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
+//         return (-1);
+//     }
+//     if (data->pids[i] == 0)
+//     {
+//         reset_child_signal_handlers();
+//         redirect_io(data->cmds[i]->input_file, data->cmds[i]->output_file, 
+// 				data->cmds[i]->output_mode);
+//         if (i > 0)
+//             dup2(data->pipes[i - 1][0], STDIN_FILENO);
+//         if (i < data->cmd_count - 1)
+//             dup2(data->pipes[i][1], STDOUT_FILENO);
+//         close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
+// 		// ** THE FIX IS HERE **
+//         // If there are no arguments after redirection, it's an empty command. Exit successfully.
+//         if (data->cmds[i]->args[0] == NULL)
+//             exit(0);
+//         if (is_builtin(data->cmds[i]->args[0]))
+//         {
+//             exit(run_builtin(data->cmds[i]->args, data));
+//         }
+//         else
+//         {
+//             execute_cmd(data->cmds[i]->cmd_path, data->cmds[i]->args, data->path_dirs, data->env_list);
+//         }
+//         // perror("execve"); // DEBUG: Print error if execve fails
+// 		ft_error_and_exit("execve", strerror(errno), EXIT_FAILURE);
+//         // exit(EXIT_FAILURE);
+//     }
+//     return fork_all_processes_recursive(data, i + 1);
+// }
+
 static int fork_all_processes_recursive(t_process_data *data, int i)
 {
     if (i >= data->cmd_count)
         return (0);
+
     data->pids[i] = fork();
     if (data->pids[i] == -1)
     {
-        // perror("fork"); // DEBUG: Print error if fork fails
-		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
+        ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
         return (-1);
     }
+
     if (data->pids[i] == 0)
     {
+        /* -------- CHILD i -------- */
         reset_child_signal_handlers();
-        redirect_io(data->cmds[i]->input_file, data->cmds[i]->output_file, 
-				data->cmds[i]->output_mode);
+
+        /* 1) PIPE WIRING FIRST (so own redirs can override later) */
         if (i > 0)
-            dup2(data->pipes[i - 1][0], STDIN_FILENO);
+        {
+            if (dup2(data->pipes[i - 1][0], STDIN_FILENO) == -1)
+                ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
+        }
         if (i < data->cmd_count - 1)
-            dup2(data->pipes[i][1], STDOUT_FILENO);
+        {
+            if (dup2(data->pipes[i][1], STDOUT_FILENO) == -1)
+                ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
+        }
+
+        /* Close all pipe fds in the child (we've dup2'ed what we need) */
         close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
-		// ** THE FIX IS HERE **
-        // If there are no arguments after redirection, it's an empty command. Exit successfully.
-        if (data->cmds[i]->args[0] == NULL)
+
+        /* 2) NOW APPLY THIS COMMAND'S REDIRECTIONS → override pipe fds */
+        redirect_io(data->cmds[i]->input_file,
+                    data->cmds[i]->output_file,
+                    data->cmds[i]->output_mode);
+
+        /* 3) Empty command after redirs → succeed */
+        if (data->cmds[i]->args == NULL || data->cmds[i]->args[0] == NULL)
             exit(0);
+
+        /* 4) Builtin runs in child within pipeline */
         if (is_builtin(data->cmds[i]->args[0]))
-        {
             exit(run_builtin(data->cmds[i]->args, data));
-        }
-        else
-        {
-            execute_cmd(data->cmds[i]->cmd_path, data->cmds[i]->args, data->path_dirs, data->env_list);
-        }
-        // perror("execve"); // DEBUG: Print error if execve fails
-		ft_error_and_exit("execve", strerror(errno), EXIT_FAILURE);
-        // exit(EXIT_FAILURE);
+
+        /* 5) External command */
+        execute_cmd(data->cmds[i]->cmd_path,
+                    data->cmds[i]->args,
+                    data->path_dirs,
+                    data->env_list);
+
+        /* If execute_cmd ever returns */
+        ft_error_and_exit("execve", strerror(errno), EXIT_FAILURE);
     }
+
     return fork_all_processes_recursive(data, i + 1);
 }
 
