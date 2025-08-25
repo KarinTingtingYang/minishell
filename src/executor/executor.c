@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/22 14:06:10 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/25 09:03:27 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
 	// FIX FOR CASE 1: Syntax error in redirection (e.g., "echo >")
     if (!data.clean_args)
     {
-         // ** THE FIX IS HERE **
+        // ** THE FIX IS HERE **
         // First, check if the failure was due to a signal (e.g., Ctrl+C in heredoc).
         if (g_signal_received == SIGINT)
         {
@@ -151,13 +151,18 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
         }
         
         // // If not a signal, handle it as a syntax or file error.
-        // if (args[1] == NULL && is_redirection(args[0]))
-        // {
+        //if (args[1] == NULL && is_redirection(args[0]))
+		int last_arg_index = 0;
+		while(args[last_arg_index + 1] != NULL) 
+			last_arg_index++;
+		if (is_redirection(args[last_arg_index]))
+        {
              process_data->last_exit_status = 2; // Syntax error like ">"
              return (2);
-        // }
-        // process_data->last_exit_status = 1; // File error like "> /noperm"
-        // return (1);
+        }
+        // If not a signal, handle it as a syntax or file error.        
+		process_data->last_exit_status = 1; // File error like "> /noperm"
+        return (1);
     }
     
     // Fix: Handle commands that are only redirections
