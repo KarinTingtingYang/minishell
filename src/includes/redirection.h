@@ -1,18 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   redirection.h                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 11:11:42 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/22 14:14:43 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   redirection.h                                      :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 11:11:42 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/25 10:04:07 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #ifndef	REDIRECTION_H
 # define REDIRECTION_H
+
+# define MAX_HEREDOCS 16           // Maximum number of here-documents
 
 // utils:
 int	process_output_file(char *output_file, int is_append);

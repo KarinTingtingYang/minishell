@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 08:25:34 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/25 08:37:13 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/25 10:15:34 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,7 +221,22 @@ char	**handle_redirection(char **args, char **final_input_file, char **final_out
 {
     int		i = 0;
     int		argc;
+	int     heredoc_count = 0;
 
+	// 1. Pre-scan to count heredocs before processing anything.
+	while (args[i])
+    {
+        if (ft_strncmp(args[i], "<<", 3) == 0)
+            heredoc_count++;
+        i++;
+    }
+	// 2. Check the limit before entering the main processing loop.
+	if (heredoc_count > MAX_HEREDOCS)
+	{
+		ft_error_and_exit("", "maximum here-document count exceeded", 2);
+		return (NULL);
+	}
+	i = 0; // Reset index for main processing loop
     *final_input_file = NULL;
     *final_output_file = NULL;
 	*output_mode = 0; // Initialize output_mode
