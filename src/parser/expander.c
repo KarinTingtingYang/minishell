@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/22 13:45:03 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   expander.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/25 13:28:47 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,7 +231,7 @@ char	**expand_and_split_args(t_token **tokens,
 			if (expanded == NULL)
 				return (NULL);
 			split = process_token(tokens[i], expanded);
-			
+			free(expanded); // memory leak fix
 			if (split == NULL)
 				return (NULL);
 			printf("process_token returns:\n");
