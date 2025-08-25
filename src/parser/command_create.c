@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   command_create.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/20 12:55:17 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   command_create.c                                   :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/26 10:49:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/25 09:34:58 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,10 +160,12 @@ t_command	*create_command(char **tokens, char **path_dirs, t_process_data *proce
 	// 	free_command(cmd);
 	// 	return (NULL);
 	// }
-	if (!is_builtin(cmd->args[0]) && search_command_in_path(cmd, path_dirs) == -1) // DEBUGGING
-    {
-        free_command(cmd);
-        return (NULL);
-    }
+	// if (!is_builtin(cmd->args[0]) && search_command_in_path(cmd, path_dirs) == -1) // DEBUGGING
+    // {
+    //     free_command(cmd);
+    //     return (NULL);
+    // }
+	if (!is_builtin(cmd->args[0]))
+		search_command_in_path(cmd, path_dirs);
 	return (cmd);
 }
