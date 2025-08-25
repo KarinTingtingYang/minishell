@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 08:25:34 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/22 14:51:24 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/25 08:37:13 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,16 +156,16 @@ static int	process_redirection_token(char **args, int i, t_env_var *env_list, in
 		*final_input_file = ft_strdup(args[i + 1]);
 		// EXIT CODE BUG FIX
 		// 
-		// if (access(*final_input_file, F_OK) != 0)
-		// {
-		// 	ft_error(args[i + 1], "No such file or directory");
-		// 	return (-1);
-		// }
-		// if (access(*final_input_file, R_OK) != 0)
-		// {
-		// 	ft_error(args[i + 1], "Permission denied");
-		// 	return (-1);
-		// }
+		if (access(*final_input_file, F_OK) != 0)
+		{
+			ft_error(args[i + 1], "No such file or directory");
+			return (-1);
+		}
+		if (access(*final_input_file, R_OK) != 0)
+		{
+			ft_error(args[i + 1], "Permission denied");
+			return (-1);
+		}
 	}
 	// 5️⃣ Handle output truncation
 	else if (ft_strncmp(args[i], ">", 2) == 0)
