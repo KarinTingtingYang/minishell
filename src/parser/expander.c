@@ -114,6 +114,8 @@ static char **process_token(t_token *token, char *expanded)
     if (had_original_quotes(token))
     {
         char *unquoted = remove_quotes_and_join(expanded);
+		free(expanded);
+		expanded = NULL; // memory leak fix
         if (!unquoted)
             return NULL;
 
@@ -231,7 +233,8 @@ char	**expand_and_split_args(t_token **tokens,
 			if (expanded == NULL)
 				return (NULL);
 			split = process_token(tokens[i], expanded);
-			free(expanded); // memory leak fix
+			// free(expanded); // memory leak fix
+			// expanded = NULL;
 			if (split == NULL)
 				return (NULL);
 			printf("process_token returns:\n");
