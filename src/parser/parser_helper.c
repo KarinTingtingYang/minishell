@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser_helper.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 09:30:22 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   parser_helper.c                                    :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/21 11:05:27 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/27 12:59:13 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,4 +162,32 @@ int	quotes_are_closed(const char *line)
 		return (0);
 	}
 	return (1);
+}
+
+/**
+ * @brief Counts the number of unquoted heredoc delimiters (<<) in a line.
+ * @param line The command line string to check.
+ * @return The total number of heredocs.
+ */
+int	count_heredocs(const char *line)
+{
+	int		count;
+	char	quote_char;
+
+	count = 0;
+	quote_char = 0;
+	while (line && *line)
+	{
+		if (quote_char == 0 && (*line == '\'' || *line == '"'))
+			quote_char = *line;
+		else if (*line == quote_char)
+			quote_char = 0;
+		if (quote_char == 0 && *line == '<' && *(line + 1) == '<')
+		{
+			count++;
+			line++;
+		}
+		line++;
+	}
+	return (count);
 }

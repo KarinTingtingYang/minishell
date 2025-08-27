@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 08:25:34 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/25 10:15:34 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/27 13:04:04 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ void	redirect_io(char *input_file, char *output_file, int output_mode)
 //     return (0);
 // }
 
-static int	process_redirection_token(char **args, int i, t_env_var *env_list, int last_exit_status,
+static int	process_redirection_token(char **args, int i, t_process_data *process_data,
 			char **final_input_file, char **final_output_file, int *output_mode, char **heredoc_file)
 {
 	// 1️⃣ Make sure there is a token after the redirection operator
@@ -143,7 +143,8 @@ static int	process_redirection_token(char **args, int i, t_env_var *env_list, in
 			free(*heredoc_file);
 			*heredoc_file = NULL;
 		}
-		*heredoc_file = handle_heredoc(args[i + 1], env_list, last_exit_status);
+		*heredoc_file = handle_heredoc(args[i + 1], 
+			process_data->env_list, process_data->last_exit_status);
 		if (!*heredoc_file)
 			return (-1);
 		free(*final_input_file);
@@ -156,15 +157,31 @@ static int	process_redirection_token(char **args, int i, t_env_var *env_list, in
 		*final_input_file = ft_strdup(args[i + 1]);
 		// EXIT CODE BUG FIX
 		// 
-		if (access(*final_input_file, F_OK) != 0)
+		// if (access(*final_input_file, F_OK) != 0)
+		// {
+		// 	ft_error(args[i + 1], "No such file or directory");
+		// 	return (-1);
+		// }
+		// if (access(*final_input_file, R_OK) != 0)
+		// {
+		// 	ft_error(args[i + 1], "Permission denied");
+		// 	return (-1);
+		// }
+		// --- THE FIX ---
+		// Only check the file if we are in a single command context.
+		// In a pipeline, the check happens later inside the child process.
+		if (!process_data->in_pipeline)
 		{
-			ft_error(args[i + 1], "No such file or directory");
-			return (-1);
-		}
-		if (access(*final_input_file, R_OK) != 0)
-		{
-			ft_error(args[i + 1], "Permission denied");
-			return (-1);
+			if (access(*final_input_file, F_OK) != 0)
+			{
+				ft_error(args[i + 1], "No such file or directory");
+				return (-1);
+			}
+			if (access(*final_input_file, R_OK) != 0)
+			{
+				ft_error(args[i + 1], "Permission denied");
+				return (-1);
+			}
 		}
 	}
 	// 5️⃣ Handle output truncation
@@ -216,27 +233,27 @@ static char	**build_clean_args(char **args, int argc)
  * and its arguments. Returns NULL on syntax or file error.
  */
 // Main function split into helpers
-char	**handle_redirection(char **args, char **final_input_file, char **final_output_file,
-							int *output_mode, char **heredoc_file, t_env_var *env_list, int last_exit_status)
+char	**handle_redirection(char **args, t_process_data *process_data, char **final_input_file, 
+	char **final_output_file, int *output_mode, char **heredoc_file)
 {
     int		i = 0;
     int		argc;
-	int     heredoc_count = 0;
+	//int     heredoc_count = 0;
 
-	// 1. Pre-scan to count heredocs before processing anything.
-	while (args[i])
-    {
-        if (ft_strncmp(args[i], "<<", 3) == 0)
-            heredoc_count++;
-        i++;
-    }
-	// 2. Check the limit before entering the main processing loop.
-	if (heredoc_count > MAX_HEREDOCS)
-	{
-		ft_error_and_exit("", "maximum here-document count exceeded", 2);
-		return (NULL);
-	}
-	i = 0; // Reset index for main processing loop
+	// // 1. Pre-scan to count heredocs before processing anything.
+	// while (args[i])
+    // {
+    //     if (ft_strncmp(args[i], "<<", 3) == 0)
+    //         heredoc_count++;
+    //     i++;
+    // }
+	// // 2. Check the limit before entering the main processing loop.
+	// if (heredoc_count > MAX_HEREDOCS)
+	// {
+	// 	ft_error_and_exit("", "maximum here-document count exceeded", 2);
+	// 	return (NULL);
+	// }
+	// i = 0; // Reset index for main processing loop
     *final_input_file = NULL;
     *final_output_file = NULL;
 	*output_mode = 0; // Initialize output_mode
@@ -247,7 +264,7 @@ char	**handle_redirection(char **args, char **final_input_file, char **final_out
     {
         if (is_redirection(args[i]))
         {
-            if (process_redirection_token(args, i, env_list, last_exit_status, final_input_file, final_output_file,
+            if (process_redirection_token(args, i, process_data, final_input_file, final_output_file,
 											output_mode, heredoc_file) != 0)
             {
 				if (*heredoc_file)

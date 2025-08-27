@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser.h                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 10:54:01 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 09:08:18 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   parser.h                                           :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/26 10:54:01 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/27 12:59:30 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,5 +40,6 @@ t_token		*create_token(char *value, t_quote_type quote_type);
 int			quotes_are_closed(const char *line);
 int			validate_redirect_syntax(t_token **tokens);
 int is_redirect(const char *s);
+int	count_heredocs(const char *line);
 
 #endif

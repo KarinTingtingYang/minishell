@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/26 10:49:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/25 09:34:58 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/27 11:08:47 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,8 @@ static int	parse_args_and_redirection(t_command *cmd, char **tokens, t_process_d
 	original_args = duplicate_split(tokens);
 	if (original_args == NULL)
 		return (-1);
-	cmd->args = handle_redirection(original_args, &cmd->input_file,
-			&cmd->output_file, &cmd->output_mode, &cmd->heredoc_file, 
-			process_data->env_list, process_data->last_exit_status);
+	cmd->args = handle_redirection(original_args, process_data, &cmd->input_file,
+			&cmd->output_file, &cmd->output_mode, &cmd->heredoc_file);
 	free_split(original_args);
 	if (cmd->args == NULL)
 		return (-1);

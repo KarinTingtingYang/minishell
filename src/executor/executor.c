@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/25 09:03:27 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/27 13:26:16 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,9 +136,12 @@ static int execute_single_command(char **args, t_env_var *env_list, t_process_da
 	// ---> THIS IS THE FIX <---
 	// We must populate the data struct with the environment list.
 	data.env_list = env_list;
+
+	 // Set in_pipeline to 0 for single commands
+    process_data->in_pipeline = 0;
 	
-    data.clean_args = handle_redirection(args, &data.input_file, &data.output_file, &data.output_mode, &data.heredoc_file,
-							env_list, process_data->last_exit_status);
+    data.clean_args = handle_redirection(args, process_data, &data.input_file, 
+		&data.output_file, &data.output_mode, &data.heredoc_file);
 	// FIX FOR CASE 1: Syntax error in redirection (e.g., "echo >")
     if (!data.clean_args)
     {
@@ -304,6 +307,15 @@ int	is_unquoted_pipe_present(const char *line)
 
 int	execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
 {
+	// --- START OF THE FIX ---
+	// Check the total number of heredocs for the entire line BEFORE splitting.
+	if (count_heredocs(line) > MAX_HEREDOCS)
+	{
+		ft_error_and_exit("", "maximum here-document count exceeded", 2);
+		return (2);
+	}
+	// --- END OF THE FIX ---
+
 	//if (ft_strchr(line, '|'))
 	if (is_unquoted_pipe_present(line))
 	{
