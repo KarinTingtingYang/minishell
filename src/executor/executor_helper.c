@@ -188,8 +188,8 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
         // return (0);		 // no command to execute // but we still want to return 1 to indicate success
 		return (1); // no command to execute, but we still want to return 1 to indicate success
     }
-    data->clean_args = handle_redirection(data->original_args, &data->input_file, 
-		&data->output_file, &data->output_mode, &data->heredoc_file, env_list, process_data->last_exit_status);
+    data->clean_args = handle_redirection(data->original_args, process_data, &data->input_file, 
+		&data->output_file, &data->output_mode, &data->heredoc_file);
     if (!data->clean_args)
     {
 		// DEBUG FIX: centralise freeing of resources in the caller function 
