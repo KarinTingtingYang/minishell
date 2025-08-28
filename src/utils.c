@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/22 08:36:48 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/28 23:27:33 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,32 @@ void	ft_error_with_arg(char *command, char *arg, char *message)
 	ft_putstr_fd(message, STDERR_FILENO);
 	ft_putstr_fd("\n", STDERR_FILENO);
 }
+
+/* Prints: minishell: <cmd>: `arg': <msg> */
+void error_with_backticked_arg(const char *cmd, const char *arg, const char *msg)
+{
+	char *tmp;
+	char *backticked;
+
+	tmp = ft_strjoin("`", (char *)arg);
+	backticked = NULL;
+	if (tmp)
+	{
+		backticked = ft_strjoin(tmp, "'");
+		free(tmp);
+	}
+	if (backticked)
+	{
+		ft_error_with_arg((char *)cmd, backticked, (char *)msg);
+		free(backticked);
+	}
+	else
+	{
+		/* fallback if allocation failed */
+		ft_error_with_arg((char *)cmd, (char *)arg, (char *)msg);
+	}
+}
+
 
 void	free_split(char **array)
 {

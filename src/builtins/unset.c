@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 08:47:50 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/16 13:47:32 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/28 23:20:28 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

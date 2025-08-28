@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor.c                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/27 13:26:16 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/29 00:02:54 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,10 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_l
             else
             {
                 if (envp) free_split(envp);
+                // ft_error_and_exit(args[0], "command not found", 127);
+				if (path_dirs == NULL)
+                ft_error_and_exit(args[0], "No such file or directory", 127);
+            else
                 ft_error_and_exit(args[0], "command not found", 127);
             }
         }
@@ -259,13 +263,15 @@ static int prepare_and_run_pipeline(char *line,  t_env_var *env_list, t_process_
 		return (2);
 	}
     path_dirs = find_path_dirs(env_list);
-	if (!path_dirs)
-	{
-		ft_putendl_fd("Error: PATH variable not found", 2);
-		return (1);
-	}
+	// if (!path_dirs)
+	// {
+	// 	ft_putendl_fd("Error: PATH variable not found", 2);
+	// 	return (1);
+	// }
     status = run_command_pipeline(cmds, count, path_dirs, env_list);
-    free_split(path_dirs);
+    // free_split(path_dirs);
+	if (path_dirs)
+    	free_split(path_dirs);
     free_commands_recursive(cmds, 0, count);
     free(cmds);
     free_split(parts);

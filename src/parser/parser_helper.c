@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   parser_helper.c                                    :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/21 11:05:27 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/27 12:59:13 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   parser_helper.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/28 22:28:05 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,4 +190,102 @@ int	count_heredocs(const char *line)
 		line++;
 	}
 	return (count);
+}
+
+/* Returns 1 if OK, 0 if a bash-style redirection syntax error was found.
+   Prints the correct error message and sets pd->last_exit_status = 2 on error. */
+int precheck_redir_syntax(const char *line, t_process_data *pd)
+{
+    int  i;
+    char q;
+
+    if (!line)
+        return 1;
+
+    i = 0;
+    q = 0;
+    while (line[i] != '\0')
+    {
+        /* enter/exit quotes */
+        if ((line[i] == '\'' || line[i] == '"') && q == 0)
+        {
+            q = line[i];
+            i++;
+            continue;
+        }
+        if (q && line[i] == q)
+        {
+            q = 0;
+            i++;
+            continue;
+        }
+
+        /* outside quotes: check redirections */
+        if (q == 0 && (line[i] == '<' || line[i] == '>'))
+        {
+            int op_len;
+            int j;
+
+            /* classify operator: <<<, <>, <<, >>, <, > */
+            op_len = 1;
+            if (line[i] == '<')
+            {
+                if (line[i + 1] == '<' && line[i + 2] == '<')
+                    op_len = 3; /* <<< */
+                else if (line[i + 1] == '>')
+                    op_len = 2; /* <>  */
+                else if (line[i + 1] == '<')
+                    op_len = 2; /* <<  */
+            }
+            else
+            {
+                if (line[i + 1] == '>')
+                    op_len = 2; /* >> */
+            }
+
+            j = i + op_len;
+            while (line[j] == ' ' || line[j] == '\t')
+                j++;
+
+            /* choose bash-like token to report */
+            if (line[j] == '\0')
+            {
+                ft_error(NULL, "syntax error near unexpected token `newline'");
+                if (pd) pd->last_exit_status = 2;
+                return 0;
+            }
+            if (line[j] == '|')
+            {
+                ft_error(NULL, "syntax error near unexpected token `|'");
+                if (pd) pd->last_exit_status = 2;
+                return 0;
+            }
+            if (line[j] == '<')
+            {
+                /* bash prints newline for bare `<<<` */
+                if (op_len == 3)
+                {
+                    ft_error(NULL, "syntax error near unexpected token `newline'");
+                    if (pd) pd->last_exit_status = 2;
+                    return 0;
+                }
+                ft_error(NULL, "syntax error near unexpected token `<'");
+                if (pd) pd->last_exit_status = 2;
+                return 0;
+            }
+            if (line[j] == '>')
+            {
+                /* e.g. `<>>` → prints just `>' */
+                ft_error(NULL, "syntax error near unexpected token `>'");
+                if (pd) pd->last_exit_status = 2;
+                return 0;
+            }
+
+            i = j;
+            continue;
+        }
+
+        i++;
+    }
+    return 1;
 }

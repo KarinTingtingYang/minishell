@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 13:12:47 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/25 10:13:59 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/28 23:56:48 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static int	ft_str_to_llong(const char *str, long long *out_val)
 		if (sign == -1 && (result > -(LLONG_MIN / 10)
 				|| (result == -(LLONG_MIN / 10)
 					&& (*str - '0') > -(LLONG_MIN % 10))))
-			return (0);
+			return (0); 
 		result = result * 10 + (*str - '0');
 		str++;
 	}
@@ -65,26 +65,64 @@ static int	ft_str_to_llong(const char *str, long long *out_val)
  * It prints a message indicating the exit status and terminates the program.
  * @param status The exit status to return to the operating system.
  */
+// int	run_exit(char **args, int last_exit_status)
+// {
+// 	long long	exit_code;
+
+// 	ft_putstr_fd("exit\n", STDOUT_FILENO);
+// 	if (args[1] == NULL)
+// 		exit((unsigned char)last_exit_status);
+// 	else
+// 	{
+// 		if (ft_str_to_llong(args[1], &exit_code) == 0)
+// 		{
+// 			// ft_error_and_exit("exit", "numeric argument required", 2);
+// 			ft_error_with_arg("exit", args[1], "numeric argument required");
+// 			exit(2);  // Exit immediately on bad numeric arg, don't check args[2]
+// 		}
+// 		if (args[2] != NULL)
+// 		{
+// 			// ft_error("exit", "too many arguments");
+// 			ft_error_with_arg("exit", args[1], "too many arguments");
+// 			return (1);
+// 		}
+// 		else
+// 			exit((unsigned char)exit_code);
+// 	}
+// 	return (0);
+// }
+
 int	run_exit(char **args, int last_exit_status)
 {
 	long long	exit_code;
+	int         argc;
+
+	/* count args */
+	argc = 0;
+	while (args && args[argc])
+		argc++;
 
 	ft_putstr_fd("exit\n", STDOUT_FILENO);
-	if (args[1] == NULL)
+
+	/* no arguments -> exit with last status */
+	if (argc == 1)
 		exit((unsigned char)last_exit_status);
-	else
+
+	/* first arg must be numeric; if not, print ONE error and exit 2 */
+	if (ft_str_to_llong(args[1], &exit_code) == 0)
 	{
-		if (ft_str_to_llong(args[1], &exit_code) == 0)
-		{
-			ft_error_and_exit("exit", "numeric argument required", 2);
-		}
-		if (args[2] != NULL)
-		{
-			ft_error("exit", "too many arguments");
-			return (1);
-		}
-		else
-			exit((unsigned char)exit_code);
+		ft_error_with_arg("exit", args[1], "numeric argument required");
+		exit(2);
 	}
+
+	/* numeric first arg but extra args -> print error, do NOT exit */
+	if (argc > 2)
+	{
+		ft_error("exit", "too many arguments");
+		return (1);
+	}
+
+	/* one numeric argument -> exit with value modulo 256 */
+	exit((unsigned char)exit_code);
 	return (0);
 }

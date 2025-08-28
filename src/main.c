@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   main.c                                             :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:09:59 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/22 11:13:11 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/28 22:29:55 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,14 @@ int	main(int argc, char **argv, char **envp)
         // -----------------------------------------------------
 		if (*input && g_signal_received != SIGINT)
 		{
+			/* 🔎 Run the redirection precheck on the RAW line (handles <<<, <>, <>>, > |, > EOL, etc.) */
+			if (!precheck_redir_syntax(input, &process_data))
+			{
+				/* error already printed and exit status set to 2 */
+				free(input);
+				continue; /* do NOT add history or execute */
+			}
+
 			add_history(input);
 			// if (execute_command(input, env_list, &process_data) == -1)
 			// {

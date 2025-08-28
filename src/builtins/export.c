@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/25 10:18:19 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/28 23:09:37 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,19 +153,26 @@ static int export_variable(const char *arg, t_env_var *env_list)
     {
         if (!is_valid_identifier((char *)arg))
         {
-            ft_error("export", "not a valid identifier");
+            error_with_backticked_arg("export", arg, "not a valid identifier");
             return 1;
         }
         existing_var = find_env_var((char *)arg, env_list);
         if (existing_var == NULL)
         {
+            char *empty;
+
             key = ft_strdup(arg);
-            if (!key) return 1;
-
-            /* If add_env_var is NULL-safe, prefer NULL; otherwise "" avoids segfaults */
-            /* add_env_var(key, NULL, env_list); */
-            add_env_var(key, "", env_list);
-
+            if (!key)
+                return 1;
+            empty = ft_strdup("");
+            if (!empty)
+            {
+                free(key);
+                return 1;
+            }
+            add_env_var(key, empty, env_list);
+            /* if add_env_var duplicates internally, you may free(empty) here */
+            /* free(empty); */
             free(key);
         }
         return 0;
@@ -182,7 +189,7 @@ static int export_variable(const char *arg, t_env_var *env_list)
 
     if (!key || !is_valid_identifier(key))
     {
-        ft_error("export", "not a valid identifier");
+        error_with_backticked_arg("export", arg, "not a valid identifier");
         if (key) free(key);
         return 1;
     }
@@ -191,7 +198,7 @@ static int export_variable(const char *arg, t_env_var *env_list)
     raw = ft_strdup(equal_sign + 1);
     if (!raw) { free(key); return 1; }
 
-    /* Use 0 for last_exit_status to keep signature 2-arg and compile everywhere */
+    /* If you track last_exit_status/quote type, pass them; here kept simple */
     expanded = expand_variables(raw, env_list, 0, NO_QUOTE);
     free(raw);
     if (!expanded) { free(key); return 1; }
@@ -206,7 +213,9 @@ static int export_variable(const char *arg, t_env_var *env_list)
     {
         if (append && existing_var->value)
         {
-            char *joined = ft_strjoin(existing_var->value, clean);
+            char *joined;
+
+            joined = ft_strjoin(existing_var->value, clean);
             if (!joined) { free(clean); free(key); return 1; }
             free(existing_var->value);
             existing_var->value = joined;
@@ -222,12 +231,13 @@ static int export_variable(const char *arg, t_env_var *env_list)
     {
         add_env_var(key, clean, env_list);
         /* if add_env_var duplicates internally, uncomment: */
-        free(clean);
+        /* free(clean); */
     }
 
     free(key);
     return 0;
 }
+
 
 int	run_export(t_env_var *env_list, char **args)
 {

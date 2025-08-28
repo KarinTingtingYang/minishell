@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/22 10:00:28 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/29 00:07:10 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@
 
 # define _POSIX_C_SOURCE 200809L   // Added for signal handling
 # define _GNU_SOURCE               // Added for signal handling
+
+// #ifndef WCOREDUMP  // Some systems may not define WCOREDUMP
+// #  define WCOREDUMP(x) 0 // Define it as 0 if not available
+// #endif
+
 
 # include <signal.h>				// Added for signal handling
 # include <stdint.h>                // Added for signal handling
@@ -63,5 +68,6 @@ void print_array(char **array);
 void print_tokens(t_token **tokens);
 void	skip_spaces(const char **s);
 void	ft_error_with_arg(char *command, char *arg, char *message);
+void error_with_backticked_arg(const char *cmd, const char *arg, const char *msg);
 
 #endif

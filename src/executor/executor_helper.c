@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_helper.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:26:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/25 11:18:25 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/29 00:00:05 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -543,6 +543,102 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
     char      **path_dirs;
     int         i;
 
+	/* ---- PRECHECK on raw line: outside quotes, detect bad redirections ---- */
+	if (line)
+	{
+		int  i;
+		char q;
+
+		i = 0;
+		q = 0;
+		while (line[i] != '\0')
+		{
+			/* enter/exit quotes */
+			if ((line[i] == '\'' || line[i] == '"') && q == 0)
+			{
+				q = line[i];
+				i++;
+				continue;
+			}
+			if (q && line[i] == q)
+			{
+				q = 0;
+				i++;
+				continue;
+			}
+
+			if (q == 0 && (line[i] == '<' || line[i] == '>'))
+			{
+				int  op_len;
+				int  j;
+
+				/* operator length: <<<, <>, <<, >>, <, > */
+				op_len = 1;
+				if (line[i] == '<')
+				{
+					if (line[i + 1] == '<' && line[i + 2] == '<')
+						op_len = 3;              /* <<< */
+					else if (line[i + 1] == '>')
+						op_len = 2;              /* <>  */
+					else if (line[i + 1] == '<')
+						op_len = 2;              /* <<  */
+				}
+				else /* '>' */
+				{
+					if (line[i + 1] == '>')
+						op_len = 2;              /* >>  */
+				}
+
+				j = i + op_len;
+
+				/* skip spaces after operator */
+				while (line[j] == ' ' || line[j] == '\t')
+					j++;
+
+				/* choose bash-like token to report */
+				if (line[j] == '\0')
+				{
+					ft_error(NULL, "syntax error near unexpected token `newline'");
+					if (process_data) process_data->last_exit_status = 2;
+					return NULL; /* abort early */
+				}
+				if (line[j] == '|')
+				{
+					ft_error(NULL, "syntax error near unexpected token `|'");
+					if (process_data) process_data->last_exit_status = 2;
+					return NULL;
+				}
+				if (line[j] == '<')
+				{
+					/* Special case: bash-3.2 prints `newline' for `<<<' */
+					if (op_len == 3) {
+						ft_error(NULL, "syntax error near unexpected token `newline'");
+						if (process_data) process_data->last_exit_status = 2;
+						return NULL;
+					}
+					ft_error(NULL, "syntax error near unexpected token `<'");
+					if (process_data) process_data->last_exit_status = 2;
+					return NULL;
+				}
+				if (line[j] == '>')
+				{
+					/* For `<>>` bash prints just `>' */
+					ft_error(NULL, "syntax error near unexpected token `>'");
+					if (process_data) process_data->last_exit_status = 2;
+					return NULL;
+				}
+
+				/* ok, continue scanning */
+				i = j;
+				continue;
+			}
+
+			i++;
+		}
+	}
+	/* ---- END PRECHECK ---- */
+
+
     *parts = split_line_by_pipe(line);
     if (*parts == NULL || (*parts)[0] == NULL)
         return (NULL);
@@ -575,14 +671,14 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
 
     /* get PATH dirs once for the whole pipeline */
     path_dirs = find_path_dirs(process_data->env_list);
-    if (path_dirs == NULL)
-    {
-        ft_error(NULL, "PATH variable not found");
-        free(cmds);
-        free_split(*parts);
-        *parts = NULL;
-        return (NULL);
-    }
+    // if (path_dirs == NULL)
+    // {
+    //     ft_error(NULL, "PATH variable not found");
+    //     free(cmds);
+    //     free_split(*parts);
+    //     *parts = NULL;
+    //     return (NULL);
+    // }
 
     /* build each command with the SAME process_data pointer */
     i = 0;
@@ -631,7 +727,9 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
         i++;
     }
 
-    free_split(path_dirs);      /* path_dirs no longer needed */
+    // free_split(path_dirs);      /* path_dirs no longer needed */
+	if (path_dirs)
+    	free_split(path_dirs);
     cmds[*count] = NULL;
     return cmds;
 }
