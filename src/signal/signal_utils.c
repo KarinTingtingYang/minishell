@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   signal_utils.c                                     :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 11:51:29 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/13 14:51:54 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   signal_utils.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 11:51:29 by tiyang            #+#    #+#             */
+/*   Updated: 2025/08/29 18:07:56 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,21 +22,35 @@
  *
  * @param signum The signal number (SIGINT).
  */
-void handle_parent_sigint(int signum)
-{ //
-    // (void)signum; // Cast to void to suppress unused parameter warning
+// void handle_parent_sigint(int signum)
+// { //
+//     // (void)signum; // Cast to void to suppress unused parameter warning
 
-    // // If no child is running, print a new prompt on SIGINT
-    // if (g_child_running == 0) { //
-    //     ft_putstr_fd("\n", STDOUT_FILENO); // Move to a new line
-    //     rl_on_new_line(); // Tell readline that we're on a new line
-    //     rl_replace_line("", 0); // Clear the current input buffer
-    //     rl_redisplay(); // Redraw the prompt
-    // }
-    // If a child is running, do nothing.
-    // The child will receive SIGINT and terminate, and the parent's waitpid
-    // will be interrupted, returning control to the main loop.
-	g_signal_received = signum; // Set the global signal received flag
+//     // // If no child is running, print a new prompt on SIGINT
+//     // if (g_child_running == 0) { //
+//     //     ft_putstr_fd("\n", STDOUT_FILENO); // Move to a new line
+//     //     rl_on_new_line(); // Tell readline that we're on a new line
+//     //     rl_replace_line("", 0); // Clear the current input buffer
+//     //     rl_redisplay(); // Redraw the prompt
+//     // }
+//     // If a child is running, do nothing.
+//     // The child will receive SIGINT and terminate, and the parent's waitpid
+//     // will be interrupted, returning control to the main loop.
+// 	g_signal_received = signum; // Set the global signal received flag
+// }
+
+void handle_parent_sigint(int signum)
+{
+    (void)signum;
+
+    /* record it so main can set $?=130 */
+    g_signal_received = SIGINT;
+
+    /* make Ctrl-C behave like bash at the prompt */
+    // write(STDOUT_FILENO, "\n", 1);
+    rl_on_new_line();
+    rl_replace_line("", 0);
+    rl_redisplay();
 }
 
 void	print_signal_message(int status)

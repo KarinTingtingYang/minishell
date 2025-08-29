@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 09:34:52 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/25 09:35:01 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/29 18:20:03 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,6 +153,48 @@ static char	*combine_cmd_path(const char *path_dir, const char *cmd)
 //     return (NULL);
 // }
 
+// char *find_full_cmd_path(char *cmd, char **path_dirs)
+// {
+//     char *full_cmd_path;
+//     int   i;
+
+//     if (!cmd || *cmd == '\0')
+//         return (NULL);
+
+//     // --- Case 1: If cmd has a slash → treat as literal path
+//     if (ft_strchr(cmd, '/'))
+//     {
+//         if (access(cmd, F_OK) == 0)
+//             return ft_strdup(cmd);
+//         return (NULL);
+//     }
+
+//     // --- Case 2: If PATH exists → search all directories
+//     i = 0;
+//     if (path_dirs)
+//     {
+//         while (path_dirs[i])
+//         {
+//             full_cmd_path = combine_cmd_path(path_dirs[i], cmd);
+//             if (full_cmd_path == NULL)
+//                 ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
+//             if (access(full_cmd_path, F_OK) == 0)
+//                 return (full_cmd_path);
+//             free(full_cmd_path);
+//             i++;
+//         }
+//     }
+//     else
+//     {
+//         // --- Case 3: PATH is NULL → fallback to ./cmd (like Bash)
+//         if (access(cmd, F_OK) == 0)
+//             return (ft_strdup(cmd));
+//     }
+
+//     return (NULL);
+// }
+
+/* ---- resolver ---- */
 char *find_full_cmd_path(char *cmd, char **path_dirs)
 {
     char *full_cmd_path;
@@ -161,38 +203,24 @@ char *find_full_cmd_path(char *cmd, char **path_dirs)
     if (!cmd || *cmd == '\0')
         return (NULL);
 
-    // --- Case 1: If cmd has a slash → treat as literal path
+    /* path form: let the executor decide exact error */
     if (ft_strchr(cmd, '/'))
-    {
-        if (access(cmd, F_OK) == 0)
-            return ft_strdup(cmd);
-        return (NULL);
-    }
+        return ft_strdup(cmd);
 
-    // --- Case 2: If PATH exists → search all directories
     i = 0;
-    if (path_dirs)
+    while (path_dirs && path_dirs[i])
     {
-        while (path_dirs[i])
-        {
-            full_cmd_path = combine_cmd_path(path_dirs[i], cmd);
-            if (full_cmd_path == NULL)
-                ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
-            if (access(full_cmd_path, F_OK) == 0)
-                return (full_cmd_path);
-            free(full_cmd_path);
-            i++;
-        }
+        full_cmd_path = combine_cmd_path(path_dirs[i], cmd);
+        if (full_cmd_path == NULL)
+            ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
+        if (access(full_cmd_path, F_OK) == 0)
+            return (full_cmd_path);
+        free(full_cmd_path);
+        i++;
     }
-    else
-    {
-        // --- Case 3: PATH is NULL → fallback to ./cmd (like Bash)
-        if (access(cmd, F_OK) == 0)
-            return (ft_strdup(cmd));
-    }
-
     return (NULL);
 }
+
 
 char **find_path_dirs(t_env_var *env_list)
 {

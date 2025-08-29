@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/25 08:52:32 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/29 17:53:23 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,22 +42,42 @@ static int wait_all_children(pid_t *pids, int index, int max, int last_status, i
         if (index == max - 1)
             last_status = WEXITSTATUS(status);
     }
-    else if (WIFSIGNALED(status))
-    {
-        // if (index == max - 1)
-        // {
-		// 	print_signal_message(status);
-		// 	last_status = 128 + WTERMSIG(status);
-		// }
-		// EXIT CODE DEBUG
+    // else if (WIFSIGNALED(status))
+    // {
+    //     // if (index == max - 1)
+    //     // {
+	// 	// 	print_signal_message(status);
+	// 	// 	last_status = 128 + WTERMSIG(status);
+	// 	// }
+	// 	// EXIT CODE DEBUG
+	// 	if (!(*signal_printed))
+	// 	{
+	// 		print_signal_message(status);
+	// 		*signal_printed = 1;
+	// 	}
+    //     if (index == max - 1)
+	// 		last_status = 128 + WTERMSIG(status);
+    // }
+	else if (WIFSIGNALED(status))
+	{
+		int sig;
+
+		sig = WTERMSIG(status);
+
+		/* print once per pipeline:
+		- SIGINT  -> newline
+		- SIGQUIT -> nothing */
 		if (!(*signal_printed))
 		{
-			print_signal_message(status);
+			if (sig == SIGINT)
+				write(STDOUT_FILENO, "\n", 1);
+			/* no output for SIGQUIT */
 			*signal_printed = 1;
 		}
-        if (index == max - 1)
-			last_status = 128 + WTERMSIG(status);
-    }
+
+		if (index == max - 1)
+			last_status = 128 + sig;
+	}
     return (wait_all_children(pids, index + 1, max, last_status, signal_printed));
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/29 00:02:54 by mariahudono      ###   ########.fr       */
+/*   Updated: 2025/08/29 18:23:41 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,27 +31,27 @@ extern char **environ;
 // 	free(cmd_path);
 // }
 
-static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
-{
-    (void)path_dirs;
+// static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
+// {
+//     (void)path_dirs;
 
-    if (!cmd_path || !args || !args[0])
-    {
-        // Safety fallback
-        ft_error_and_exit("minishell", "Unknown execution error", 126);
-    }
+//     if (!cmd_path || !args || !args[0])
+//     {
+//         // Safety fallback
+//         ft_error_and_exit("minishell", "Unknown execution error", 126);
+//     }
 
-    if (errno == ENOENT)
-        ft_error_and_exit(args[0], "No such file or directory", 127);
-    else if (errno == EACCES)
-        ft_error_and_exit(args[0], "Permission denied", 126);
-    else if (errno == ENOEXEC)
-        ft_error_and_exit(args[0], "Exec format error", 126);
-    else
-        ft_error_and_exit(args[0], strerror(errno), 126);
+//     if (errno == ENOENT)
+//         ft_error_and_exit(args[0], "No such file or directory", 127);
+//     else if (errno == EACCES)
+//         ft_error_and_exit(args[0], "Permission denied", 126);
+//     else if (errno == ENOEXEC)
+//         ft_error_and_exit(args[0], "Exec format error", 126);
+//     else
+//         ft_error_and_exit(args[0], strerror(errno), 126);
 
-    free(cmd_path); // cmd_path is now properly used
-}
+//     free(cmd_path); // cmd_path is now properly used
+// }
 
 
 // void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
@@ -73,61 +73,127 @@ static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
 //     handle_execve_error(cmd_path, args, path_dirs);
 // }
 
+// void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
+// {
+//     char        **envp;
+//     struct stat   st;
+
+//     (void)path_dirs;
+
+//     reset_child_signal_handlers();
+//     envp = env_list_to_array(env_list);
+
+//     /* Resolver failed: choose correct message based on args[0] */
+//     if (cmd_path == NULL)
+//     {
+//         if (args && args[0])
+//         {
+//             if (ft_strchr(args[0], '/'))
+//             {
+//                 if (envp) free_split(envp);
+//                 ft_error_and_exit(args[0], "No such file or directory", 127);
+//             }
+//             else
+//             {
+//                 if (envp) free_split(envp);
+//                 // ft_error_and_exit(args[0], "command not found", 127);
+// 				if (path_dirs == NULL)
+//                 ft_error_and_exit(args[0], "No such file or directory", 127);
+//             else
+//                 ft_error_and_exit(args[0], "command not found", 127);
+//             }
+//         }
+//         if (envp) free_split(envp);
+//         exit(127);
+//     }
+
+//     /* Pre-checks to match bash */
+//     if (stat(cmd_path, &st) == 0 && S_ISDIR(st.st_mode))
+//     {
+//         if (envp) free_split(envp);
+//         ft_error_and_exit(args[0], "Is a directory", 126);
+//     }
+//     if (access(cmd_path, X_OK) != 0)
+//     {
+//         if (envp) free_split(envp);
+//         ft_error_and_exit(args[0], "Permission denied", 126);
+//     }
+
+//     /* Try to exec */
+//     execve(cmd_path, args, envp);
+
+//     /* If we’re here, execve failed → map errno (ENOEXEC, etc.) */
+//     free_split(envp);
+//     handle_execve_error(cmd_path, args, NULL);
+// }
+
+/* ---- executor ---- */
 void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
 {
     char        **envp;
     struct stat   st;
+    int           e;
 
     (void)path_dirs;
-
     reset_child_signal_handlers();
     envp = env_list_to_array(env_list);
 
-    /* Resolver failed: choose correct message based on args[0] */
+    /* resolver failed: choose message by how argv[0] looks */
     if (cmd_path == NULL)
     {
-        if (args && args[0])
+        if (args && args[0] && ft_strchr(args[0], '/'))
         {
-            if (ft_strchr(args[0], '/'))
-            {
-                if (envp) free_split(envp);
-                ft_error_and_exit(args[0], "No such file or directory", 127);
-            }
-            else
-            {
-                if (envp) free_split(envp);
-                // ft_error_and_exit(args[0], "command not found", 127);
-				if (path_dirs == NULL)
-                ft_error_and_exit(args[0], "No such file or directory", 127);
-            else
-                ft_error_and_exit(args[0], "command not found", 127);
-            }
+            if (envp) free_split(envp);
+            ft_error_and_exit(args[0], "No such file or directory", 127);
         }
         if (envp) free_split(envp);
-        exit(127);
+        ft_error_and_exit(args && args[0] ? args[0] : "minishell",
+                          "command not found", 127);
     }
 
-    /* Pre-checks to match bash */
-    if (stat(cmd_path, &st) == 0 && S_ISDIR(st.st_mode))
+    /* precise pre-checks like bash */
+    if (stat(cmd_path, &st) == -1)
+    {
+        e = errno;
+        if (envp) free_split(envp);
+        if (e == ENOTDIR)
+            ft_error_and_exit(args[0], "Not a directory", 126);
+        if (e == ENOENT)
+            ft_error_and_exit(args[0], "No such file or directory", 127);
+        ft_error_and_exit(args[0], strerror(e), 126);
+    }
+    if (S_ISDIR(st.st_mode))
     {
         if (envp) free_split(envp);
         ft_error_and_exit(args[0], "Is a directory", 126);
     }
-    if (access(cmd_path, X_OK) != 0)
+    if (access(cmd_path, X_OK) == -1)
     {
+        e = errno;
         if (envp) free_split(envp);
-        ft_error_and_exit(args[0], "Permission denied", 126);
+        if (e == EACCES)
+            ft_error_and_exit(args[0], "Permission denied", 126);
+        if (e == ENOTDIR)
+            ft_error_and_exit(args[0], "Not a directory", 126);
+        ft_error_and_exit(args[0], strerror(e), 126);
     }
 
-    /* Try to exec */
+    /* run */
     execve(cmd_path, args, envp);
 
-    /* If we’re here, execve failed → map errno (ENOEXEC, etc.) */
+    /* execve failed → map remaining cases */
+    e = errno;
     free_split(envp);
-    handle_execve_error(cmd_path, args, NULL);
+    if (e == ENOEXEC)
+        ft_error_and_exit(args[0], "Exec format error", 126);
+    if (e == ENOTDIR)
+        ft_error_and_exit(args[0], "Not a directory", 126);
+    if (e == ENOENT)
+        ft_error_and_exit(args[0], "No such file or directory", 127);
+    if (e == EACCES)
+        ft_error_and_exit(args[0], "Permission denied", 126);
+    ft_error_and_exit(args[0], strerror(e), 126);
 }
-
-
 
 static int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data)
 {
