@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:14:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 14:03:22 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/30 15:04:58 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,12 @@ typedef struct s_expand_data
 	t_env_var	*env_list;
 	int			last_exit_status;
 }	t_expand_data;
+
+typedef struct s_exp_proc_data
+{
+	t_expand_data	*exp_data;
+	char			quote_char;
+}	t_exp_proc_data;
 
 char	**ft_split_whitespace(char *s);
 char	*remove_outer_quotes(char *str);

@@ -38,6 +38,7 @@ SRCS       = $(SRC_DIR)/main.c \
 			 $(SRC_DIR)/parser/expander_helper_2.c \
 			 $(SRC_DIR)/parser/expander_helper_3.c \
 			 $(SRC_DIR)/parser/expander_helper_4.c \
+			 $(SRC_DIR)/parser/expander_helper_5.c \
              $(SRC_DIR)/utils.c \
              $(SRC_DIR)/signal/signal.c \
              $(SRC_DIR)/signal/signal_utils.c \

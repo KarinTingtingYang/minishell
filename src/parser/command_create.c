@@ -1,27 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   command_create.c                                   :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/26 10:49:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/27 11:08:47 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   command_create.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/30 14:39:06 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 /**
- * @brief Resolves the full path of the executable command.
+ * @brief Searches for the command in the PATH directories.
  * 
- * Uses the first argument in the command (`cmd->args[0]`) and searches 
- * for its full path using the directories provided in `path_dirs`.
- * On success, sets `cmd->cmd_path` to the resolved full path.
- * @param cmd        Pointer to the command struct to update.
- * @param path_dirs  NULL-terminated array of directories from the PATH
- *                   environment variable.
- * @return           0 on success, -1 if the command was not found.
+ * This function attempts to find the full path of the command specified
+ * in `cmd->args[0]` by searching through the provided `path_dirs`.
+ * If found, it sets `cmd->cmd_path` to the full path; otherwise, it
+ * leaves it as NULL.
+ * @param cmd       Pointer to the command structure to update.
+ * @param path_dirs NULL-terminated array of directories from the PATH
+ *                  environment variable.
+ * @return          0 if the command is found, -1 if not found.
  */
 static int	search_command_in_path(t_command *cmd, char **path_dirs)
 {
@@ -32,12 +33,14 @@ static int	search_command_in_path(t_command *cmd, char **path_dirs)
 }
 
 /**
- * @brief Frees the memory allocated for a command structure.
+ * @brief Duplicates an array of strings.
  * 
- * This function frees all dynamically allocated fields in the `t_command`
- * structure, including the command path, arguments, input/output files,
- * and heredoc file. It does not free the structure itself.
- * @param cmd Pointer to the command structure to free.
+ * This function creates a deep copy of the provided NULL-terminated
+ * array of strings. Each string is duplicated, and the new array is
+ * also NULL-terminated.
+ * @param split The original array of strings to duplicate.
+ * @return      A pointer to the newly allocated array of strings,
+ *              or NULL on failure.
  */
 static char	**duplicate_split(char **split)
 {
@@ -69,17 +72,20 @@ static char	**duplicate_split(char **split)
 }
 
 /**
- * @brief Parses command arguments and handles redirection.
+ * @brief Parses command arguments and handles redirections.
  * 
- * This function processes the provided tokens to extract command arguments
- * and redirection information. It updates the `cmd` structure with the parsed
- * arguments and redirection files.
- * @param cmd    Pointer to the command structure to populate.
- * @param tokens Array of strings representing the command and its arguments.
- * @return       0 on success, -1 if an error occurs (e.g., memory
- *               allocation failure).
+ * This function processes the provided tokens to separate command
+ * arguments from redirection operators and files. It updates the
+ * command structure with the parsed arguments and redirection info.
+ * @param cmd          Pointer to the command structure to update.
+ * @param tokens       Array of strings representing the command and its
+ *                     arguments, including redirection operators.
+ * @param process_data Pointer to the process data structure for context.
+ * @return             0 on success, -1 on memory allocation failure,
+ *                     1 if no command arguments remain after parsing.
  */
-static int	parse_args_and_redirection(t_command *cmd, char **tokens, t_process_data *process_data)
+static int	parse_args_and_redirection(t_command *cmd, char **tokens,
+											t_process_data *process_data)
 {
 	char	**original_args;
 
@@ -88,8 +94,9 @@ static int	parse_args_and_redirection(t_command *cmd, char **tokens, t_process_d
 	original_args = duplicate_split(tokens);
 	if (original_args == NULL)
 		return (-1);
-	cmd->args = handle_redirection(original_args, process_data, &cmd->input_file,
-			&cmd->output_file, &cmd->output_mode, &cmd->heredoc_file);
+	cmd->args = handle_redirection(original_args, process_data,
+			&cmd->input_file, &cmd->output_file, &cmd->output_mode,
+			&cmd->heredoc_file);
 	free_split(original_args);
 	if (cmd->args == NULL)
 		return (-1);
@@ -101,11 +108,10 @@ static int	parse_args_and_redirection(t_command *cmd, char **tokens, t_process_d
 /**
  * @brief Creates an empty command structure.
  * 
- * Allocates memory for a new `t_command` structure and initializes its fields
- * to NULL or default values. This is used as a starting point for creating
- * commands from parsed input.
+ * This function allocates and initializes a new `t_command` structure
+ * with all fields set to NULL or default values.
  * @return A pointer to the newly created `t_command` structure,
- *         or NULL on failure.
+ *         or NULL on memory allocation failure.
  */
 static t_command	*create_empty_command(void)
 {
@@ -124,19 +130,22 @@ static t_command	*create_empty_command(void)
 }
 
 /**
- * @brief Creates a new command structure from the provided tokens.
+ * @brief Creates and initializes a command structure from tokens.
  * 
- * This function initializes a new `t_command` structure, parses the provided
- * tokens to extract command arguments and redirection information, and searches
- * for the command in the PATH directories. If successful, it returns the command
- * structure; otherwise, it returns NULL.
- * @param tokens     Array of strings representing the command and its arguments.
- * @param path_dirs  NULL-terminated array of directories from the PATH
- *                   environment variable.
- * @return           A pointer to the newly created t_command structure,
- *                   or NULL on failure.
+ * This function creates a `t_command` structure, parses the provided
+ * tokens to separate command arguments and redirections, and searches
+ * for the command in the PATH if it's not a built-in.
+ * @param tokens       Array of strings representing the command and its
+ *                     arguments, including redirection operators.
+ * @param path_dirs    NULL-terminated array of directories from the PATH
+ *                     environment variable.
+ * @param process_data Pointer to the process data structure for context.
+ * @return             A pointer to the initialized `t_command` structure,
+ *                     or NULL on failure. If no command arguments remain
+ *                     after parsing, returns a command with args[0] == NULL.
  */
-t_command	*create_command(char **tokens, char **path_dirs, t_process_data *process_data)
+t_command	*create_command(char **tokens, char **path_dirs,
+								t_process_data *process_data)
 {
 	t_command	*cmd;
 	int			redir_parse_result;
@@ -154,16 +163,6 @@ t_command	*create_command(char **tokens, char **path_dirs, t_process_data *proce
 	}
 	if (redir_parse_result == 1)
 		return (cmd);
-	// if (search_command_in_path(cmd, path_dirs) == -1)
-	// {
-	// 	free_command(cmd);
-	// 	return (NULL);
-	// }
-	// if (!is_builtin(cmd->args[0]) && search_command_in_path(cmd, path_dirs) == -1) // DEBUGGING
-    // {
-    //     free_command(cmd);
-    //     return (NULL);
-    // }
 	if (!is_builtin(cmd->args[0]))
 		search_command_in_path(cmd, path_dirs);
 	return (cmd);
