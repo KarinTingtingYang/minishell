@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/29 00:07:10 by mariahudono      ###   ########.fr       */
+/*   Updated: 2025/08/30 13:52:32 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ void		free_split(char **array);
 void ft_error_and_exit(char *command, char *message, int exit_status);
 // void		error_msg_exit(const char *msg);
 void ft_error(char *command, char *message);
-t_env_var	*init_env(char **environ);
-void		free_env(t_env_var *env);
+// t_env_var	*init_env(char **environ);
+// void		free_env(t_env_var *env);
 char		*ft_strjoin_free(char *s1, char *s2);
 void print_array(char **array);
 void print_tokens(t_token **tokens);

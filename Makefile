@@ -44,7 +44,8 @@ SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/redirection/redirection.c \
              $(SRC_DIR)/redirection/redirection_utils.c \
 			 $(SRC_DIR)/redirection/heredoc.c \
-             $(SRC_DIR)/env/env_utils.c \
+             $(SRC_DIR)/env/env_utils_1.c \
+			 $(SRC_DIR)/env/env_utils_2.c \
 			 $(SRC_DIR)/env/env_init.c
 
 # === Object Files ===
