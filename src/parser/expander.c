@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   expander.c                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/25 13:28:47 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   expander.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/30 14:14:54 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -238,7 +238,7 @@ char	**expand_and_split_args(t_token **tokens,
 			if (split == NULL)
 				return (NULL);
 			printf("process_token returns:\n");
-			print_array(split);
+			// print_array(split);
 		}
 		final_args = append_split_to_final(final_args, &final_count, split);
 		if (final_args == NULL)

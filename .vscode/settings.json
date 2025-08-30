@@ -4,6 +4,11 @@
 		"string_view": "c",
 		"ranges": "c",
 		"span": "c",
-		"type_traits": "c"
+		"type_traits": "c",
+		"pipes.h": "c",
+		"parser.h": "c",
+		"fcntl.h": "c",
+		"libft.h": "c",
+		"readline.h": "c"
 	}
 }

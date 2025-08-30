@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/29 18:23:41 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/30 14:14:42 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -402,7 +402,7 @@ int	execute_command(char *line, t_env_var *env_list, t_process_data *process_dat
 		char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
 		// debug
 		printf("expand_and_split_args returns: \n");
-		print_array(args);
+		// print_array(args);
 		free_tokens(tokens);
 		if (args == NULL || args[0] == NULL)
 		{
