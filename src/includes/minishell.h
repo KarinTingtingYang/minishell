@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   minishell.h                                        :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/04 13:10:15 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/31 11:54:48 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/22 10:00:28 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,35 +28,40 @@
 # include <stdlib.h>
 # include <string.h>
 # include <sys/wait.h>
+# include <sys/stat.h> 
 # include <readline/history.h>
 # include <readline/readline.h>
 
 #include "./libft.h"
 #include "./pipes.h"
-#include "./parse.h"
+#include "./parser.h"
 #include "./executor.h"
 #include "./builtins.h"
 #include "./redirection.h"
 #include "./signal_handling.h"
 #include "./lexer.h"
 #include "./env.h"
+#include "./expander.h"
 
-
-// typedef struct s_env_var // Structure to represent an environment variable
-// {
-//     char            *key;       // Variable name (key)
-//     char            *value;     // Variable value
-//     struct s_env_var *next; 	// Pointer to the next environment variable in the linked list
-// }   t_env_var;
 
 // Global flag to indicate if a child process is currently running.
 // volatile sig_atomic_t is used for variables modified by signal handlers.
-extern volatile sig_atomic_t g_child_running;
+// extern volatile sig_atomic_t g_child_running;
+
+// NEW GLOBAL VARIABLE FOR SIGNAL HANDLING INCLUDING HEREDOC
+extern volatile sig_atomic_t g_signal_received;
 
 void		free_split(char **array);
-void		error_exit(const char *msg);
-void		error_msg_exit(const char *msg);
+// void		error_exit(const char *msg);
+void ft_error_and_exit(char *command, char *message, int exit_status);
+// void		error_msg_exit(const char *msg);
+void ft_error(char *command, char *message);
 t_env_var	*init_env(char **environ);
 void		free_env(t_env_var *env);
+char		*ft_strjoin_free(char *s1, char *s2);
+void print_array(char **array);
+void print_tokens(t_token **tokens);
+void	skip_spaces(const char **s);
+void	ft_error_with_arg(char *command, char *arg, char *message);
 
 #endif

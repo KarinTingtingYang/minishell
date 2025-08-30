@@ -6,13 +6,15 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 11:11:42 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/04 10:30:33 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/27 11:08:19 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #ifndef	REDIRECTION_H
 # define REDIRECTION_H
+
+# define MAX_HEREDOCS 16           // Maximum number of here-documents
 
 // utils:
 int	process_output_file(char *output_file, int is_append);
@@ -22,12 +24,15 @@ int		count_clean_args(char **args);
 int		is_redirection(const char *token);
 
 // heredoc:
-char	*handle_heredoc(const char *delimiter);
+char *handle_heredoc(const char *delimiter, t_env_var *env_list, int last_exit_status);
 
 
 // main functions:
 void	redirect_io(char *input_file, char *output_file, int output_mode);
-char	**handle_redirection(char **args, char **final_input_file, 
-	char **final_output_file, int *output_mode, char **heredoc_file);
+// int redirect_io(char *input_file, char *output_file, int output_mode);
+// int open_and_redirect_input(const char *input_file);
+// int open_and_redirect_output(const char *output_file, int output_mode);
+char	**handle_redirection(char **args, t_process_data *p_data, char **final_input_file,
+							char **final_output_file, int *output_mode, char **heredoc_file);
 
 #endif

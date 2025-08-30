@@ -1,43 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   signal_utils.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 11:51:29 by tiyang            #+#    #+#             */
-/*   Updated: 2025/07/30 11:48:22 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   signal_utils.c                                     :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 11:51:29 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/08/13 14:51:54 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../includes/minishell.h"
+
 /**
- * @brief Signal handler for SIGINT (Ctrl+C) in the parent process.
+ * @brief Handles SIGINT signal in the parent process.
  *
- * This handler is designed to behave differently based on whether a child process
- * is currently executing.
- * - If no child is running (g_child_running == 0), it prints a new prompt.
- * - If a child is running (g_child_running == 1), it does nothing. This allows
- * the SIGINT to terminate the child, and the parent's waitpid will be
- * interrupted, leading it back to the prompt after the child exits.
+ * This function is called when the parent process receives a SIGINT signal.
+ * It sets a global flag to indicate that a signal was received, allowing
+ * the main loop to handle it appropriately.
  *
- * @param signum The signal number (expected to be SIGINT).
+ * @param signum The signal number (SIGINT).
  */
 void handle_parent_sigint(int signum)
 { //
-    (void)signum; // Cast to void to suppress unused parameter warning
+    // (void)signum; // Cast to void to suppress unused parameter warning
 
-    // If no child is running, print a new prompt on SIGINT
-    if (g_child_running == 0) { //
-        ft_putstr_fd("\n", STDOUT_FILENO); // Move to a new line
-        rl_on_new_line(); // Tell readline that we're on a new line
-        rl_replace_line("", 0); // Clear the current input buffer
-        rl_redisplay(); // Redraw the prompt
-    }
+    // // If no child is running, print a new prompt on SIGINT
+    // if (g_child_running == 0) { //
+    //     ft_putstr_fd("\n", STDOUT_FILENO); // Move to a new line
+    //     rl_on_new_line(); // Tell readline that we're on a new line
+    //     rl_replace_line("", 0); // Clear the current input buffer
+    //     rl_redisplay(); // Redraw the prompt
+    // }
     // If a child is running, do nothing.
     // The child will receive SIGINT and terminate, and the parent's waitpid
     // will be interrupted, returning control to the main loop.
+	g_signal_received = signum; // Set the global signal received flag
 }
 
 void	print_signal_message(int status)
@@ -53,4 +52,20 @@ void	print_signal_message(int status)
     {
         ft_putstr_fd("\n", STDOUT_FILENO);
     }
+}
+
+/**
+ * @brief The event hook for readline. Readline calls this periodically
+ * while waiting for input.
+ * @return 0 on success.
+ */
+int	signal_event_hook(void)
+{
+	// If our signal handler has set the global variable...
+	if (g_signal_received)
+	{
+		// ...tell readline to stop waiting and return immediately.
+		rl_done = 1;
+	}
+	return (0);
 }

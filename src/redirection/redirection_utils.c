@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 11:10:49 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/04 09:55:29 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/08/22 14:52:59 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,11 @@ int	process_output_file(char *output_file, int is_append)
 	if (fd_out < 0)
 	{
 		// Use perror to print a descriptive error message to STDERR
-		perror(output_file);
+		// perror(output_file); // DEBUG: Print error if open fails
+		//ft_error_and_exit(output_file, strerror(errno), EXIT_FAILURE);
 		// Return -1 to signal an error to the caller
+		// FIX: Report the error but do not exit the whole shell.
+		ft_error(output_file, strerror(errno));
 		return (-1);
 	}
 	// Immediately close the file descriptor. We're done with it for now.
@@ -50,13 +53,15 @@ void	open_and_redirect_input(char *input_file)
     fd_in = open(input_file, O_RDONLY);
     if (fd_in == -1)
     {
-        perror(input_file);
-        exit(EXIT_FAILURE);
+        // perror(input_file); // DEBUG: Print error if open fails
+		ft_error_and_exit(input_file, strerror(errno), EXIT_FAILURE);
+        // exit(EXIT_FAILURE);
     }
     if (dup2(fd_in, STDIN_FILENO) == -1)
     {
-        perror("dup2");
-        exit(EXIT_FAILURE);
+        // perror("dup2"); // DEBUG: Print error if dup2 fails
+		ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
+        // exit(EXIT_FAILURE);
     }
     close(fd_in);
 }
@@ -75,16 +80,50 @@ void	open_and_redirect_output(char *output_file, int output_mode)
 	fd_out = open(output_file, flags, 0644);
 	if (fd_out == -1)
 	{
-		perror(output_file);
-		exit(EXIT_FAILURE);
+		// perror(output_file); // DEBUG: Print error if open fails
+		ft_error_and_exit(output_file, strerror(errno), EXIT_FAILURE);
+		// exit(EXIT_FAILURE);
 	}
 	if (dup2(fd_out, STDOUT_FILENO) == -1)
 	{
-		perror("dup2");
-		exit(EXIT_FAILURE);
+		// perror("dup2"); // DEBUG: Print error if dup2 fails
+		ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
+		// exit(EXIT_FAILURE);
 	}
 	close(fd_out);
 }
+
+
+// /* 0 ok, -1 error (errno is set) */
+// int open_and_redirect_input(const char *input_file)
+// {
+//     int fd = open(input_file, O_RDONLY);
+//     if (fd < 0)
+//         return -1;
+//     if (dup2(fd, STDIN_FILENO) < 0)
+// 	{
+//         close(fd);
+//         return -1;
+//     }
+//     close(fd);
+//     return 0;
+// }
+
+// /* output_mode: 2 = append (>>), else truncate (>) */
+// int open_and_redirect_output(const char *output_file, int output_mode)
+// {
+//     int flags = O_WRONLY | O_CREAT | (output_mode == 2 ? O_APPEND : O_TRUNC);
+//     int fd = open(output_file, flags, 0644);
+//     if (fd < 0)
+//         return -1;
+//     if (dup2(fd, STDOUT_FILENO) < 0)
+// 	{
+//         close(fd);
+//         return -1;
+//     }
+//     close(fd);
+//     return 0;
+// }
 
 // Helper: Count non-redirection arguments
 int	count_clean_args(char **args)

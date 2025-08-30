@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 11:21:01 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/04 10:25:00 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/25 10:09:02 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,30 @@
  * is "-n", it does not print a newline at the end.
  * @param args The arguments array. Should contain the strings to echo.
  */
-void	run_echo(char **args)
+
+static int	is_valid_n_flag(char *str)
+{
+	int	i;
+
+	i = 1;
+	if (!str || str[0] != '-')
+		return (0);
+	while (str[i] == 'n')
+		i++;
+	if (str[i] == '\0')
+		return (1);
+	return (0);
+}
+
+void	run_echo(char **args, t_env_var *env_list)
 {
 	int	i;
 	int	newline;
-	
+
 	i = 1;
 	newline = 1;
-	if (args[i]  && ft_strncmp(args[i], "-n", 3) == 0)
+	(void)env_list;
+	while (args[i] && is_valid_n_flag(args[i]))
 	{
 		newline = 0;
 		i++;

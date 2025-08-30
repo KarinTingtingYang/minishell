@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 13:12:47 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/04 10:31:43 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/25 10:13:59 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,13 @@ static int	ft_str_to_llong(const char *str, long long *out_val)
 	{
 		if (!ft_isdigit(*str))
 			return (0);
-		if (sign == 1 && (result > LLONG_MAX / 10 ||
-			(result == LLONG_MAX / 10 && (*str - '0') > LLONG_MAX % 10)))
-			return (0); // Overflow
-		if (sign == -1 && (result > -(LLONG_MIN / 10) ||
-			(result == -(LLONG_MIN / 10) && (*str - '0') > -(LLONG_MIN % 10))))
-			return (0); // Overflow
+		if (sign == 1 && (result > LLONG_MAX / 10
+				|| (result == LLONG_MAX / 10 && (*str - '0') > LLONG_MAX % 10)))
+			return (0);
+		if (sign == -1 && (result > -(LLONG_MIN / 10)
+				|| (result == -(LLONG_MIN / 10)
+					&& (*str - '0') > -(LLONG_MIN % 10))))
+			return (0);
 		result = result * 10 + (*str - '0');
 		str++;
 	}
@@ -64,32 +65,26 @@ static int	ft_str_to_llong(const char *str, long long *out_val)
  * It prints a message indicating the exit status and terminates the program.
  * @param status The exit status to return to the operating system.
  */
-int builtin_exit(char **args)
+int	run_exit(char **args, int last_exit_status)
 {
-	long long exit_code;
+	long long	exit_code;
 
 	ft_putstr_fd("exit\n", STDOUT_FILENO);
-	if (args[1] == NULL) // Case 1: Just "exit"
-		exit(0); // default: Exit with status 0 if no argument is provided
-	else if (args[2] != NULL) // Case 2: "exit" with too many arguments
+	if (args[1] == NULL)
+		exit((unsigned char)last_exit_status);
+	else
 	{
-		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
-		return 1; // Return 1 to indicate an error, do not exit
-	}
-	else // Case 3: "exit" with one argument
-	{
-		// Attempt to convert the argument to a long long
-		// If conversion fails or the argument is not a valid number, print an error
-		// and exit with status 255.
 		if (ft_str_to_llong(args[1], &exit_code) == 0)
 		{
-			ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
-			ft_putstr_fd(args[1], STDERR_FILENO);
-			ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
-			exit(255); // Standard failure code for this error // NEED TO DOUBLE CHECK!!!!
+			ft_error_and_exit("exit", "numeric argument required", 2);
 		}
-		// If the conversion is successful, exit with the specified code
-		exit((unsigned char)exit_code); 
+		if (args[2] != NULL)
+		{
+			ft_error("exit", "too many arguments");
+			return (1);
+		}
+		else
+			exit((unsigned char)exit_code);
 	}
-	return 0; // This line is never reached, but added for completeness
+	return (0);
 }

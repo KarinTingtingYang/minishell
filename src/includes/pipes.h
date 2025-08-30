@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   pipes.h                                            :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/22 11:30:32 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/04 09:50:34 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   pipes.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/22 11:30:32 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/25 11:12:20 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,9 @@ typedef struct s_process_data
     int			cmd_count;   // Total number of commands in the pipeline to execute
 	// char    **envp;       // Environment variables for the child processes
 	t_env_var *env_list;
+	int			last_exit_status; // Last exit status of the executed command
+	int in_pipeline;
+	int syntax_error;
 } t_process_data;
 
 int		**prepare_pipe_fds(int cmd_count);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   pipes.c                                            :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/22 10:08:55 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/07/31 09:40:25 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   pipes.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/25 08:52:32 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,17 @@
 /**
  * @brief Recursively waits for all child processes in a pipeline.
  *
- * This function uses recursion to wait for each child process identified
- * by its PID in the `pids` array. It waits sequentially from `index` to
- * `max - 1`. If the last process terminates normally, its exit status
- * is returned. If it was terminated by a signal, the return value is
- * 128 + signal number. If any `waitpid` call fails, the function prints
- * an error and continues waiting.
- * @param pids         Array of process IDs to wait for.
- * @param index        Current index in the PID array.
- * @param max          Total number of processes.
- * @param last_status  Last known exit status (updated on the last child).
- * @return The exit status of the last process, or -1 if any waitpid fails.
+ * This function now tracks whether a signal message has been printed to avoid
+ * duplicate messages (e.g., multiple newlines). It will print a message for
+ * the first process it finds that was terminated by a signal.
+ * @param pids            Array of process IDs to wait for.
+ * @param index           Current index in the PID array.
+ * @param max             Total number of processes.
+ * @param last_status     Last known exit status (updated on the last child).
+ * @param signal_printed  Pointer to a flag indicating if a signal message has been printed.
+ * @return The exit status of the last process.
  */
-static int wait_all_children(pid_t *pids, int index, int max, int last_status)
+static int wait_all_children(pid_t *pids, int index, int max, int last_status, int *signal_printed)
 {
     int status;
 
@@ -35,8 +33,9 @@ static int wait_all_children(pid_t *pids, int index, int max, int last_status)
         return (last_status);
     if (waitpid(pids[index], &status, 0) == -1)
     {
-        perror("waitpid");
-        return (wait_all_children(pids, index + 1, max, -1));
+        // perror("waitpid"); // DEBUG: Print error if waitpid fails
+		ft_error_and_exit("waitpid", strerror(errno), EXIT_FAILURE);
+        return (wait_all_children(pids, index + 1, max, -1, signal_printed));
     }
     if (WIFEXITED(status))
     {
@@ -45,10 +44,21 @@ static int wait_all_children(pid_t *pids, int index, int max, int last_status)
     }
     else if (WIFSIGNALED(status))
     {
+        // if (index == max - 1)
+        // {
+		// 	print_signal_message(status);
+		// 	last_status = 128 + WTERMSIG(status);
+		// }
+		// EXIT CODE DEBUG
+		if (!(*signal_printed))
+		{
+			print_signal_message(status);
+			*signal_printed = 1;
+		}
         if (index == max - 1)
-            last_status = 128 + WTERMSIG(status);
+			last_status = 128 + WTERMSIG(status);
     }
-    return (wait_all_children(pids, index + 1, max, last_status));
+    return (wait_all_children(pids, index + 1, max, last_status, signal_printed));
 }
 
 /**
@@ -67,37 +77,101 @@ static int wait_all_children(pid_t *pids, int index, int max, int last_status)
  * @param i The current index of the command being forked.
  * @return 0 on success, -1 on fork failure.
  */
+// static int fork_all_processes_recursive(t_process_data *data, int i)
+// {
+//     if (i >= data->cmd_count)
+//         return (0);
+//     data->pids[i] = fork();
+//     if (data->pids[i] == -1)
+//     {
+//         // perror("fork"); // DEBUG: Print error if fork fails
+// 		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
+//         return (-1);
+//     }
+//     if (data->pids[i] == 0)
+//     {
+//         reset_child_signal_handlers();
+//         redirect_io(data->cmds[i]->input_file, data->cmds[i]->output_file, 
+// 				data->cmds[i]->output_mode);
+//         if (i > 0)
+//             dup2(data->pipes[i - 1][0], STDIN_FILENO);
+//         if (i < data->cmd_count - 1)
+//             dup2(data->pipes[i][1], STDOUT_FILENO);
+//         close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
+// 		// ** THE FIX IS HERE **
+//         // If there are no arguments after redirection, it's an empty command. Exit successfully.
+//         if (data->cmds[i]->args[0] == NULL)
+//             exit(0);
+//         if (is_builtin(data->cmds[i]->args[0]))
+//         {
+//             exit(run_builtin(data->cmds[i]->args, data));
+//         }
+//         else
+//         {
+//             execute_cmd(data->cmds[i]->cmd_path, data->cmds[i]->args, data->path_dirs, data->env_list);
+//         }
+//         // perror("execve"); // DEBUG: Print error if execve fails
+// 		ft_error_and_exit("execve", strerror(errno), EXIT_FAILURE);
+//         // exit(EXIT_FAILURE);
+//     }
+//     return fork_all_processes_recursive(data, i + 1);
+// }
+
 static int fork_all_processes_recursive(t_process_data *data, int i)
 {
     if (i >= data->cmd_count)
         return (0);
+
     data->pids[i] = fork();
     if (data->pids[i] == -1)
     {
-        perror("fork");
+        ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
         return (-1);
     }
+
     if (data->pids[i] == 0)
     {
+        /* -------- CHILD i -------- */
         reset_child_signal_handlers();
-        redirect_io(data->cmds[i]->input_file, data->cmds[i]->output_file, 
-				data->cmds[i]->output_mode);
+
+        /* 1) PIPE WIRING FIRST (so own redirs can override later) */
         if (i > 0)
-            dup2(data->pipes[i - 1][0], STDIN_FILENO);
+        {
+            if (dup2(data->pipes[i - 1][0], STDIN_FILENO) == -1)
+                ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
+        }
         if (i < data->cmd_count - 1)
-            dup2(data->pipes[i][1], STDOUT_FILENO);
+        {
+            if (dup2(data->pipes[i][1], STDOUT_FILENO) == -1)
+                ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
+        }
+
+        /* Close all pipe fds in the child (we've dup2'ed what we need) */
         close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
+
+        /* 2) NOW APPLY THIS COMMAND'S REDIRECTIONS → override pipe fds */
+        redirect_io(data->cmds[i]->input_file,
+                    data->cmds[i]->output_file,
+                    data->cmds[i]->output_mode);
+
+        /* 3) Empty command after redirs → succeed */
+        if (data->cmds[i]->args == NULL || data->cmds[i]->args[0] == NULL)
+            exit(0);
+
+        /* 4) Builtin runs in child within pipeline */
         if (is_builtin(data->cmds[i]->args[0]))
-        {
-            exit(run_builtin(data->cmds[i]->args, data->env_list));
-        }
-        else
-        {
-            execute_cmd(data->cmds[i]->cmd_path, data->cmds[i]->args, data->path_dirs, data->env_list);
-        }
-        perror("execve");
-        exit(EXIT_FAILURE);
+            exit(run_builtin(data->cmds[i]->args, data));
+
+        /* 5) External command */
+        execute_cmd(data->cmds[i]->cmd_path,
+                    data->cmds[i]->args,
+                    data->path_dirs,
+                    data->env_list);
+
+        /* If execute_cmd ever returns */
+        ft_error_and_exit("execve", strerror(errno), EXIT_FAILURE);
     }
+
     return fork_all_processes_recursive(data, i + 1);
 }
 
@@ -185,8 +259,7 @@ static int setup_and_fork_pipeline(t_process_data *data, t_command **cmds, int c
 
 /**
  * @brief Executes a pipeline of commands with proper pipe and process management.
- * 
- * This function sets up necessary pipes between commands, forks child processes
+ * * This function sets up necessary pipes between commands, forks child processes
  * for each command in the pipeline, and ensures proper execution and
  * synchronization. It handles:
  * - Pipe file descriptor allocation and cleanup.
@@ -197,23 +270,34 @@ static int setup_and_fork_pipeline(t_process_data *data, t_command **cmds, int c
  * @param cmd_count   Total number of commands in the pipeline.
  * @param path_dirs   Array of directories used to resolve command paths.
  * @return The exit status of the last command in the pipeline on success,
- *         or -1 on failure (e.g., memory allocation or forking error).
+ * or -1 on failure (e.g., memory allocation or forking error).
  */
 int run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs, t_env_var *env_list)
 {
     t_process_data data;
     int fork_status;
 	int exit_status;
+	int signal_printed; // EXIT CODE DEBUG: flag to track if a signal message has been printed
 
+	signal_printed = 0;
+	// EXIT CODE DEBUG
+	// Temporarily ignore signals in the parent shell
+    signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
     fork_status = setup_and_fork_pipeline(&data, cmds, cmd_count, path_dirs, env_list);
     if (fork_status == -1)
     {
         free(data.pids);
         close_free_pipes_recursively(data.pipes, 0, cmd_count - 1);
+		setup_signal_handlers(); // Restore handlers on error
         return (-1);
     }
     close_free_pipes_recursively(data.pipes, 0, cmd_count - 1);
-	exit_status = wait_all_children(data.pids, 0, cmd_count, 0);
+	exit_status = wait_all_children(data.pids, 0, cmd_count, 0, &signal_printed);
+	// EXIT CODE DEBUG
+	 // Restore the parent's original signal handlers after waiting is complete
+    setup_signal_handlers();
+	data.last_exit_status = exit_status;
     free(data.pids);
     return (exit_status);
 }

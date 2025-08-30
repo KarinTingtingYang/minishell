@@ -1,29 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lexer.h                                            :+:      :+:    :+:   */
+/*   ft_strndup.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/30 08:42:04 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 11:09:24 by makhudon         ###   ########.fr       */
+/*   Created: 2025/08/04 13:10:35 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/04 13:24:11 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LEXER_H
-# define LEXER_H
+#include "libft.h"
 
-typedef struct s_append_info
+char	*ft_strndup(const char *s, size_t n)
 {
-	char	**array;
-	int		count;
-}	t_append_info;
+	char	*dup;
 
-char	**tokenize_input(char *line);
-void	free_tokens(t_token **tokens);
-char	*append_char(char *str, char c);
-char	**split_line_by_pipe(char *line);
-char	**duplicate_tokens_to_array(t_token **tokens, int len);
-char	**append_str(t_append_info *info, char *line, int start, int end);
-
-#endif
+	dup = malloc(n + 1);
+	if (dup == NULL)
+		return (NULL);
+	ft_strlcpy(dup, s, n + 1);
+	dup[n] = '\0';
+	return (dup);
+}

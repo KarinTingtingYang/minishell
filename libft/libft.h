@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   libft.h                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/29 13:05:10 by makhudon          #+#    #+#             */
-/*   Updated: 2025/07/30 09:34:39 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   libft.h                                            :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/04/29 13:05:10 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/08/14 10:40:44 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <string.h>
 # include <limits.h>
 # include <stdint.h>
+# include "get_next_line/get_next_line.h"
 
 int		ft_isalpha(int c);
 int		ft_isdigit(int c);
@@ -54,5 +55,6 @@ void	ft_putchar_fd(char c, int fd);
 void	ft_putstr_fd(const char *s, int fd);
 void	ft_putendl_fd(char *s, int fd);
 void	ft_putnbr_fd(int n, int fd);
+char	*ft_strndup(const char *s, size_t n);
 
 #endif
