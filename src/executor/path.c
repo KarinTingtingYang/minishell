@@ -12,6 +12,7 @@
 
 #include "../includes/minishell.h"
 
+
 static char	*combine_cmd_path(const char *path_dir, const char *cmd)
 {
 	size_t	length;

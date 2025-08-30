@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/19 09:44:17 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/30 20:47:29 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,30 +26,59 @@ typedef struct s_execute_data
     char **path_dirs;      // Array of directories in PATH environment variable
     char *cmd_path;        // Full path to the executable command
 	int  output_mode;		//  FOR APPEND REDIRECTION: 0=none, 1=truncate(>), 2=append(>>)
-	// char **envp;	   // passing envp down to built-in commands
 	t_env_var *env_list;
 	char *heredoc_file;    // File name for heredoc redirection (if any)
 	
 } t_execute_data;
 
-char		**find_path_dirs(t_env_var *env_list);
-int			count_command_parts(char **parts);
-void		free_execute_data(t_execute_data *data);
-// int execute_command(char *line, t_env_var *env_list);
+// path.c
+char *find_full_cmd_path(char *cmd, char **path_dirs);
+char **find_path_dirs(t_env_var *env_list);
 
-
+// executor.c
+int perform_command_checks(char *cmd_path, char **args, char **envp);
+void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list);
+int handle_pipeline_command(char *line, t_env_var *env_list, t_process_data *process_data);
+int handle_single_command(char *line, t_env_var *env_list, t_process_data *process_data);
 int execute_command(char *line, t_env_var *env_list, t_process_data *process_data);
-// int execute_command(char **args, t_env_var *env_list, t_process_data *process_data);
 
+// execute_command_types.c
+int execute_builtin_command(t_execute_data *data, t_process_data *process_data);
+int execute_external_command(t_execute_data *data, t_process_data *process_data, t_env_var *env_list);
+int handle_redirection_only(t_execute_data *data, t_process_data *process_data);
+int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data);
 
-// int			execute_prepared_command(t_execute_data *data);
+// prepare_command_execution.c
+int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *data,
+								t_process_data *process_data);
+
+// execute_prepared_command.c
 int execute_prepared_command(t_execute_data *data, t_process_data *process_data);
-char		*find_full_cmd_path(char *cmd, char **path_dirs);
-void		execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list);
-void		free_commands_recursive(t_command **cmds, int index, int count);
-int			prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *data, t_process_data *process_data);
-t_command   **prepare_pipeline_commands(char *line, int *count, char ***parts, t_process_data *process_data);
-char **ft_split_dup(char **args);
-// int precheck_pipe_syntax(const char *line);
+
+// prepare_pipeline_commands.c
+int build_commands_from_parts(t_command **cmds, char **parts, int index, int count,
+							  t_process_data *process_data);
+t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
+                                      t_process_data *process_data);
+
+// executor_helper.c
+int		validate_pipeline_parts(char **parts, int count);
+int		is_empty_or_whitespace(const char *str);
+char	**ft_split_dup(char **args);
+int		count_command_parts(char **parts);
+int 	check_heredoc_limit(char *line);
+int		is_unquoted_pipe_present(const char *line);
+
+// executor_error.c
+void handle_stat_error(char **envp, char **args, int error_code);
+void handle_access_error(char **envp, char **args, int error_code);
+void handle_execve_error(char **envp, char **args, int error_code);
+void handle_null_cmd_path(char **args, char **envp);
+int handle_redirection_error(t_execute_data *data, t_process_data *process_data,
+							char **args);
+
+// executor_cleanup.c
+void free_execute_data(t_execute_data *data);
+void free_commands_recursive(t_command **cmds, int index, int count);
 
 #endif

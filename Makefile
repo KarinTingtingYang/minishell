@@ -13,8 +13,13 @@ INCLUDES   = -I$(LIBFT_DIR) -I$(INC_DIR) -I.
 SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/executor/executor.c \
              $(SRC_DIR)/executor/executor_helper.c \
-             $(SRC_DIR)/executor/executor_utils.c \
+             $(SRC_DIR)/executor/executor_cleanup.c \
+			 $(SRC_DIR)/executor/executor_error.c \
              $(SRC_DIR)/executor/path.c \
+			 $(SRC_DIR)/executor/prepare_command_execution.c \
+			 $(SRC_DIR)/executor/prepare_pipeline_commands.c \
+			 $(SRC_DIR)/executor/execute_prepared_command.c \
+			 $(SRC_DIR)/executor/execute_command_types.c \
 			 $(SRC_DIR)/builtins/builtins.c \
 			 $(SRC_DIR)/builtins/builtins_io.c \
 			 $(SRC_DIR)/builtins/cd_pwd.c \
