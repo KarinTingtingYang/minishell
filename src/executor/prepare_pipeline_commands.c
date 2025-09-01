@@ -6,112 +6,12 @@
 /*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 16:42:20 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/30 19:47:27 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/01 20:36:24 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-/**
- * @brief Performs a precheck on the raw line for bad redirections.
- *
- * @param line The command line.
- * @param process_data Pointer to the process data.
- * @return 1 on success, 0 on failure.
- */
-static int precheck_line(char *line, t_process_data *process_data)
-{
-    if (line)
-    {
-        int i = 0;
-        char q = 0;
-
-        while (line[i] != '\0')
-        {
-            if ((line[i] == '\'' || line[i] == '"') && q == 0)
-            {
-                q = line[i];
-                i++;
-                continue;
-            }
-            if (q && line[i] == q)
-            {
-                q = 0;
-                i++;
-                continue;
-            }
-
-            if (q == 0 && (line[i] == '<' || line[i] == '>'))
-            {
-                int op_len;
-                int j;
-
-                op_len = 1;
-                if (line[i] == '<')
-                {
-                    if (line[i + 1] == '<' && line[i + 2] == '<')
-                        op_len = 3;
-                    else if (line[i + 1] == '>')
-                        op_len = 2;
-                    else if (line[i + 1] == '<')
-                        op_len = 2;
-                }
-                else
-                {
-                    if (line[i + 1] == '>')
-                        op_len = 2;
-                }
-
-                j = i + op_len;
-
-                while (line[j] == ' ' || line[j] == '\t')
-                    j++;
-
-                if (line[j] == '\0')
-                {
-                    ft_error(NULL, "syntax error near unexpected token `newline'");
-                    if (process_data)
-                        process_data->last_exit_status = 2;
-                    return 0;
-                }
-                if (line[j] == '|')
-                {
-                    ft_error(NULL, "syntax error near unexpected token `|'");
-                    if (process_data)
-                        process_data->last_exit_status = 2;
-                    return 0;
-                }
-                if (line[j] == '<')
-                {
-                    if (op_len == 3)
-                    {
-                        ft_error(NULL, "syntax error near unexpected token `newline'");
-                        if (process_data)
-                            process_data->last_exit_status = 2;
-                        return 0;
-                    }
-                    ft_error(NULL, "syntax error near unexpected token `<'");
-                    if (process_data)
-                        process_data->last_exit_status = 2;
-                    return 0;
-                }
-                if (line[j] == '>')
-                {
-                    ft_error(NULL, "syntax error near unexpected token `>'");
-                    if (process_data)
-                        process_data->last_exit_status = 2;
-                    return 0;
-                }
-
-                i = j;
-                continue;
-            }
-
-            i++;
-        }
-    }
-    return 1;
-}
 
 /**
  * @brief Allocates memory for the command array.
@@ -253,11 +153,7 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
     if (process_data)
         process_data->syntax_error = 0;
     if (!validate_pipeline_parts(*parts, *count))
-    {
-        free_split(*parts);
-        *parts = NULL;
-        return (NULL);
-    }
+		return (free_split(*parts), *parts = NULL, NULL);
     if (!allocate_command_array(*count, parts, &cmds))
         return (NULL);
     if (process_data)
@@ -266,9 +162,7 @@ t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
     {
         free_commands_recursive(cmds, 0, *count);
         free(cmds);
-        free_split(*parts);
-        *parts = NULL;
-        return (NULL);
+		return (free_split(*parts), *parts = NULL, NULL);
 	}
 	cmds[*count] = NULL;
 	return cmds;

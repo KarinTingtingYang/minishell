@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 20:47:29 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/01 20:29:08 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,9 @@ typedef struct s_execute_data
 	char *heredoc_file;    // File name for heredoc redirection (if any)
 	
 } t_execute_data;
+
+// precheck_line.c
+int precheck_line(char *line, t_process_data *process_data);
 
 // path.c
 char *find_full_cmd_path(char *cmd, char **path_dirs);

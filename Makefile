@@ -11,6 +11,7 @@ INCLUDES   = -I$(LIBFT_DIR) -I$(INC_DIR) -I.
 
 # === Source Files ===
 SRCS       = $(SRC_DIR)/main.c \
+			 $(SRC_DIR)/executor/precheck_line.c \
              $(SRC_DIR)/executor/executor.c \
              $(SRC_DIR)/executor/executor_helper.c \
              $(SRC_DIR)/executor/executor_cleanup.c \
