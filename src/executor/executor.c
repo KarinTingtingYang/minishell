@@ -6,7 +6,7 @@
 /*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/02 01:02:44 by mariahudono      ###   ########.fr       */
+/*   Updated: 2025/09/02 01:06:51 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -250,80 +250,80 @@ int execute_command(char *line, t_env_var *env_list, t_process_data *process_dat
 //     handle_execve_error(cmd_path, args, NULL);
 // }
 
-// /* ---- executor ---- */
-// void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
-// {
-//     char        **envp;
-//     struct stat   st;
-//     int           e;
+/* ---- executor ---- */
+void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
+{
+    char        **envp;
+    struct stat   st;
+    int           e;
 
-//     (void)path_dirs;
-//     reset_child_signal_handlers();
-//     envp = env_list_to_array(env_list);
+    (void)path_dirs;
+    reset_child_signal_handlers();
+    envp = env_list_to_array(env_list);
 
-//     /* resolver failed: choose message by how argv[0] looks */
-//     if (cmd_path == NULL)
-//     {
-//         if (args && args[0] && ft_strchr(args[0], '/'))
-//         {
-//             if (envp) free_split(envp);
-//             ft_error_and_exit(args[0], "No such file or directory", 127);
-//         }
-//         if (envp) free_split(envp);
-//         ft_error_and_exit(args && args[0] ? args[0] : "minishell",
-//                           "command not found", 127);
-//     }
+    /* resolver failed: choose message by how argv[0] looks */
+    if (cmd_path == NULL)
+    {
+        if (args && args[0] && ft_strchr(args[0], '/'))
+        {
+            if (envp) free_split(envp);
+            ft_error_and_exit(args[0], "No such file or directory", 127);
+        }
+        if (envp) free_split(envp);
+        ft_error_and_exit(args && args[0] ? args[0] : "minishell",
+                          "command not found", 127);
+    }
 
-//     /* precise pre-checks like bash */
-//     if (stat(cmd_path, &st) == -1)
-//     {
-//         e = errno;
-//         if (envp) free_split(envp);
-//         if (e == ENOTDIR)
-//             ft_error_and_exit(args[0], "Not a directory", 126);
-//         if (e == ENOENT)
-//             ft_error_and_exit(args[0], "No such file or directory", 127);
-//         ft_error_and_exit(args[0], strerror(e), 126);
-//     }
-//     if (S_ISDIR(st.st_mode))
-//     {
-//         if (envp) free_split(envp);
-//         ft_error_and_exit(args[0], "Is a directory", 126);
-//     }
-//     if (access(cmd_path, X_OK) == -1)
-//     {
-//         e = errno;
-//         if (envp) free_split(envp);
-//         if (e == EACCES)
-//             ft_error_and_exit(args[0], "Permission denied", 126);
-//         if (e == ENOTDIR)
-//             ft_error_and_exit(args[0], "Not a directory", 126);
-//         ft_error_and_exit(args[0], strerror(e), 126);
-//     }
+    /* precise pre-checks like bash */
+    if (stat(cmd_path, &st) == -1)
+    {
+        e = errno;
+        if (envp) free_split(envp);
+        if (e == ENOTDIR)
+            ft_error_and_exit(args[0], "Not a directory", 126);
+        if (e == ENOENT)
+            ft_error_and_exit(args[0], "No such file or directory", 127);
+        ft_error_and_exit(args[0], strerror(e), 126);
+    }
+    if (S_ISDIR(st.st_mode))
+    {
+        if (envp) free_split(envp);
+        ft_error_and_exit(args[0], "Is a directory", 126);
+    }
+    if (access(cmd_path, X_OK) == -1)
+    {
+        e = errno;
+        if (envp) free_split(envp);
+        if (e == EACCES)
+            ft_error_and_exit(args[0], "Permission denied", 126);
+        if (e == ENOTDIR)
+            ft_error_and_exit(args[0], "Not a directory", 126);
+        ft_error_and_exit(args[0], strerror(e), 126);
+    }
 
-//     /* run */
-//     execve(cmd_path, args, envp);
+    /* run */
+    execve(cmd_path, args, envp);
 
-//     /* execve failed → map remaining cases */
-//     e = errno;
-//     free_split(envp);
-//     if (e == ENOEXEC)
-//         ft_error_and_exit(args[0], "Exec format error", 126);
-//     if (e == ENOTDIR)
-//         ft_error_and_exit(args[0], "Not a directory", 126);
-//     if (e == ENOENT)
-//         ft_error_and_exit(args[0], "No such file or directory", 127);
-//     if (e == EACCES)
-//         ft_error_and_exit(args[0], "Permission denied", 126);
-//     ft_error_and_exit(args[0], strerror(e), 126);
-// }
+    /* execve failed → map remaining cases */
+    e = errno;
+    free_split(envp);
+    if (e == ENOEXEC)
+        ft_error_and_exit(args[0], "Exec format error", 126);
+    if (e == ENOTDIR)
+        ft_error_and_exit(args[0], "Not a directory", 126);
+    if (e == ENOENT)
+        ft_error_and_exit(args[0], "No such file or directory", 127);
+    if (e == EACCES)
+        ft_error_and_exit(args[0], "Permission denied", 126);
+    ft_error_and_exit(args[0], strerror(e), 126);
+}
 
-// static int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data)
-// {
-//     t_execute_data  data;
-//     int             original_stdin;
-//     int             original_stdout;
-//     int             exit_status;
+static int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data)
+{
+    t_execute_data  data;
+    int             original_stdin;
+    int             original_stdout;
+    int             exit_status;
 
 //     ft_bzero(&data, sizeof(t_execute_data));
 // 	// ---> THIS IS THE FIX <---
@@ -448,29 +448,29 @@ int execute_command(char *line, t_env_var *env_list, t_process_data *process_dat
 // 	}
 // 	// --- END OF THE FIX ---
 
-// 	//if (ft_strchr(line, '|'))
-// 	if (is_unquoted_pipe_present(line))
-// 	{
-// 		printf("pipe is found, calling prepare_and_run_pipeline\n");
-// 		return prepare_and_run_pipeline(line, env_list, process_data);
-// 	}
-// 	else
-// 	{
-// 		t_token **tokens = parse_line(line);
-// 		if (tokens == NULL)
-// 			return (1);
-// 		char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
-// 		// debug
-// 		printf("expand_and_split_args returns: \n");
-// 		print_array(args);
-// 		free_tokens(tokens);
-// 		if (args == NULL || args[0] == NULL)
-// 		{
-// 			free_split(args);
-// 			return (0); 
-// 		}
-// 		int result = execute_single_command(args, env_list, process_data);
-// 		free_split(args);
-// 		return result;
-// 	}
-// }
+	//if (ft_strchr(line, '|'))
+	if (is_unquoted_pipe_present(line))
+	{
+		printf("pipe is found, calling prepare_and_run_pipeline\n");
+		return prepare_and_run_pipeline(line, env_list, process_data);
+	}
+	else
+	{
+		t_token **tokens = parse_line(line);
+		if (tokens == NULL)
+			return (1);
+		char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
+		// debug
+		printf("expand_and_split_args returns: \n");
+		// print_array(args);
+		free_tokens(tokens);
+		if (args == NULL || args[0] == NULL)
+		{
+			free_split(args);
+			return (0); 
+		}
+		int result = execute_single_command(args, env_list, process_data);
+		free_split(args);
+		return result;
+	}
+}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:02:37 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/28 23:27:33 by mariahudono      ###   ########.fr       */
+/*   Updated: 2025/08/30 14:16:03 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,47 +108,8 @@ void	free_split(char **array)
 	array = NULL;
 }
 
-char *ft_strjoin_free(char *s1, char *s2)
-{
-    char *joined = ft_strjoin(s1, s2);
-    free(s1);
-    free(s2);
-    return (joined);
-}
-
-
 void	skip_spaces(const char **s)
 {
 	while (**s && (**s == ' ' || **s == '\t'))
 		(*s)++;
-}
-
-void print_array(char **array)
-{
-	int i = 0;
-	if (!array)
-	{
-		ft_putstr_fd("NULL\n", STDOUT_FILENO);
-		return;
-	}
-	while (array[i])
-	{
-		printf("Array[%d]: %s\n", i, array[i]);
-		i++;
-	}
-}
-
-void print_tokens(t_token **tokens)
-{
-	int i = 0;
-	if (!tokens)
-	{
-		ft_putstr_fd("NULL\n", STDOUT_FILENO);
-		return;
-	}
-	while (tokens[i])
-	{
-		printf("Token %d: value='%s', quote=%d\n", i, tokens[i]->value, tokens[i]->quote);
-		i++;
-	}
 }

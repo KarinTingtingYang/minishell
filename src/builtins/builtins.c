@@ -6,20 +6,19 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 09:00:14 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/25 10:03:18 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/30 11:30:39 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 /**
- * @brief Executes the built-in commands based on the provided arguments.
+ * @brief Executes a built-in command.
  *
- * This function checks the first argument to determine which built-in command
- * to execute and calls the corresponding function.
- * @param args The arguments array, where args[0] is the command name.
- * @param env_list The environment variable linked list.
- * @return Returns 0 on success, or an error code on failure.
+ * @param args The command and its arguments.
+ * @param process_data The process data containing environment variables and
+ * last exit status.
+ * @return The exit status of the built-in command, or 0 if not a built-in.
  */
 int	run_builtin(char **args, t_process_data *process_data)
 {
@@ -43,10 +42,10 @@ int	run_builtin(char **args, t_process_data *process_data)
 }
 
 /**
- * @brief Checks if a command is a built-in command.
+ * @brief Checks if a command is a built-in.
  *
  * @param cmd The command to check.
- * @return 1 if it is a built-in command, 0 otherwise.
+ * @return 1 if the command is a built-in, 0 otherwise.
  */
 int	is_builtin(char *cmd)
 {

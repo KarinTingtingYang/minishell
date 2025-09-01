@@ -3,32 +3,72 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 13:12:47 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/28 23:56:48 by mariahudono      ###   ########.fr       */
+/*   Updated: 2025/08/30 11:45:53 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 /**
- * @brief Safely converts a string to a long long, checking for overflow.
+ * @brief Parses a string of digits and checks for overflow.
  *
- * This function converts a string to a long long integer. It handles whitespace,
- * signs, and crucially, checks for overflow before it can occur.
+ * This function takes a pointer to the start of a digit sequence, a sign,
+ * and a pointer to a long long variable. It converts the digit sequence
+ * to a long long, while also checking for overflow and underflow.
+ *
+ * @param str The string of digits to parse.
+ * @param sign The sign of the number (+1 or -1).
+ * @param out_val A pointer to store the resulting long long value.
+ * @return 1 on success, 0 on failure (e.g., non-digit characters, overflow).
+ */
+static int	ft_parse_digits_to_llong(const char *str,
+										int sign, long long *out_val)
+{
+	long long	result;
+
+	result = 0;
+	while (*str != '\0')
+	{
+		if (!ft_isdigit(*str))
+			return (0);
+		if (sign == 1)
+		{
+			if (result > LLONG_MAX / 10
+				|| (result == LLONG_MAX / 10 && (*str - '0') > LLONG_MAX % 10))
+				return (0);
+		}
+		else
+		{
+			if (result > -(LLONG_MIN / 10)
+				|| (result == -(LLONG_MIN / 10)
+					&& (*str - '0') > -(LLONG_MIN % 10)))
+				return (0);
+		}
+		result = result * 10 + (*str - '0');
+		str++;
+	}
+	*out_val = result * sign;
+	return (1);
+}
+
+/**
+ * @brief Converts a string to a long long, handling whitespace and sign.
+ *
+ * This is the main function that handles the full conversion logic. It
+ * correctly skips leading whitespace and determines the sign before
+ * calling ft_parse_digits_to_llong to perform the final conversion.
  *
  * @param str The string to convert.
- * @param out_val A pointer to a long long where the result will be stored.
- * @return Returns 1 on successful conversion, and 0 if the string is not a
- * valid number or if the number would overflow the long long type.
+ * @param out_val A pointer to store the resulting long long value.
+ * @return 1 on success, 0 on failure.
  */
 static int	ft_str_to_llong(const char *str, long long *out_val)
 {
-	long long	result;
-	int			sign;
+	int	sign;
 
-	result = 0;
 	sign = 1;
 	while (*str == ' ' || (*str >= '\t' && *str <= '\r'))
 		str++;
@@ -38,91 +78,46 @@ static int	ft_str_to_llong(const char *str, long long *out_val)
 			sign = -1;
 		str++;
 	}
-	if (!*str)
+	if (!*str || !ft_isdigit(*str))
 		return (0);
-	while (*str != '\0')
-	{
-		if (!ft_isdigit(*str))
-			return (0);
-		if (sign == 1 && (result > LLONG_MAX / 10
-				|| (result == LLONG_MAX / 10 && (*str - '0') > LLONG_MAX % 10)))
-			return (0);
-		if (sign == -1 && (result > -(LLONG_MIN / 10)
-				|| (result == -(LLONG_MIN / 10)
-					&& (*str - '0') > -(LLONG_MIN % 10))))
-			return (0); 
-		result = result * 10 + (*str - '0');
-		str++;
-	}
-	*out_val = result * sign;
-	return (1);
+	return (ft_parse_digits_to_llong(str, sign, out_val));
 }
 
 /**
- * @brief Exits the shell with the specified exit status.
- * 
- * This function is called when the user types `exit` in the shell.
- * It prints a message indicating the exit status and terminates the program.
- * @param status The exit status to return to the operating system.
+ * @brief Implements the 'exit' built-in command.
+ *
+ * This function handles the 'exit' command, which can take an optional
+ * numeric argument to specify the exit code. It performs error checking
+ * for invalid arguments and too many arguments.
+ *
+ * @param args The command arguments. args[0] is "exit", args[1] is the
+ * optional exit code.
+ * @param last_exit_status The last exit status of the shell, used if no
+ * argument is provided.
+ * @return This function does not return; it calls exit() to terminate the
+ * process. If there are too many arguments, it returns 1 without exiting.
  */
-// int	run_exit(char **args, int last_exit_status)
-// {
-// 	long long	exit_code;
-
-// 	ft_putstr_fd("exit\n", STDOUT_FILENO);
-// 	if (args[1] == NULL)
-// 		exit((unsigned char)last_exit_status);
-// 	else
-// 	{
-// 		if (ft_str_to_llong(args[1], &exit_code) == 0)
-// 		{
-// 			// ft_error_and_exit("exit", "numeric argument required", 2);
-// 			ft_error_with_arg("exit", args[1], "numeric argument required");
-// 			exit(2);  // Exit immediately on bad numeric arg, don't check args[2]
-// 		}
-// 		if (args[2] != NULL)
-// 		{
-// 			// ft_error("exit", "too many arguments");
-// 			ft_error_with_arg("exit", args[1], "too many arguments");
-// 			return (1);
-// 		}
-// 		else
-// 			exit((unsigned char)exit_code);
-// 	}
-// 	return (0);
-// }
-
 int	run_exit(char **args, int last_exit_status)
 {
 	long long	exit_code;
-	int         argc;
+	int			argc;
 
-	/* count args */
 	argc = 0;
-	while (args && args[argc])
+	while (args && args[argc] != NULL)
 		argc++;
-
 	ft_putstr_fd("exit\n", STDOUT_FILENO);
-
-	/* no arguments -> exit with last status */
 	if (argc == 1)
 		exit((unsigned char)last_exit_status);
-
-	/* first arg must be numeric; if not, print ONE error and exit 2 */
 	if (ft_str_to_llong(args[1], &exit_code) == 0)
 	{
 		ft_error_with_arg("exit", args[1], "numeric argument required");
 		exit(2);
 	}
-
-	/* numeric first arg but extra args -> print error, do NOT exit */
 	if (argc > 2)
 	{
 		ft_error("exit", "too many arguments");
 		return (1);
 	}
-
-	/* one numeric argument -> exit with value modulo 256 */
 	exit((unsigned char)exit_code);
 	return (0);
 }

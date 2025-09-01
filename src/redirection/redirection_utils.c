@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   redirection_utils.c                                :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 11:10:49 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/22 14:52:59 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   redirection_utils.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 11:10:49 by tiyang            #+#    #+#             */
+/*   Updated: 2025/08/30 14:23:44 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,23 +124,6 @@ void	open_and_redirect_output(char *output_file, int output_mode)
 //     close(fd);
 //     return 0;
 // }
-
-// Helper: Count non-redirection arguments
-int	count_clean_args(char **args)
-{
-    int i = 0, count = 0;
-    while (args[i])
-    {
-        if (is_redirection(args[i]))
-            i += 2;
-        else
-        {
-            count++;
-            i++;
-        }
-    }
-    return count;
-}
 
 // Helper: Check if token is a redirection operator
 int	is_redirection(const char *token)

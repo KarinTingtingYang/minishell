@@ -6,42 +6,18 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 11:42:52 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/25 10:10:28 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/30 13:50:05 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 /**
- * @brief Initializes the environment variables from the provided array.
+ * @brief Implements the 'env' built-in command.
+ * Prints all environment variables in the format KEY=VALUE.
+ * Only variables with a value are printed.
  *
- * This function creates a linked list of environment variables from the
- * `environ` array, which is typically provided by the operating system.
- * Each variable is split into a key and value at the '=' character.
- * @param environ The array of environment variables in the format "KEY=VALUE".
- * @return Returns a pointer to the head of the linked list of environment
- *         variables.
- */
-char	*get_env_value(t_env_var *env_list, char *key)
-{
-	t_env_var	*current;
-
-	current = env_list;
-	while (current != NULL)
-	{
-		if (ft_strncmp(current->key, key, ft_strlen(key) + 1) == 0)
-			return (current->value);
-		current = current->next;
-	}
-	return (NULL);
-}
-
-/**
- * @brief Prints the environment variables to standard output.
- *
- * This function iterates through the linked list of environment variables
- * and prints each key-value pair in the format "KEY=VALUE".
- * @param env_list The head of the environment linked list.
+ * @param env_list The linked list of environment variables.
  */
 void	run_env(t_env_var *env_list)
 {

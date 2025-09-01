@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 10:39:19 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 09:31:39 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/30 14:57:24 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,14 +40,14 @@ static int	count_words(const char *str)
 }
 
 /**
- * @brief Creates an array of strings from a given string,
- *        splitting by whitespace.
+ * @brief Creates an array of strings by splitting the input string on
+ * whitespace.
  * 
- * This function allocates memory for an array of strings and fills it with
- * words from the input string, splitting by spaces. The resulting array is
- * NULL-terminated.
+ * This function fills the provided array with words extracted from the
+ * input string, splitting by spaces. It assumes that the array has enough
+ * space to hold all words plus a NULL terminator.
+ * @param result The array to fill with split words.
  * @param str The input string to split.
- * @return A dynamically allocated array of strings, or NULL on failure.
  */
 static void	create_split_array(char **result, char *str)
 {
@@ -77,11 +77,12 @@ static void	create_split_array(char **result, char *str)
 /**
  * @brief Splits a string into an array of words based on whitespace.
  * 
- * This function allocates memory for an array of strings and fills it with
- * words from the input string, splitting by spaces. The resulting array is
- * NULL-terminated.
+ * This function counts the number of words in the input string, allocates
+ * an array of strings, and fills it by splitting the input on whitespace.
+ * The resulting array is NULL-terminated.
  * @param str The input string to split.
- * @return A dynamically allocated array of strings, or NULL on failure.
+ * @return A pointer to the newly allocated array of strings,
+ *         or NULL on failure.
  */
 char	**ft_split_whitespace(char *str)
 {
@@ -96,4 +97,38 @@ char	**ft_split_whitespace(char *str)
 		return (NULL);
 	create_split_array(result, str);
 	return (result);
+}
+
+/**
+ * @brief Removes outer quotes from a string if they match.
+ * 
+ * This function checks if the input string starts and ends with the same
+ * quote character (single or double). If so, it removes those quotes and
+ * returns a new string. If not, it returns the original string.
+ * @param str The input string to process.
+ * @return A pointer to the new string without outer quotes,
+ *         or the original string if no quotes were removed.
+ */
+char	*remove_outer_quotes(char *str)
+{
+	size_t	len;
+	char	*result;
+
+	len = ft_strlen(str);
+	if (len >= 2 && ((str[0] == '\'' && str[len - 1] == '\'')
+			|| (str[0] == '"' && str[len - 1] == '"')))
+	{
+		if (len == 2)
+			result = ft_strdup("");
+		else
+			result = ft_substr(str, 1, len - 2);
+		if (result == NULL)
+		{
+			free(str);
+			return (NULL);
+		}
+		free(str);
+		return (result);
+	}
+	return (str);
 }

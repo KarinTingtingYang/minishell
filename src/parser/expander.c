@@ -1,140 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   expander.c                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/08/25 13:28:47 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   expander.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
+/*   Updated: 2025/08/30 15:32:03 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-static char	**append_split_to_final(char **final_args,
-										int *final_count, char **split)
-{
-	int		split_count;
-	char	**new_final;
-
-	split_count = 0;
-	while (split && split[split_count] != NULL)
-		split_count++;
-	new_final = malloc(sizeof(char *) * (*final_count + split_count + 1));
-	if (new_final == NULL)
-		return (NULL);
-	copy_original_arguments(new_final, final_args, *final_count);
-	copy_new_arguments(new_final, split, *final_count, split_count);
-	new_final[*final_count + split_count] = NULL;
-	free(final_args);
-	free(split);
-	*final_count += split_count;
-	return (new_final);
-}
-
-// static char	**process_token(t_token *token, char *expanded)
-// {
-// 	char	**split;
-
-// 	if (is_export_assignment(token) || token->quote != NO_QUOTE
-// 		//|| ft_strchr(expanded, '\'') || ft_strchr(expanded, '\"'))
-// 		|| ft_strchr(token->value, '\'') || ft_strchr(token->value, '\"')) // DEBUG
-// 	{
-// 		// debug
-// 		printf("process_token triggered condition #1\n");
-// 		split = handle_quoted_or_export_token(token, expanded);
-// 	}
-// 	else
-// 	{
-// 		printf("process_token triggered condition #2\n"); // debug
-// 		split = handle_whitespace_splitting(expanded);
-// 	}
-		
-// 	return (split);
-// }
-
-static int had_original_quotes(const t_token *token)
-{
-    const char *s;
-
-    if (!token || !token->value)
-        return (0);
-    s = token->value;
-    while (*s)
-    {
-        if (*s == '\'' || *s == '"')
-            return (1);
-        s++;
-    }
-    return (0);
-}
-
-// static char **process_token(t_token *token, char *expanded)
-// {
-//     char **split;
-
-//     if (is_export_assignment(token))
-//         return handle_quoted_or_export_token(token, expanded);
-
-//     if (token->quote != NO_QUOTE)
-//     {
-//         expanded = remove_outer_quotes(expanded);
-//         if (!expanded)
-//             return (NULL);
-//         return handle_quoted_or_export_token(token, expanded);
-//     }
-//     else
-//     {
-//         if (had_original_quotes(token))
-//         {
-//             char *joined = remove_quotes_and_join(expanded);
-//             if (!joined)
-//             {
-//                 free(expanded);
-//                 return (NULL);
-//             }
-//             free(expanded);
-//             split = handle_whitespace_splitting(joined);
-//         }
-//         else
-//         {
-//             split = handle_whitespace_splitting(expanded);
-//         }
-//     }
-//     return (split);
-// }
-
-static char **process_token(t_token *token, char *expanded)
-{
-    char **split;
-
-    /* If original token had ANY quotes, keep it as ONE field:
-       remove the quotes after expansion, no whitespace splitting. */
-    if (had_original_quotes(token))
-    {
-        char *unquoted = remove_quotes_and_join(expanded);
-		free(expanded);
-		expanded = NULL; // memory leak fix
-        if (!unquoted)
-            return NULL;
-
-        split = (char **)malloc(sizeof(char *) * 2);
-        if (!split) 
-		{
-			free(unquoted);
-			return NULL;
-		}
-        split[0] = unquoted;
-        split[1] = NULL;
-        return split;
-    }
-
-    /* No quotes originally -> normal field splitting on unquoted spaces */
-    split = handle_whitespace_splitting(expanded);
-    return split;
-}
-
+/**
+ * @brief Handles variable expansion based on the character following '$'.
+ * 
+ * This function checks if the character after '$' is '{', indicating a
+ * braced variable, and calls the appropriate expansion function. If not,
+ * it treats it as a simple variable.
+ * 
+ * @param input The input string containing the variable.
+ * @param i The current index in the input string (pointing to '$').
+ * @param result Pointer to the result string being built.
+ * @param data Pointer to the expansion data containing environment variables
+ *             and last exit status.
+ * @return The updated index in the input string after processing the variable.
+ */
 size_t	handle_variable_expansion(const char *input, size_t i,
 											char **result, t_expand_data *data)
 {
@@ -144,102 +35,165 @@ size_t	handle_variable_expansion(const char *input, size_t i,
 		return (expand_simple_variable(input, i, result, data));
 }
 
+/**
+ * @brief Processes the next segment of the input string for variable expansion.
+ * 
+ * This function checks if the current character is a '$' indicating a variable
+ * expansion. If so, it delegates to the appropriate handler based on the next
+ * character. If not, it appends the current character to the result.
+ * 
+ * @param input The input string being processed.
+ * @param i The current index in the input string.
+ * @param result Pointer to the result string being built.
+ * @param data Pointer to the expansion processing data containing environment
+ *             variables and quote context.
+ * @return The updated index in the input string after processing.
+ */
+static size_t	process_next_segment(const char *input, size_t i, char **result,
+										t_exp_proc_data *data)
+{
+	char	next_char;
+
+	if (input[i] == '$' && input[i + 1] && data->quote_char != '\'')
+	{
+		next_char = input[i + 1];
+		if (next_char == '\'' || next_char == '"')
+			return (i + 1);
+		if (ft_isalnum(next_char) || next_char == '_'
+			|| next_char == '?' || next_char == '{')
+		{
+			return (handle_variable_expansion(input, i, result,
+					data->exp_data));
+		}
+		else
+		{
+			*result = append_char(*result, input[i]);
+			return (i + 1);
+		}
+	}
+	else
+	{
+		*result = append_char(*result, input[i]);
+		return (i + 1);
+	}
+}
+
+/**
+ * @brief Expands variables in the input string based on the environment list
+ * and last exit status.
+ * 
+ * This function processes the input string character by character, expanding
+ * variables as needed while respecting quote contexts. It returns a newly
+ * allocated string with all expansions applied.
+ * 
+ * @param input The input string containing potential variables to expand.
+ * @param env_list The linked list of environment variables for expansion.
+ * @param last_exit_status The last exit status for special variable expansion.
+ * @param quote The quote type context (not used in current implementation).
+ * @return A newly allocated string with expanded variables, or NULL on failure.
+ */
 char	*expand_variables(char *input, t_env_var *env_list,
-								int last_exit_status, t_quote_type quote)
+							int last_exit_status, t_quote_type quote)
 {
 	char			*result;
 	size_t			i;
 	t_expand_data	expand_data;
-	char			quote_char;
+	t_exp_proc_data	proc_data;
 
-	// if (quote == SINGLE_QUOTE)
-	// 	return (ft_strdup(input));
 	(void)quote;
 	expand_data.env_list = env_list;
 	expand_data.last_exit_status = last_exit_status;
+	proc_data.exp_data = &expand_data;
 	result = ft_strdup("");
 	if (result == NULL)
 		return (NULL);
 	i = 0;
-	quote_char = 0;
+	proc_data.quote_char = 0;
 	while (input[i] != '\0')
 	{
-		// Update quote state
-		if (quote_char == 0 && (input[i] == '\'' || input[i] == '"'))
-			quote_char = input[i];
-		else if (input[i] == quote_char)
-			quote_char = 0;
-		
-		//if (input[i] == '$' && input[i + 1])
-		if (input[i] == '$' && input[i + 1] && quote_char != '\'')
-			//i = handle_variable_expansion(input, i, &result, &expand_data);
-		{
-			// A '$' followed by something that isn't a valid variable
-			// (e.g., a quote, space, or null) is treated as a literal '$'.
-			char next_char = input[i + 1];
-			// FIX: If '$' is followed by a quote, skip the '$' entirely.
-			if (next_char == '\'' || next_char == '"')
-			{
-				i++; // Skips the '$'
-				continue; // The loop will then process the quote
-			}
-			if (ft_isalnum(next_char) || next_char == '_' || next_char == '?')
-				i = handle_variable_expansion(input, i, &result, &expand_data);
-			else
-			{
-				result = append_char(result, input[i]);
-				i++;
-			}
-		}
-		else
-		{
-			result = append_char(result, input[i]);
-			i++;
-		}
+		if (proc_data.quote_char == 0 && (input[i] == '\'' || input[i] == '"'))
+			proc_data.quote_char = input[i];
+		else if (input[i] == proc_data.quote_char)
+			proc_data.quote_char = 0;
+		i = process_next_segment(input, i, &result, &proc_data);
 	}
 	return (result);
 }
 
+/**
+ * @brief Processes a token after variable expansion.
+ * 
+ * This function handles the token based on its quote type and whether
+ * it is an export assignment. It may split the expanded string based
+ * on whitespace or remove quotes as needed.
+ * 
+ * @param token The original token before expansion.
+ * @param expanded The expanded string after variable expansion.
+ * @return A newly allocated array of strings after processing,
+ *         or NULL on failure.
+ */
+static char	**process_token_for_expansion(t_token *token,
+		const char *prev_token_val, t_env_var *env_list, int last_exit_status)
+{
+	char	*expanded;
+	char	**split;
+
+	if (prev_token_val && ft_strncmp(prev_token_val, "<<", 3) == 0)
+	{
+		split = malloc(sizeof(char *) * 2);
+		if (split == NULL)
+			return (NULL);
+		split[0] = ft_strdup(token->value);
+		split[1] = NULL;
+	}
+	else
+	{
+		expanded = expand_variables(token->value, env_list,
+				last_exit_status, token->quote);
+		if (expanded == NULL)
+			return (NULL);
+		split = process_token(token, expanded);
+		if (split == NULL)
+			return (NULL);
+	}
+	return (split);
+}
+
+/**
+ * @brief Expands variables in a list of tokens and splits them into arguments.
+ * 
+ * This function processes each token, expands any variables, and handles
+ * whitespace splitting based on the original quotes. It returns a newly
+ * allocated array of strings representing the final arguments.
+ * 
+ * @param tokens The array of tokens to process.
+ * @param env_list The linked list of environment variables for expansion.
+ * @param last_exit_status The last exit status for special variable expansion.
+ * @return A pointer to the newly allocated array of argument strings,
+ *         or NULL on failure.
+ */
 char	**expand_and_split_args(t_token **tokens,
 									t_env_var *env_list, int last_exit_status)
 {
-	char	**final_args;
-	int		final_count;
-	char	*expanded;
-	char	**split;
-	int		i;
+	char		**final_args;
+	int			final_count;
+	char		**split;
+	int			i;
+	const char	*prev_val;
 
 	final_args = NULL;
 	final_count = 0;
 	i = 0;
 	while (tokens[i] != NULL)
 	{
-		// FIX: Prevent expansion of the heredoc delimiter
-		if (i > 0 && ft_strncmp(tokens[i - 1]->value, "<<", 3) == 0)
-		{
-			// For the delimiter, we do NOT expand variables and we do NOT remove quotes here.
-			// We just create a simple "split" array containing the raw delimiter.
-			split = malloc(sizeof(char *) * 2);
-			if (!split)
-				return (NULL);
-			split[0] = ft_strdup(tokens[i]->value);
-			split[1] = NULL;
-		}
+		if (i > 0)
+			prev_val = tokens[i - 1]->value;
 		else
-		{
-			expanded = expand_variables(tokens[i]->value, env_list,
-				last_exit_status, tokens[i]->quote);
-			printf("expand_variables returns [%s]\n", expanded); // DEBUG
-			if (expanded == NULL)
-				return (NULL);
-			split = process_token(tokens[i], expanded);
-			// free(expanded); // memory leak fix
-			// expanded = NULL;
-			if (split == NULL)
-				return (NULL);
-			printf("process_token returns:\n");
-			print_array(split);
-		}
+			prev_val = NULL;
+		split = process_token_for_expansion(tokens[i], prev_val,
+				env_list, last_exit_status);
+		if (split == NULL)
+			return (NULL);
 		final_args = append_split_to_final(final_args, &final_count, split);
 		if (final_args == NULL)
 			return (NULL);
@@ -247,4 +201,3 @@ char	**expand_and_split_args(t_token **tokens,
 	}
 	return (final_args);
 }
-

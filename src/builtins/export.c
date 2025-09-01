@@ -3,242 +3,101 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 13:03:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/28 23:09:37 by mariahudono      ###   ########.fr       */
+/*   Updated: 2025/08/30 12:29:39 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-// REPLACED QSORT WITH BUBBLE SORT AS QSORT IS NOT ALLOWED IN THIS PROJECT
 
 /**
- * @brief Checks if a string is a valid identifier for an environment variable.
- * (Starts with a letter or underscore, followed by letters, digits, or
- * underscores).
+ * @brief Prints a string with special characters escaped for export.
  *
- * @param str The string to check.
- * @return 1 if valid, 0 otherwise.
+ * This function prints the given string to standard output, escaping
+ * special characters like double quotes, backslashes, and dollar signs
+ * with a preceding backslash.
+ *
+ * @param s The string to print with escapes.
  */
-int	is_valid_identifier(const char *str)
+static void	put_escaped_export_value(const char *s)
 {
-	if (!str || (!ft_isalpha(*str) && *str != '_'))
-		return (0);
-	str++;
-	while (*str)
+	size_t	i;
+
+	i = 0;
+	while (s && s[i])
 	{
-		if (!ft_isalnum(*str) && *str != '_')
-			return (0);
-		str++;
+		if (s[i] == '"' || s[i] == '\\' || s[i] == '$')
+			ft_putchar_fd('\\', STDOUT_FILENO);
+		ft_putchar_fd(s[i], STDOUT_FILENO);
+		i++;
 	}
-	return (1);
 }
 
-
 /**
- * @brief Sorts an environment linked list alphabetically using bubble sort
- * with ft_strncmp.
- * @param start The head of the list to sort.
+ * @brief Sorts an environment variable linked list using bubble sort.
+ *
+ * This function repeatedly calls perform_single_pass until no swaps
+ * are made in a full pass, indicating the list is sorted.
+ *
+ * @param start The head of the environment variable linked list.
  */
-static void	bubble_sort_env_list(t_env_var *start)
+void	bubble_sort_env_list(t_env_var *start)
 {
-	int			swapped;
-	t_env_var	*ptr1;
-	char		*temp_key;
-	char		*temp_value;
-	size_t		len1;
-	size_t		len2;
-	size_t		n;
+	int	swapped;
 
 	if (start == NULL)
 		return ;
 	swapped = 1;
 	while (swapped)
 	{
-		swapped = 0;
-		ptr1 = start;
-		while (ptr1->next != NULL)
-		{
-			len1 = ft_strlen(ptr1->key);
-			len2 = ft_strlen(ptr1->next->key);
-			n = (len1 > len2) ? len1 : len2;
-			if (ft_strncmp(ptr1->key, ptr1->next->key, n) > 0)
-			{
-				temp_key = ptr1->key;
-				temp_value = ptr1->value;
-				ptr1->key = ptr1->next->key;
-				ptr1->value = ptr1->next->value;
-				ptr1->next->key = temp_key;
-				ptr1->next->value = temp_value;
-				swapped = 1;
-			}
-			ptr1 = ptr1->next;
-		}
+		swapped = perform_single_pass(start);
 	}
 }
 
-
 /**
- * @brief Duplicates, sorts, and prints the environment list for the 'export'
- * command.
- * @param env_list The original environment list.
+ * @brief Displays all environment variables in sorted order.
+ *
+ * This function duplicates the environment variable list, sorts it,
+ * and prints each variable in the format required by the `export` command.
+ * It frees the duplicated list after printing.
+ *
+ * @param env_list The head of the environment variable linked list.
  */
 static void	display_export(t_env_var *env_list)
 {
 	t_env_var	*sorted_list;
-	t_env_var	*current;
+	t_env_var	*cur;
 
 	sorted_list = duplicate_env_list(env_list);
 	bubble_sort_env_list(sorted_list);
-	current = sorted_list;
-	while (current)
+	cur = sorted_list;
+	while (cur != NULL)
 	{
 		ft_putstr_fd("declare -x ", STDOUT_FILENO);
-		ft_putstr_fd(current->key, STDOUT_FILENO);
-		if (current->value)
+		ft_putstr_fd(cur->key, STDOUT_FILENO);
+		if (cur->value != NULL)
 		{
 			ft_putstr_fd("=\"", STDOUT_FILENO);
-			ft_putstr_fd(current->value, STDOUT_FILENO);
+			put_escaped_export_value(cur->value);
 			ft_putstr_fd("\"", STDOUT_FILENO);
 		}
 		ft_putstr_fd("\n", STDOUT_FILENO);
-		current = current->next;
+		cur = cur->next;
 	}
 	free_env(sorted_list);
 }
 
-static char	*strip_syntactic_quotes(const char *s)
-{
-	size_t	i;
-	size_t	w;
-	size_t	len;
-	char	quote;
-	char 	*out;
-
-    if (!s) return NULL;
-    len = ft_strlen(s);
-    out = (char *)malloc(len + 1);
-    if (!out) return NULL;
-
-    i = 0; w = 0; quote = 0;
-    while (s[i])
-    {
-        if (s[i] == '\'' || s[i] == '"')
-        {
-            if (quote == 0) { quote = s[i++]; continue; }
-            if (quote == s[i]) { quote = 0; i++; continue; }
-        }
-        out[w++] = s[i++];
-    }
-    out[w] = '\0';
-    return out;
-}
-
-static int export_variable(const char *arg, t_env_var *env_list)
-{
-    char        *key;
-    char        *equal_sign;
-    char        *raw;        /* text after '=' as typed (with quotes) */
-    char        *expanded;
-    char        *clean;
-    t_env_var   *existing_var;
-    int         append;
-
-    append = 0;
-    equal_sign = ft_strchr(arg, '=');
-
-    /* -------- case: export NAME (no assignment) -------- */
-    if (equal_sign == NULL)
-    {
-        if (!is_valid_identifier((char *)arg))
-        {
-            error_with_backticked_arg("export", arg, "not a valid identifier");
-            return 1;
-        }
-        existing_var = find_env_var((char *)arg, env_list);
-        if (existing_var == NULL)
-        {
-            char *empty;
-
-            key = ft_strdup(arg);
-            if (!key)
-                return 1;
-            empty = ft_strdup("");
-            if (!empty)
-            {
-                free(key);
-                return 1;
-            }
-            add_env_var(key, empty, env_list);
-            /* if add_env_var duplicates internally, you may free(empty) here */
-            /* free(empty); */
-            free(key);
-        }
-        return 0;
-    }
-
-    /* -------- parse key and detect NAME+= -------- */
-    if (equal_sign > arg && *(equal_sign - 1) == '+')
-    {
-        append = 1;
-        key = ft_substr(arg, 0, (size_t)(equal_sign - arg - 1));
-    }
-    else
-        key = ft_substr(arg, 0, (size_t)(equal_sign - arg));
-
-    if (!key || !is_valid_identifier(key))
-    {
-        error_with_backticked_arg("export", arg, "not a valid identifier");
-        if (key) free(key);
-        return 1;
-    }
-
-    /* -------- expand RHS and strip syntactic quotes -------- */
-    raw = ft_strdup(equal_sign + 1);
-    if (!raw) { free(key); return 1; }
-
-    /* If you track last_exit_status/quote type, pass them; here kept simple */
-    expanded = expand_variables(raw, env_list, 0, NO_QUOTE);
-    free(raw);
-    if (!expanded) { free(key); return 1; }
-
-    clean = strip_syntactic_quotes(expanded);
-    free(expanded);
-    if (!clean) { free(key); return 1; }
-
-    /* -------- store/append -------- */
-    existing_var = find_env_var(key, env_list);
-    if (existing_var)
-    {
-        if (append && existing_var->value)
-        {
-            char *joined;
-
-            joined = ft_strjoin(existing_var->value, clean);
-            if (!joined) { free(clean); free(key); return 1; }
-            free(existing_var->value);
-            existing_var->value = joined;
-            free(clean);
-        }
-        else
-        {
-            free(existing_var->value);
-            existing_var->value = clean;  /* take ownership */
-        }
-    }
-    else
-    {
-        add_env_var(key, clean, env_list);
-        /* if add_env_var duplicates internally, uncomment: */
-        /* free(clean); */
-    }
-
-    free(key);
-    return 0;
-}
-
-
+/**
+ * @brief Implements the 'export' built-in command.
+ * Adds or updates environment variables, or displays all variables.
+ *
+ * @param env_list The linked list of environment variables.
+ * @param args The command arguments. args[0] is "export", args[1..n] are the
+ * variable assignments or names.
+ * @return Returns 0 on success, 1 on failure (invalid identifier).
+ */
 int	run_export(t_env_var *env_list, char **args)
 {
 	int	i;
@@ -251,7 +110,7 @@ int	run_export(t_env_var *env_list, char **args)
 		display_export(env_list);
 		return (0);
 	}
-	while (args[i])
+	while (args[i] != NULL)
 	{
 		if (export_variable(args[i], env_list) != 0)
 			exit_status = 1;

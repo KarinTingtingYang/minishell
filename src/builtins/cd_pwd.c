@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 10:45:26 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/25 10:06:34 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/30 11:31:41 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 
 /**
  * @brief Implements the 'cd' built-in command.
- *
- * Changes the current working directory to the specified path.
- * If no path is provided, it changes to the home directory.
- * @param args The arguments array. Should contain the target
- *             directory as args[1].
+ * Changes the current working directory.
+ * @param args The command arguments. args[0] is "cd", args[1] is the target
+ * directory (optional).
+ * @param env_list The linked list of environment variables to access HOME.
  * @return Returns 0 on success, 1 on failure.
  */
 int	run_cd(char **args, t_env_var *env_list)
@@ -51,7 +50,7 @@ int	run_cd(char **args, t_env_var *env_list)
 
 /**
  * @brief Implements the 'pwd' built-in command.
- * Prints the current working directory.
+ * Prints the current working directory to standard output.
  * @return Returns 0 on success, 1 on failure.
  */
 int	run_pwd(void)

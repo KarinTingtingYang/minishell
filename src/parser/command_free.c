@@ -6,19 +6,19 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 11:22:23 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/13 10:13:03 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/30 14:39:28 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
 /**
- * @brief Frees the memory allocated for a command structure.
+ * @brief Frees a NULL-terminated array of strings.
  *
- * This function frees all dynamically allocated fields in the `t_command`
- * structure, including the command path, arguments, input/output files,
- * and heredoc file. It does not free the structure itself.
- * @param cmd Pointer to the command structure to free.
+ * This function iterates through the array, freeing each individual
+ * string, and then frees the array itself.
+ *
+ * @param split The NULL-terminated array of strings to free.
  */
 void	free_command(t_command *cmd)
 {
