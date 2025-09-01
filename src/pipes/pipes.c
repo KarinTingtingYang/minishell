@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/25 08:52:32 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/08/30 20:55:36 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,10 @@ static int wait_all_children(pid_t *pids, int index, int max, int last_status, i
 		// EXIT CODE DEBUG
 		if (!(*signal_printed))
 		{
+			// if (sig == SIGINT)
+			// 	write(STDOUT_FILENO, "\n", 1);
+			// else if (sig == SIGQUIT)
+			// 	ft_putstr_fd("Quit (core dumped)\n", STDOUT_FILENO);
 			print_signal_message(status);
 			*signal_printed = 1;
 		}
