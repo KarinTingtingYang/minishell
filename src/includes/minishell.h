@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 14:25:24 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/02 01:25:32 by mariahudono      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
