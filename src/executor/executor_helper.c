@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_helper.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/09/02 01:02:08 by mariahudono      ###   ########.fr       */
+/*   Updated: 2025/09/02 14:49:53 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,9 @@ int	is_unquoted_pipe_present(const char *line)
 	return (0);
 }
 
-// BEFORE CLEANUP FUNCTIONS
+// ---------- BELOW IS CODE BEFORE CLEAN UP ----------
+// ---------- FOR REFERENCE ONLY ----------
+// ---------- DO NOT UNCOMMENT ----------
 /**
  * @brief Executes a previously prepared command in a child process.
  * 
