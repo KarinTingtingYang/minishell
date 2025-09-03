@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor.h                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/02 01:17:27 by mariahudono      ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor.h                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/21 09:39:33 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/03 11:47:57 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,9 +58,10 @@ int prepare_command_execution(char *line, t_env_var *env_list, t_execute_data *d
 // execute_prepared_command.c
 int execute_prepared_command(t_execute_data *data, t_process_data *process_data);
 
+// prepare_pipeline_helper.c
+int build_commands_from_parts(char **parts, int count, t_process_data *data);
+
 // prepare_pipeline_commands.c
-int build_commands_from_parts(t_command **cmds, char **parts, int index, int count,
-							  t_process_data *process_data);
 t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
                                       t_process_data *process_data);
 
@@ -83,5 +84,7 @@ int handle_redirection_error(t_execute_data *data, t_process_data *process_data,
 // executor_cleanup.c
 void free_execute_data(t_execute_data *data);
 void free_commands_recursive(t_command **cmds, int index, int count);
+void cleanup_pipeline_resources(t_command **cmds, char **parts, 
+                                     char **path_dirs, int count);
 
 #endif

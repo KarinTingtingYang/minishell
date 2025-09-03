@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor_cleanup.c                                 :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 08:58:09 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/02 14:50:10 by tiyang           ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor_cleanup.c                                 :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 08:58:09 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/03 11:47:36 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,16 @@ void free_commands_recursive(t_command **cmds, int index, int count)
         return ;
     free_command(cmds[index]);
     free_commands_recursive(cmds, index + 1, count);
+}
+
+void cleanup_pipeline_resources(t_command **cmds, char **parts, 
+                                     char **path_dirs, int count)
+{
+    if (path_dirs)
+        free_split(path_dirs);
+    free_commands_recursive(cmds, 0, count);
+    free(cmds);
+    free_split(parts);
 }
 // ---------- BELOW IS CODE BEFORE CLEAN UP ----------
 // ---------- FOR REFERENCE ONLY ----------

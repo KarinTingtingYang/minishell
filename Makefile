@@ -19,6 +19,7 @@ SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/executor/path.c \
 			 $(SRC_DIR)/executor/prepare_command_execution.c \
 			 $(SRC_DIR)/executor/prepare_pipeline_commands.c \
+			 $(SRC_DIR)/executor/prepare_pipeline_helper.c \
 			 $(SRC_DIR)/executor/execute_prepared_command.c \
 			 $(SRC_DIR)/executor/execute_command_types.c \
 			 $(SRC_DIR)/builtins/builtins.c \
@@ -51,6 +52,7 @@ SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/redirection/redirection.c \
              $(SRC_DIR)/redirection/redirection_utils.c \
 			 $(SRC_DIR)/redirection/heredoc.c \
+			 $(SRC_DIR)/redirection/heredoc_utils.c \
              $(SRC_DIR)/env/env_utils_1.c \
 			 $(SRC_DIR)/env/env_utils_2.c \
 			 $(SRC_DIR)/env/env_init.c

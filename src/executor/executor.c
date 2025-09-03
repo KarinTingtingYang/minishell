@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/02 14:37:51 by tiyang           ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/03 11:54:22 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,24 +66,25 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_l
 
 int handle_single_command(char *line, t_env_var *env_list, t_process_data *process_data)
 {
-    t_token **tokens = parse_line(line);
+    t_token **tokens;
+	char **args;
+	int result;
+
+	tokens = parse_line(line);
     if (tokens == NULL)
-        return 1;
-        
-    char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
-    printf("expand_and_split_args returns: \n");
+        return (1);
+    args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
+    //printf("expand_and_split_args returns: \n");
     //print_array(args);
     free_tokens(tokens);
-    
     if (args == NULL || args[0] == NULL)
     {
         free_split(args);
-        return 0;
+        return (0);
     }
-    
-    int result = execute_single_command(args, env_list, process_data);
+    result = execute_single_command(args, env_list, process_data);
     free_split(args);
-    return result;
+    return (result);
 }
 
 int handle_pipeline_command(char *line,  t_env_var *env_list, t_process_data *process_data)
@@ -109,11 +110,7 @@ int handle_pipeline_command(char *line,  t_env_var *env_list, t_process_data *pr
 	}
     path_dirs = find_path_dirs(env_list);
     status = run_command_pipeline(cmds, count, path_dirs, env_list);
-	if (path_dirs)
-    	free_split(path_dirs);
-    free_commands_recursive(cmds, 0, count);
-    free(cmds);
-    free_split(parts);
+	cleanup_pipeline_resources(cmds, parts, path_dirs, count);
 	process_data->last_exit_status = status;
     return (status);
 }
