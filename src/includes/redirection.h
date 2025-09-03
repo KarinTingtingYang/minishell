@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 11:11:42 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/03 13:32:41 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/03 15:10:11 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,15 @@
 
 # define MAX_HEREDOCS 16
 # include "expander.h" // for t_expand_data
+
+typedef struct s_heredoc_context
+{
+    int             fd;
+    int             expand_content;
+    t_expand_data   *data;
+    char            *actual_delimiter;
+    char            *tmp_filename;
+} t_heredoc_context;
 
 int		is_redirection(const char *token);
 void	open_and_redirect_input(char *input_file);
@@ -34,5 +43,6 @@ char *expand_heredoc_line(char *line, t_expand_data *data);
 
 // heredoc.c
 char	*handle_heredoc(const char *delimiter, t_env_var *env_list, int last_exit_status);
+int 	check_heredoc_limit(char *line);
 
 #endif

@@ -1,71 +1,55 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   signal_utils.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/24 11:51:29 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/29 18:07:56 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   signal_utils.c                                     :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/24 11:51:29 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/09/03 14:25:41 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../includes/minishell.h"
 
-/**
- * @brief Handles SIGINT signal in the parent process.
- *
- * This function is called when the parent process receives a SIGINT signal.
- * It sets a global flag to indicate that a signal was received, allowing
- * the main loop to handle it appropriately.
- *
- * @param signum The signal number (SIGINT).
- */
-// void handle_parent_sigint(int signum)
-// { //
-//     // (void)signum; // Cast to void to suppress unused parameter warning
-
-//     // // If no child is running, print a new prompt on SIGINT
-//     // if (g_child_running == 0) { //
-//     //     ft_putstr_fd("\n", STDOUT_FILENO); // Move to a new line
-//     //     rl_on_new_line(); // Tell readline that we're on a new line
-//     //     rl_replace_line("", 0); // Clear the current input buffer
-//     //     rl_redisplay(); // Redraw the prompt
-//     // }
-//     // If a child is running, do nothing.
-//     // The child will receive SIGINT and terminate, and the parent's waitpid
-//     // will be interrupted, returning control to the main loop.
-// 	g_signal_received = signum; // Set the global signal received flag
-// }
-
+/*
+ * @brief Signal handler for SIGINT (Ctrl+C) in the parent process.
+ * 
+ * This handler sets a global flag to indicate that a SIGINT was received.
+ * It also makes readline behave like bash by moving to a new line, clearing
+ * the current input, and redisplaying the prompt.
+*/
 void handle_parent_sigint(int signum)
 {
-    (void)signum;
+	(void)signum;
 
-    /* record it so main can set $?=130 */
-    g_signal_received = SIGINT;
-
-    /* make Ctrl-C behave like bash at the prompt */
-    // write(STDOUT_FILENO, "\n", 1);
-    rl_on_new_line();
-    rl_replace_line("", 0);
-    rl_redisplay();
+	g_signal_received = SIGINT;
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
+/**
+ * @brief Prints a message based on how a child process was terminated by a signal.
+ * 
+ * If the child was terminated by SIGQUIT, it prints "Quit" and indicates if
+ * a core dump occurred. If terminated by SIGINT, it simply prints a newline.
+ * 
+ * @param status The status code returned by waitpid().
+ */
 void	print_signal_message(int status)
 {
-    if (WTERMSIG(status) == SIGQUIT)
-    {
-        ft_putstr_fd("Quit", STDOUT_FILENO);
-        if (WCOREDUMP(status))
-            ft_putstr_fd(" (core dumped)", STDOUT_FILENO);
-        ft_putstr_fd("\n", STDOUT_FILENO);
-    }
-    else if (WTERMSIG(status) == SIGINT)
-    {
-        ft_putstr_fd("\n", STDOUT_FILENO);
-    }
+	if (WTERMSIG(status) == SIGQUIT)
+	{
+		ft_putstr_fd("Quit", STDOUT_FILENO);
+		if (WCOREDUMP(status))
+			ft_putstr_fd(" (core dumped)", STDOUT_FILENO);
+		ft_putstr_fd("\n", STDOUT_FILENO);
+	}
+	else if (WTERMSIG(status) == SIGINT)
+	{
+		ft_putstr_fd("\n", STDOUT_FILENO);
+	}
 }
 
 /**
@@ -75,10 +59,8 @@ void	print_signal_message(int status)
  */
 int	signal_event_hook(void)
 {
-	// If our signal handler has set the global variable...
 	if (g_signal_received)
 	{
-		// ...tell readline to stop waiting and return immediately.
 		rl_done = 1;
 	}
 	return (0);
