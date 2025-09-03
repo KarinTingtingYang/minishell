@@ -6,12 +6,19 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/30 16:42:20 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/03 11:40:08 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/03 14:31:57 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
+/**
+ * @brief Allocates memory for the command array.
+ *
+ * @param count The number of commands.
+ * @param cmds Pointer to the command array.
+ * @return 1 on success, 0 on failure.
+ */
 static int allocate_command_array(int count, t_command ***cmds)
 {
     *cmds = malloc(sizeof(t_command *) * ((size_t)count + 1));
@@ -21,6 +28,19 @@ static int allocate_command_array(int count, t_command ***cmds)
     return (1);
 }
 
+/**
+ * @brief Validates the command line and allocates necessary structures.
+ *
+ * This function performs a precheck on the command line, splits it by pipes,
+ * counts the number of command parts, and validates the syntax of the pipeline.
+ * If any step fails, it cleans up allocated resources and returns 0.
+ *
+ * @param line The command line to validate.
+ * @param count Pointer to store the number of command parts.
+ * @param parts Pointer to store the split command parts.
+ * @param data Pointer to the process data structure for syntax error tracking.
+ * @return 1 on success, 0 on failure.
+ */
 static int validate_and_allocate(char *line, int *count, char ***parts,
                                t_process_data *data)
 {
@@ -41,6 +61,20 @@ static int validate_and_allocate(char *line, int *count, char ***parts,
     return (1);
 }
 
+/**
+ * @brief Prepares the pipeline commands.
+ *
+ * This function validates the command line, splits it by pipes,
+ * allocates the command array, and builds the command structures
+ * from the split parts. It returns the command array on success
+ * or NULL on failure.
+ *
+ * @param line The command line.
+ * @param count Pointer to the number of commands.
+ * @param parts Pointer to the array of command parts.
+ * @param data Pointer to the process data.
+ * @return Pointer to the command array, or NULL on failure.
+ */
 t_command **prepare_pipeline_commands(char *line, int *count, char ***parts,
                                     t_process_data *data)
 {

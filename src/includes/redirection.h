@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 11:11:42 by tiyang            #+#    #+#             */
-/*   Updated: 2025/09/03 15:58:46 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/03 16:04:07 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,15 @@
 
 # define MAX_HEREDOCS 16
 # include "expander.h"
+
+typedef struct s_heredoc_context
+{
+    int             fd;
+    int             expand_content;
+    t_expand_data   *data;
+    char            *actual_delimiter;
+    char            *tmp_filename;
+} t_heredoc_context;
 
 int		is_redirection(const char *token);
 void	open_and_redirect_input(char *input_file);
@@ -36,7 +45,7 @@ void	cleanup_heredoc(char *line, int fd, char *tmp_filename,
 			char *actual_delimiter);
 
 // heredoc.c
-char	*handle_heredoc(const char *delimiter, t_env_var *env_list,
-			int last_exit_status);
+char	*handle_heredoc(const char *delimiter, t_env_var *env_list, int last_exit_status);
+int 	check_heredoc_limit(char *line);
 
 #endif

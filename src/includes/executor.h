@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/21 09:39:33 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/09/03 11:47:57 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/03 14:56:10 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@ int		validate_pipeline_parts(char **parts, int count);
 int		is_empty_or_whitespace(const char *str);
 char	**ft_split_dup(char **args);
 int		count_command_parts(char **parts);
-int 	check_heredoc_limit(char *line);
 int		is_unquoted_pipe_present(const char *line);
 
 // executor_error.c

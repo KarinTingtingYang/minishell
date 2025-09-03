@@ -1,20 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor_helper.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/09/02 14:49:53 by tiyang           ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor_helper.c                                  :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: Invalid date        by               #+#    #+#                 */
+/*   Updated: 2025/09/03 14:55:51 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-
-
 #include "../includes/minishell.h"
 
-// Add this new helper function at the top of src/executor/executor_helper.c
+/**
+ * @brief Checks if a string is NULL, empty, or contains only whitespace.
+ * 
+ * This function iterates through the string and verifies if all characters
+ * are spaces or tabs. If the string is NULL or empty, it also returns true.
+ * 
+ * @param str The string to check.
+ * @return 1 if the string is NULL, empty, or only whitespace; 0 otherwise.
+ */
 int is_empty_or_whitespace(const char *str)
 {
     if (!str)
@@ -36,19 +42,18 @@ int validate_pipeline_parts(char **parts, int count)
     int i;
 
 	if (count <= 1)
-		return (1); // No pipes, or single command, no pipe syntax to check.
-
+		return (1);
 	i = 0;
 	while (i < count)
 	{
 		if (is_empty_or_whitespace(parts[i]))
         {
             ft_error("", "syntax error near unexpected token `|'");
-            return (0); // Validation failed.
+            return (0);
         }
 		i++;
 	}
-    return (1); // All parts are valid.
+    return (1);
 }
 
 /**
@@ -79,7 +84,6 @@ char **ft_split_dup(char **args)
 		dup[i] = ft_strdup(args[i]);
 		if (dup[i] == NULL)
 		{
-			// If strdup fails, we need to free previously allocated strings
 			while (--i >= 0)
 				free(dup[i]);
 			free(dup);
@@ -107,25 +111,6 @@ int count_command_parts(char **parts)
     return (count);
 }
 
-/**
- * @brief Checks if the number of here-documents in the command line exceeds the maximum allowed.
- * 
- * This function counts the number of here-document redirections (<<) in the provided
- * command line and compares it against a predefined maximum limit (MAX_HEREDOCS).
- * If the limit is exceeded, it prints an error message and exits the program.
- * @param line The command line string to check.
- * @return Returns 1 if within limit, 0 if exceeded (after exiting).
- */
-int check_heredoc_limit(char *line)
-{
-    if (count_heredocs(line) > MAX_HEREDOCS)
-    {
-        ft_error_and_exit("", "maximum here-document count exceeded", 2);
-        return 0;
-    }
-    return 1;
-}
-
 int	is_unquoted_pipe_present(const char *line)
 {
 	char	quote_char;
@@ -133,18 +118,14 @@ int	is_unquoted_pipe_present(const char *line)
 	quote_char = 0;
 	while (*line)
 	{
-		// If we are not inside quotes and we see a quote, enter quote mode
 		if (quote_char == 0 && (*line == '\'' || *line == '"'))
 			quote_char = *line;
-		// If we are inside quotes and we see the matching quote, exit quote mode
 		else if (*line == quote_char)
 			quote_char = 0;
-		// If we are NOT inside quotes and we see a pipe, we found it!
 		else if (quote_char == 0 && *line == '|')
 			return (1);
 		line++;
 	}
-	// No unquoted pipe was found
 	return (0);
 }
 
