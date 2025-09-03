@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 11:30:32 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 14:20:22 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/03 12:27:38 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,12 @@
 
 typedef struct s_env_var	t_env_var;
 
+/** @brief Struct to represent a command with its arguments and redirections.
+ *
+ * This struct holds all necessary information for executing a command,
+ * including the command path, arguments, input/output redirection files,
+ * output mode (append or truncate), and heredoc file if applicable.
+ */
 typedef struct s_command
 {
 	char	*cmd_path;
@@ -25,6 +31,13 @@ typedef struct s_command
 	char	*heredoc_file;
 }	t_command;
 
+/**
+ * @brief Struct to hold all necessary data for process execution.
+ *
+ * This struct contains information about the commands to execute,
+ * pipe file descriptors, environment variables, process IDs, and
+ * execution state such as the last exit status and syntax error flag.
+ */
 typedef struct s_process_data
 {
 	t_command	**cmds;
@@ -38,9 +51,24 @@ typedef struct s_process_data
 	int			syntax_error;
 }	t_process_data;
 
-int		**prepare_pipe_fds(int cmd_count);
-int		**create_pipe_fds_between_commands(int cmd_count);
+/**
+ * @brief Struct to hold state information for child process waiting.
+ *
+ * This struct is used to pass multiple state variables to the recursive
+ * function as a single argument, reducing the argument count.
+ */
+typedef struct s_wait_info
+{
+	int	last_status;
+	int	signal_printed;
+}	t_wait_info;
+
+// int		**prepare_pipe_fds(int cmd_count);
+// int		**create_pipe_fds_between_commands(int cmd_count);
 pid_t	*create_child_processes(int cmd_count, int **pipes);
+int		run_pipeline_core(t_process_data *data, int cmd_count);
+int		fork_all_processes_recursive(t_process_data *data, int i);
+void	execute_child_command(t_command *cmd, t_process_data *data);
 void	close_free_pipes_recursively(int **pipes, int idx, int max);
 int		create_all_pipes_recursively(int **pipes, int index, int max);
 int		run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs,

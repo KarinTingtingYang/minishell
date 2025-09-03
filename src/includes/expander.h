@@ -6,19 +6,29 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:14:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 15:04:58 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/03 11:26:54 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef EXPANDER_H
 # define EXPANDER_H
 
+/** @brief Struct to hold data needed for variable expansion.
+ *
+ * This struct contains the environment variable list and the last
+ * exit status, which are used during variable expansion.
+ */
 typedef struct s_expand_data
 {
 	t_env_var	*env_list;
 	int			last_exit_status;
 }	t_expand_data;
 
+/** @brief Struct to hold state information during expansion processing.
+ *
+ * This struct is used to pass multiple state variables to the recursive
+ * function as a single argument, reducing the argument count.
+ */
 typedef struct s_exp_proc_data
 {
 	t_expand_data	*exp_data;

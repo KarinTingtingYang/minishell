@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 10:39:19 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 14:56:55 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/03 11:16:26 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ void	copy_original_arguments(char **new_final,
 		i++;
 	}
 }
+
 /**
  * @brief Copies a string from `str` to `result`, omitting quotes.
  * 
