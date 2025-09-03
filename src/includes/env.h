@@ -6,13 +6,18 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 11:51:13 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/30 13:54:34 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/03 11:26:39 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ENV_H
 # define ENV_H	
 
+/** @brief Struct to represent an environment variable.
+ *
+ * This struct holds the key and value of an environment variable,
+ * along with a pointer to the next variable in the linked list.
+ */
 typedef struct s_env_var
 {
 	char				*key;

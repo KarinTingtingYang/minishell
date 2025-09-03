@@ -33,9 +33,13 @@ SRCS       = $(SRC_DIR)/main.c \
 			 $(SRC_DIR)/builtins/export_helper2.c \
 			 $(SRC_DIR)/builtins/unset.c \
              $(SRC_DIR)/pipes/pipes.c \
-             $(SRC_DIR)/pipes/pipes_helper.c \
+             $(SRC_DIR)/pipes/pipes_helper_1.c \
+			 $(SRC_DIR)/pipes/pipes_helper_2.c \
              $(SRC_DIR)/parser/parser.c \
-			 $(SRC_DIR)/parser/parser_helper.c \
+			 $(SRC_DIR)/parser/parser_helper_1.c \
+			 $(SRC_DIR)/parser/parser_helper_2.c \
+			 $(SRC_DIR)/parser/parser_helper_3.c \
+			 $(SRC_DIR)/parser/parser_helper_4.c \
              $(SRC_DIR)/parser/command_create.c \
              $(SRC_DIR)/parser/command_free.c \
 			 $(SRC_DIR)/parser/lexer.c \

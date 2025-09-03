@@ -6,13 +6,19 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 08:42:04 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/14 11:09:24 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/03 11:27:13 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LEXER_H
 # define LEXER_H
 
+/** @brief Struct to hold information for appending strings.
+ *
+ * This struct contains an array of strings and a count of how many
+ * strings are currently in the array. It is used to manage dynamic
+ * appending of strings.
+ */
 typedef struct s_append_info
 {
 	char	**array;
