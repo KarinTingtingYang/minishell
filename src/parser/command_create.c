@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 14:39:06 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/03 15:31:11 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,17 +72,19 @@ static char	**duplicate_split(char **split)
 }
 
 /**
- * @brief Parses command arguments and handles redirections.
+ * @brief Parses command arguments and redirections from tokens.
  * 
  * This function processes the provided tokens to separate command
- * arguments from redirection operators and files. It updates the
- * command structure with the parsed arguments and redirection info.
+ * arguments from redirection operators and their associated files.
+ * It updates the command structure with the cleaned arguments and
+ * redirection information.
  * @param cmd          Pointer to the command structure to update.
  * @param tokens       Array of strings representing the command and its
  *                     arguments, including redirection operators.
  * @param process_data Pointer to the process data structure for context.
- * @return             0 on success, -1 on memory allocation failure,
- *                     1 if no command arguments remain after parsing.
+ * @return             -1 on memory allocation failure or error,
+ *                     1 if no command arguments remain after parsing,
+ *                     0 on successful parsing with valid command arguments.
  */
 static int	parse_args_and_redirection(t_command *cmd, char **tokens,
 											t_process_data *process_data)
@@ -94,9 +96,7 @@ static int	parse_args_and_redirection(t_command *cmd, char **tokens,
 	original_args = duplicate_split(tokens);
 	if (original_args == NULL)
 		return (-1);
-	cmd->args = handle_redirection(original_args, process_data,
-			&cmd->input_file, &cmd->output_file, &cmd->output_mode,
-			&cmd->heredoc_file);
+	cmd->args = handle_redirection(original_args, process_data, (t_execute_data *)cmd);
 	free_split(original_args);
 	if (cmd->args == NULL)
 		return (-1);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   prepare_command_execution.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 16:25:35 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/30 16:35:12 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/03 15:31:36 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,21 +34,23 @@ static int tokenize_and_check(char *line, t_execute_data *data)
 }
 
 /**
- * @brief Handles redirections and sets up clean arguments.
+ * @brief Handles input/output redirection.
  *
- * @param data Pointer to `t_execute_data` where arguments and file info is stored.
- * @param process_data Pointer to `t_process_data` for process related information.
- * @return Returns 0 if there is a redirection syntax or file error, 1 otherwise.
+ * This function processes the original arguments to handle any
+ * input/output redirection symbols and files. It updates the
+ * `t_execute_data` structure with cleaned arguments and redirection
+ * information.
+ * @param data Pointer to `t_execute_data` where redirection data is stored.
+ * @param process_data Pointer to the global process data.
+ * @return Returns 0 if there was a redirection syntax or file error,
+ *         1 otherwise.
  */
-static int handle_redirections(t_execute_data *data, 
-	t_process_data *process_data)
+static int handle_redirections(t_execute_data *data, t_process_data *process_data)
 {
-    data->clean_args = handle_redirection(data->original_args, process_data,
-							&data->input_file, &data->output_file,
-							&data->output_mode, &data->heredoc_file);
-	if (!data->clean_args)
-		return (0);
-	return (1);
+    data->clean_args = handle_redirection(data->original_args, process_data, data);
+    if (!data->clean_args)
+        return (0);
+    return (1);
 }
 
 /**

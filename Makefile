@@ -54,6 +54,7 @@ SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/signal/signal.c \
              $(SRC_DIR)/signal/signal_utils.c \
              $(SRC_DIR)/redirection/redirection.c \
+			 $(SRC_DIR)/redirection/redirection_helper.c \
              $(SRC_DIR)/redirection/redirection_utils.c \
 			 $(SRC_DIR)/redirection/heredoc.c \
 			 $(SRC_DIR)/redirection/heredoc_utils.c \

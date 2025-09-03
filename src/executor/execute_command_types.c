@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_command_types.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 19:24:59 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/30 19:28:58 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/03 15:32:08 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,19 @@ int handle_redirection_only(t_execute_data *data, t_process_data *process_data)
     return 0;
 }
 
+/**
+ * @brief Executes a single command, handling builtins, externals, and redirections.
+ *
+ * This function determines if the command is a builtin or an external command,
+ * handles any input/output redirections, and executes the command accordingly.
+ * It also manages error handling for redirection issues and updates the
+ * process data with the last exit status.
+ *
+ * @param args The tokenized command arguments.
+ * @param env_list The environment variable list.
+ * @param process_data Pointer to the global process data structure.
+ * @return The exit status of the executed command.
+ */
 int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data)
 {
     t_execute_data data;
@@ -71,21 +84,15 @@ int execute_single_command(char **args, t_env_var *env_list, t_process_data *pro
     ft_bzero(&data, sizeof(t_execute_data));
     data.env_list = env_list;
     process_data->in_pipeline = 0;
-    
-    data.clean_args = handle_redirection(args, process_data, &data.input_file, 
-        &data.output_file, &data.output_mode, &data.heredoc_file);
-    
+    data.clean_args = handle_redirection(args, process_data, &data);
     if (!data.clean_args)
         return handle_redirection_error(&data, process_data, args);
-        
     if (!data.clean_args[0])
         return handle_redirection_only(&data, process_data);
-
     if (is_builtin(data.clean_args[0]))
         exit_status = execute_builtin_command(&data, process_data);
     else
         exit_status = execute_external_command(&data, process_data, env_list);
-
     process_data->last_exit_status = exit_status;
     free_execute_data(&data);
     return exit_status;
