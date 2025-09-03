@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/02 01:06:51 by mariahudono      ###   ########.fr       */
+/*   Updated: 2025/09/02 14:37:51 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,12 +64,6 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_l
     handle_execve_error(envp, args, e);
 }
 
-// int handle_pipeline_command(char *line, t_env_var *env_list, t_process_data *process_data)
-// {
-//     printf("pipe is found, calling prepare_and_run_pipeline\n");
-//     return prepare_and_run_pipeline(line, env_list, process_data);
-// }
-
 int handle_single_command(char *line, t_env_var *env_list, t_process_data *process_data)
 {
     t_token **tokens = parse_line(line);
@@ -78,7 +72,7 @@ int handle_single_command(char *line, t_env_var *env_list, t_process_data *proce
         
     char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
     printf("expand_and_split_args returns: \n");
-    print_array(args);
+    //print_array(args);
     free_tokens(tokens);
     
     if (args == NULL || args[0] == NULL)
@@ -135,7 +129,10 @@ int execute_command(char *line, t_env_var *env_list, t_process_data *process_dat
         return handle_single_command(line, env_list, process_data);
 }
 
-// BEFORE CLEANUP
+// ---------- BELOW IS CODE BEFORE CLEAN UP ----------
+// ---------- FOR REFERENCE ONLY ----------
+// ---------- DO NOT UNCOMMENT ----------
+
 //extern volatile sig_atomic_t g_child_running; // Declare extern for global flag
 
 // static void handle_execve_error(char *cmd_path, char **args, char **path_dirs)
@@ -250,227 +247,227 @@ int execute_command(char *line, t_env_var *env_list, t_process_data *process_dat
 //     handle_execve_error(cmd_path, args, NULL);
 // }
 
-/* ---- executor ---- */
-void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
-{
-    char        **envp;
-    struct stat   st;
-    int           e;
+// /* ---- executor ---- */
+// void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
+// {
+//     char        **envp;
+//     struct stat   st;
+//     int           e;
 
-    (void)path_dirs;
-    reset_child_signal_handlers();
-    envp = env_list_to_array(env_list);
+//     (void)path_dirs;
+//     reset_child_signal_handlers();
+//     envp = env_list_to_array(env_list);
 
-    /* resolver failed: choose message by how argv[0] looks */
-    if (cmd_path == NULL)
-    {
-        if (args && args[0] && ft_strchr(args[0], '/'))
-        {
-            if (envp) free_split(envp);
-            ft_error_and_exit(args[0], "No such file or directory", 127);
-        }
-        if (envp) free_split(envp);
-        ft_error_and_exit(args && args[0] ? args[0] : "minishell",
-                          "command not found", 127);
-    }
-
-    /* precise pre-checks like bash */
-    if (stat(cmd_path, &st) == -1)
-    {
-        e = errno;
-        if (envp) free_split(envp);
-        if (e == ENOTDIR)
-            ft_error_and_exit(args[0], "Not a directory", 126);
-        if (e == ENOENT)
-            ft_error_and_exit(args[0], "No such file or directory", 127);
-        ft_error_and_exit(args[0], strerror(e), 126);
-    }
-    if (S_ISDIR(st.st_mode))
-    {
-        if (envp) free_split(envp);
-        ft_error_and_exit(args[0], "Is a directory", 126);
-    }
-    if (access(cmd_path, X_OK) == -1)
-    {
-        e = errno;
-        if (envp) free_split(envp);
-        if (e == EACCES)
-            ft_error_and_exit(args[0], "Permission denied", 126);
-        if (e == ENOTDIR)
-            ft_error_and_exit(args[0], "Not a directory", 126);
-        ft_error_and_exit(args[0], strerror(e), 126);
-    }
-
-    /* run */
-    execve(cmd_path, args, envp);
-
-    /* execve failed → map remaining cases */
-    e = errno;
-    free_split(envp);
-    if (e == ENOEXEC)
-        ft_error_and_exit(args[0], "Exec format error", 126);
-    if (e == ENOTDIR)
-        ft_error_and_exit(args[0], "Not a directory", 126);
-    if (e == ENOENT)
-        ft_error_and_exit(args[0], "No such file or directory", 127);
-    if (e == EACCES)
-        ft_error_and_exit(args[0], "Permission denied", 126);
-    ft_error_and_exit(args[0], strerror(e), 126);
-}
-
-static int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data)
-{
-    t_execute_data  data;
-    int             original_stdin;
-    int             original_stdout;
-    int             exit_status;
-
-//     ft_bzero(&data, sizeof(t_execute_data));
-// 	// ---> THIS IS THE FIX <---
-// 	// We must populate the data struct with the environment list.
-// 	data.env_list = env_list;
-
-// 	 // Set in_pipeline to 0 for single commands
-//     process_data->in_pipeline = 0;
-	
-//     data.clean_args = handle_redirection(args, process_data, &data.input_file, 
-// 		&data.output_file, &data.output_mode, &data.heredoc_file);
-// 	// FIX FOR CASE 1: Syntax error in redirection (e.g., "echo >")
-//     if (!data.clean_args)
+//     /* resolver failed: choose message by how argv[0] looks */
+//     if (cmd_path == NULL)
 //     {
-//         // ** THE FIX IS HERE **
-//         // First, check if the failure was due to a signal (e.g., Ctrl+C in heredoc).
-//         if (g_signal_received == SIGINT)
+//         if (args && args[0] && ft_strchr(args[0], '/'))
 //         {
-//             process_data->last_exit_status = 130;
-//             return (130);
+//             if (envp) free_split(envp);
+//             ft_error_and_exit(args[0], "No such file or directory", 127);
 //         }
-        
-//         // // If not a signal, handle it as a syntax or file error.
-//         //if (args[1] == NULL && is_redirection(args[0]))
-// 		int last_arg_index = 0;
-// 		while(args[last_arg_index + 1] != NULL) 
-// 			last_arg_index++;
-// 		if (is_redirection(args[last_arg_index]))
-//         {
-//              process_data->last_exit_status = 2; // Syntax error like ">"
-//              return (2);
-//         }
-//         // If not a signal, handle it as a syntax or file error.        
-// 		process_data->last_exit_status = 1; // File error like "> /noperm"
-//         return (1);
+//         if (envp) free_split(envp);
+//         ft_error_and_exit(args && args[0] ? args[0] : "minishell",
+//                           "command not found", 127);
 //     }
-    
-//     // Fix: Handle commands that are only redirections
-// 	 // FIX FOR CASE 2: Redirection-only command (e.g., "< nofile" or "> newfile")
-//     if (!data.clean_args[0])
+
+//     /* precise pre-checks like bash */
+//     if (stat(cmd_path, &st) == -1)
 //     {
-// 		 exit_status = 0;
-//         // Check input file for existence and permissions
-//         if (data.input_file)
-//         {
-//             int fd = open(data.input_file, O_RDONLY);
-//             if (fd == -1) {
-//                 ft_error(data.input_file, strerror(errno));
-//                 exit_status = 1;
-//             } else {
-//                 close(fd);
-//             }
-//         }
-//         // Output files are already created/checked in handle_redirection.
-//         // If an output file failed, data.clean_args would be NULL and we wouldn't be here.
-        
-//         process_data->last_exit_status = exit_status;
-//         free_execute_data(&data);
-//         return (0);
+//         e = errno;
+//         if (envp) free_split(envp);
+//         if (e == ENOTDIR)
+//             ft_error_and_exit(args[0], "Not a directory", 126);
+//         if (e == ENOENT)
+//             ft_error_and_exit(args[0], "No such file or directory", 127);
+//         ft_error_and_exit(args[0], strerror(e), 126);
 //     }
-
-//     if (is_builtin(data.clean_args[0]))
+//     if (S_ISDIR(st.st_mode))
 //     {
-//         original_stdin = dup(STDIN_FILENO);
-//         original_stdout = dup(STDOUT_FILENO);
-
-//         if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
-//             exit_status = 1;
-//         else
-//             exit_status = run_builtin(data.clean_args, process_data);
-
-//         dup2(original_stdin, STDIN_FILENO);
-//         dup2(original_stdout, STDOUT_FILENO);
-//         close(original_stdin);
-//         close(original_stdout);
+//         if (envp) free_split(envp);
+//         ft_error_and_exit(args[0], "Is a directory", 126);
 //     }
-//     else // Not a builtin
+//     if (access(cmd_path, X_OK) == -1)
 //     {
-//         char **path_dirs = find_path_dirs(env_list);
-        
-//         // Find command path, handle errors if not found
-//         data.cmd_path = find_full_cmd_path(data.clean_args[0], path_dirs);
-//         free_split(path_dirs);
-
-//         // if (!data.cmd_path)
-//         // {
-//         //     // ft_error(data.clean_args[0], "command not found");
-//         //     exit_status = 127;
-//         // }
-//         // else
-//         // {
-//         exit_status = execute_prepared_command(&data, process_data);
-//         // }
+//         e = errno;
+//         if (envp) free_split(envp);
+//         if (e == EACCES)
+//             ft_error_and_exit(args[0], "Permission denied", 126);
+//         if (e == ENOTDIR)
+//             ft_error_and_exit(args[0], "Not a directory", 126);
+//         ft_error_and_exit(args[0], strerror(e), 126);
 //     }
 
-//     process_data->last_exit_status = exit_status;
-//     free_execute_data(&data);
-//     return (exit_status);
+//     /* run */
+//     execve(cmd_path, args, envp);
+
+//     /* execve failed → map remaining cases */
+//     e = errno;
+//     free_split(envp);
+//     if (e == ENOEXEC)
+//         ft_error_and_exit(args[0], "Exec format error", 126);
+//     if (e == ENOTDIR)
+//         ft_error_and_exit(args[0], "Not a directory", 126);
+//     if (e == ENOENT)
+//         ft_error_and_exit(args[0], "No such file or directory", 127);
+//     if (e == EACCES)
+//         ft_error_and_exit(args[0], "Permission denied", 126);
+//     ft_error_and_exit(args[0], strerror(e), 126);
 // }
 
-
-
-/**
- * @brief Checks for the presence of an unquoted pipe character.
- *
- * This function iterates through the command line, respecting single and
- * double quotes. It returns 1 if it finds a '|' character that is not
- * enclosed within any quotes, and 0 otherwise.
- * @param line The command line string to check.
- * @return 1 if an unquoted pipe is found, 0 otherwise.
- */
-
-
-// int	execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
+// static int execute_single_command(char **args, t_env_var *env_list, t_process_data *process_data)
 // {
-// 	// --- START OF THE FIX ---
-// 	// Check the total number of heredocs for the entire line BEFORE splitting.
-// 	if (count_heredocs(line) > MAX_HEREDOCS)
-// 	{
-// 		ft_error_and_exit("", "maximum here-document count exceeded", 2);
-// 		return (2);
-// 	}
-// 	// --- END OF THE FIX ---
+//     t_execute_data  data;
+//     int             original_stdin;
+//     int             original_stdout;
+//     int             exit_status;
 
-	//if (ft_strchr(line, '|'))
-	if (is_unquoted_pipe_present(line))
-	{
-		printf("pipe is found, calling prepare_and_run_pipeline\n");
-		return prepare_and_run_pipeline(line, env_list, process_data);
-	}
-	else
-	{
-		t_token **tokens = parse_line(line);
-		if (tokens == NULL)
-			return (1);
-		char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
-		// debug
-		printf("expand_and_split_args returns: \n");
-		// print_array(args);
-		free_tokens(tokens);
-		if (args == NULL || args[0] == NULL)
-		{
-			free_split(args);
-			return (0); 
-		}
-		int result = execute_single_command(args, env_list, process_data);
-		free_split(args);
-		return result;
-	}
-}
+// //     ft_bzero(&data, sizeof(t_execute_data));
+// // 	// ---> THIS IS THE FIX <---
+// // 	// We must populate the data struct with the environment list.
+// // 	data.env_list = env_list;
+
+// // 	 // Set in_pipeline to 0 for single commands
+// //     process_data->in_pipeline = 0;
+	
+// //     data.clean_args = handle_redirection(args, process_data, &data.input_file, 
+// // 		&data.output_file, &data.output_mode, &data.heredoc_file);
+// // 	// FIX FOR CASE 1: Syntax error in redirection (e.g., "echo >")
+// //     if (!data.clean_args)
+// //     {
+// //         // ** THE FIX IS HERE **
+// //         // First, check if the failure was due to a signal (e.g., Ctrl+C in heredoc).
+// //         if (g_signal_received == SIGINT)
+// //         {
+// //             process_data->last_exit_status = 130;
+// //             return (130);
+// //         }
+        
+// //         // // If not a signal, handle it as a syntax or file error.
+// //         //if (args[1] == NULL && is_redirection(args[0]))
+// // 		int last_arg_index = 0;
+// // 		while(args[last_arg_index + 1] != NULL) 
+// // 			last_arg_index++;
+// // 		if (is_redirection(args[last_arg_index]))
+// //         {
+// //              process_data->last_exit_status = 2; // Syntax error like ">"
+// //              return (2);
+// //         }
+// //         // If not a signal, handle it as a syntax or file error.        
+// // 		process_data->last_exit_status = 1; // File error like "> /noperm"
+// //         return (1);
+// //     }
+    
+// //     // Fix: Handle commands that are only redirections
+// // 	 // FIX FOR CASE 2: Redirection-only command (e.g., "< nofile" or "> newfile")
+// //     if (!data.clean_args[0])
+// //     {
+// // 		 exit_status = 0;
+// //         // Check input file for existence and permissions
+// //         if (data.input_file)
+// //         {
+// //             int fd = open(data.input_file, O_RDONLY);
+// //             if (fd == -1) {
+// //                 ft_error(data.input_file, strerror(errno));
+// //                 exit_status = 1;
+// //             } else {
+// //                 close(fd);
+// //             }
+// //         }
+// //         // Output files are already created/checked in handle_redirection.
+// //         // If an output file failed, data.clean_args would be NULL and we wouldn't be here.
+        
+// //         process_data->last_exit_status = exit_status;
+// //         free_execute_data(&data);
+// //         return (0);
+// //     }
+
+// //     if (is_builtin(data.clean_args[0]))
+// //     {
+// //         original_stdin = dup(STDIN_FILENO);
+// //         original_stdout = dup(STDOUT_FILENO);
+
+// //         if (apply_builtin_redirection(data.input_file, data.output_file, data.output_mode) == -1)
+// //             exit_status = 1;
+// //         else
+// //             exit_status = run_builtin(data.clean_args, process_data);
+
+// //         dup2(original_stdin, STDIN_FILENO);
+// //         dup2(original_stdout, STDOUT_FILENO);
+// //         close(original_stdin);
+// //         close(original_stdout);
+// //     }
+// //     else // Not a builtin
+// //     {
+// //         char **path_dirs = find_path_dirs(env_list);
+        
+// //         // Find command path, handle errors if not found
+// //         data.cmd_path = find_full_cmd_path(data.clean_args[0], path_dirs);
+// //         free_split(path_dirs);
+
+// //         // if (!data.cmd_path)
+// //         // {
+// //         //     // ft_error(data.clean_args[0], "command not found");
+// //         //     exit_status = 127;
+// //         // }
+// //         // else
+// //         // {
+// //         exit_status = execute_prepared_command(&data, process_data);
+// //         // }
+// //     }
+
+// //     process_data->last_exit_status = exit_status;
+// //     free_execute_data(&data);
+// //     return (exit_status);
+// // }
+
+
+
+// /**
+//  * @brief Checks for the presence of an unquoted pipe character.
+//  *
+//  * This function iterates through the command line, respecting single and
+//  * double quotes. It returns 1 if it finds a '|' character that is not
+//  * enclosed within any quotes, and 0 otherwise.
+//  * @param line The command line string to check.
+//  * @return 1 if an unquoted pipe is found, 0 otherwise.
+//  */
+
+
+// // int	execute_command(char *line, t_env_var *env_list, t_process_data *process_data)
+// // {
+// // 	// --- START OF THE FIX ---
+// // 	// Check the total number of heredocs for the entire line BEFORE splitting.
+// // 	if (count_heredocs(line) > MAX_HEREDOCS)
+// // 	{
+// // 		ft_error_and_exit("", "maximum here-document count exceeded", 2);
+// // 		return (2);
+// // 	}
+// // 	// --- END OF THE FIX ---
+
+// 	//if (ft_strchr(line, '|'))
+// 	if (is_unquoted_pipe_present(line))
+// 	{
+// 		printf("pipe is found, calling prepare_and_run_pipeline\n");
+// 		return prepare_and_run_pipeline(line, env_list, process_data);
+// 	}
+// 	else
+// 	{
+// 		t_token **tokens = parse_line(line);
+// 		if (tokens == NULL)
+// 			return (1);
+// 		char **args = expand_and_split_args(tokens, env_list, process_data->last_exit_status);
+// 		// debug
+// 		printf("expand_and_split_args returns: \n");
+// 		// print_array(args);
+// 		free_tokens(tokens);
+// 		if (args == NULL || args[0] == NULL)
+// 		{
+// 			free_split(args);
+// 			return (0); 
+// 		}
+// 		int result = execute_single_command(args, env_list, process_data);
+// 		free_split(args);
+// 		return result;
+// 	}
+// }

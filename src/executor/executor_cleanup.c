@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 08:58:09 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 17:04:27 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/02 14:50:10 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,9 @@ void free_commands_recursive(t_command **cmds, int index, int count)
     free_command(cmds[index]);
     free_commands_recursive(cmds, index + 1, count);
 }
-
+// ---------- BELOW IS CODE BEFORE CLEAN UP ----------
+// ---------- FOR REFERENCE ONLY ----------
+// ---------- DO NOT UNCOMMENT ----------
 // int precheck_pipe_syntax(const char *line)
 // {
 //     int   i;

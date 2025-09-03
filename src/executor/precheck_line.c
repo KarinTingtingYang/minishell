@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 19:51:29 by tiyang            #+#    #+#             */
-/*   Updated: 2025/09/01 20:42:35 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/02 14:51:26 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,9 @@ int precheck_line(char *line, t_process_data *process_data) {
     return 1;
 }
 
-
+// ---------- BELOW IS CODE BEFORE CLEAN UP ----------
+// ---------- FOR REFERENCE ONLY ----------
+// ---------- DO NOT UNCOMMENT ----------
 // /**
 //  * @brief Performs a precheck on the raw line for bad redirections.
 //  *
