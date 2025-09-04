@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/09/03 11:30:14 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/04 10:40:10 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/04 12:12:46 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,7 @@ static char	**expand_command_args(char *cmd_str, t_process_data *data)
 	tokens = parse_line(cmd_str);
 	if (tokens == NULL)
 		return (NULL);
-	expanded_args = expand_and_split_args(tokens, data->env_list,
-			data->last_exit_status);
+	expanded_args = expand_and_split_args(tokens, data);
 	free_tokens(tokens);
 	return (expanded_args);
 }
