@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander_helper_5.c                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/30 15:19:17 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 15:36:13 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   expander_helper_5.c                                :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/30 15:19:17 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/04 14:10:48 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,4 +103,28 @@ char	**process_token(t_token *token, char *expanded)
 	}
 	split = handle_whitespace_splitting(expanded);
 	return (split);
+}
+
+int	is_ambiguous_redirect(const char *expanded_value,
+				const char *original_value, t_process_data *pdata)
+{
+	char	**split;
+	int		count;
+
+	split = ft_split_whitespace((char *)expanded_value);
+	count = 0;
+	if (split)
+	{
+		while (split[count])
+			count++;
+		free_split(split);
+	}
+	if (count != 1)
+	{
+		ft_error((char *)original_value, "ambiguous redirect");
+		pdata->last_exit_status = 1;
+		pdata->syntax_error = 1;
+		return (1);
+	}
+	return (0);
 }

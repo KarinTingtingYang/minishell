@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 15:32:03 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   expander.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/04 14:07:20 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,42 +121,21 @@ char	*expand_variables(char *input, t_env_var *env_list,
 }
 
 /**
- * @brief Processes a token after variable expansion.
+ * @brief Assigns the previous token's value for context during expansion.
  * 
- * This function handles the token based on its quote type and whether
- * it is an export assignment. It may split the expanded string based
- * on whitespace or remove quotes as needed.
+ * This helper function sets the `prev_val` pointer to the value of the
+ * previous token in the array, or NULL if processing the first token.
  * 
- * @param token The original token before expansion.
- * @param expanded The expanded string after variable expansion.
- * @return A newly allocated array of strings after processing,
- *         or NULL on failure.
+ * @param prev_val Pointer to store the previous token's value.
+ * @param tokens The array of tokens being processed.
+ * @param i The current index in the tokens array.
  */
-static char	**process_token_for_expansion(t_token *token,
-		const char *prev_token_val, t_env_var *env_list, int last_exit_status)
+static void	assign_prev_val_value(char **prev_val, t_token **tokens, int i)
 {
-	char	*expanded;
-	char	**split;
-
-	if (prev_token_val && ft_strncmp(prev_token_val, "<<", 3) == 0)
-	{
-		split = malloc(sizeof(char *) * 2);
-		if (split == NULL)
-			return (NULL);
-		split[0] = ft_strdup(token->value);
-		split[1] = NULL;
-	}
+	if (i > 0)
+		*prev_val = tokens[i - 1]->value;
 	else
-	{
-		expanded = expand_variables(token->value, env_list,
-				last_exit_status, token->quote);
-		if (expanded == NULL)
-			return (NULL);
-		split = process_token(token, expanded);
-		if (split == NULL)
-			return (NULL);
-	}
-	return (split);
+		*prev_val = NULL;
 }
 
 /**
@@ -172,8 +151,7 @@ static char	**process_token_for_expansion(t_token *token,
  * @return A pointer to the newly allocated array of argument strings,
  *         or NULL on failure.
  */
-char	**expand_and_split_args(t_token **tokens,
-									t_env_var *env_list, int last_exit_status)
+char	**expand_and_split_args(t_token **tokens, t_process_data *pdata)
 {
 	char		**final_args;
 	int			final_count;
@@ -184,16 +162,15 @@ char	**expand_and_split_args(t_token **tokens,
 	final_args = NULL;
 	final_count = 0;
 	i = 0;
+	pdata->syntax_error = 0;
 	while (tokens[i] != NULL)
 	{
-		if (i > 0)
-			prev_val = tokens[i - 1]->value;
-		else
-			prev_val = NULL;
-		split = process_token_for_expansion(tokens[i], prev_val,
-				env_list, last_exit_status);
+		assign_prev_val_value((char **)&prev_val, tokens, i);
+		split = process_token_for_expansion(tokens[i], prev_val, pdata);
 		if (split == NULL)
-			return (NULL);
+			return (free_split(final_args), NULL);
+		if (pdata->syntax_error)
+			return (free_split(split), free_split(final_args), NULL);
 		final_args = append_split_to_final(final_args, &final_count, split);
 		if (final_args == NULL)
 			return (NULL);

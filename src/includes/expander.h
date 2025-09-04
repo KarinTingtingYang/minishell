@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander.h                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/04 12:14:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/03 11:26:54 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   expander.h                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/04 12:14:24 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/04 14:08:35 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	copy_original_arguments(char **new_final,
 			char **final_args, int final_count);
 char	**handle_whitespace_splitting(char *expanded);
 char	**expand_and_split_args(t_token **tokens,
-			t_env_var *env_list, int last_exit_status);
+			t_process_data *process_data);
 char	*get_var_value(const char *var_name,
 			t_env_var *env_list, int last_exit_status);
 void	copy_new_arguments(char **new_final, char **split,
@@ -60,5 +60,9 @@ size_t	handle_variable_expansion(const char *input, size_t i,
 			char **result, t_expand_data *data);
 char	**handle_quoted_or_export_token(t_token *token, char *expanded);
 int		handle_default_case(const char *input, size_t i, char **result);
+int		is_ambiguous_redirect(const char *expanded_value,
+			const char *original_value, t_process_data *pdata);
+char	**process_token_for_expansion(t_token *token,
+			const char *prev_token_val, t_process_data *pdata);
 
 #endif

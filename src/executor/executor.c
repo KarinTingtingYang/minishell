@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/09/04 10:27:07 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/04 12:25:40 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,9 +105,13 @@ int	handle_single_command(char *line, t_env_var *env_list,
 	tokens = parse_line(line);
 	if (tokens == NULL)
 		return (1);
-	args = expand_and_split_args(tokens, env_list,
-			process_data->last_exit_status);
+	args = expand_and_split_args(tokens, process_data);
 	free_tokens(tokens);
+	if (process_data->syntax_error)
+	{
+		free_split(args);
+		return (process_data->last_exit_status);
+	}
 	if (args == NULL || args[0] == NULL)
 	{
 		free_split(args);
@@ -130,7 +134,7 @@ int	handle_single_command(char *line, t_env_var *env_list,
  * @param process_data Pointer to the process data structure.
  * @return The exit status of the pipeline execution.
  */
-int	handle_pipeline_command(char *line,  t_env_var *env_list,
+int	handle_pipeline_command(char *line, t_env_var *env_list,
 	t_process_data *process_data)
 {
 	char		**parts;
@@ -142,6 +146,8 @@ int	handle_pipeline_command(char *line,  t_env_var *env_list,
 	parts = NULL;
 	count = 0;
 	cmds = prepare_pipeline_commands(line, &count, &parts, process_data);
+	if (process_data->syntax_error)
+		return (free_split(parts), process_data->last_exit_status);
 	if (cmds == NULL)
 	{
 		if (g_signal_received == SIGINT)
@@ -155,8 +161,7 @@ int	handle_pipeline_command(char *line,  t_env_var *env_list,
 	path_dirs = find_path_dirs(env_list);
 	status = run_command_pipeline(cmds, count, path_dirs, env_list);
 	cleanup_pipeline_resources(cmds, parts, path_dirs, count);
-	process_data->last_exit_status = status;
-	return (status);
+	return (process_data->last_exit_status = status, status);
 }
 
 /**
