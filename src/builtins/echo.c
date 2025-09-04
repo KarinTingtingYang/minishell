@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 11:21:01 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/30 11:34:22 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/04 12:13:06 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,11 @@ static int	is_valid_n_flag(char *str)
 {
 	int	i;
 
-	i = 1;
 	if (str == NULL || str[0] != '-')
 		return (0);
+	if (str[1] != 'n')
+		return (0);
+	i = 2;
 	while (str[i] == 'n')
 		i++;
 	if (str[i] == '\0')
