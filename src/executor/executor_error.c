@@ -1,17 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor_error.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/30 19:07:14 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/30 19:49:53 by tiyang           ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   executor_error.c                                   :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/30 19:07:14 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/09/04 09:11:04 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
+/**
+ * @brief Handles errors related to stat() system call.
+ *
+ * This function checks the error code from a failed stat() call and
+ * prints an appropriate error message before exiting with a specific
+ * exit code.
+ *
+ * @param envp The environment variables array to free if needed.
+ * @param args The command arguments array to free if needed.
+ * @param error_code The error code from the failed stat() call.
+ */
 void handle_stat_error(char **envp, char **args, int error_code)
 {
     if (envp) 
@@ -23,6 +34,17 @@ void handle_stat_error(char **envp, char **args, int error_code)
     ft_error_and_exit(args[0], strerror(error_code), 126);
 }
 
+/**
+ * @brief Handles errors related to access() system call.
+ *
+ * This function checks the error code from a failed access() call and
+ * prints an appropriate error message before exiting with a specific
+ * exit code.
+ *
+ * @param envp The environment variables array to free if needed.
+ * @param args The command arguments array to free if needed.
+ * @param error_code The error code from the failed access() call.
+ */
 void handle_access_error(char **envp, char **args, int error_code)
 {
     if (envp) 
@@ -34,6 +56,17 @@ void handle_access_error(char **envp, char **args, int error_code)
     ft_error_and_exit(args[0], strerror(error_code), 126);
 }
 
+/**
+ * @brief Handles errors related to execve() system call.
+ *
+ * This function checks the error code from a failed execve() call and
+ * prints an appropriate error message before exiting with a specific
+ * exit code.
+ *
+ * @param envp The environment variables array to free if needed.
+ * @param args The command arguments array to free if needed.
+ * @param error_code The error code from the failed execve() call.
+ */
 void handle_execve_error(char **envp, char **args, int error_code)
 {
     free_split(envp);
@@ -48,6 +81,16 @@ void handle_execve_error(char **envp, char **args, int error_code)
     ft_error_and_exit(args[0], strerror(error_code), 126);
 }
 
+/**
+ * @brief Handles the case when the command path is NULL.
+ *
+ * This function checks if the command contains a '/' character to determine
+ * if it was specified with a path. It then prints an appropriate error message
+ * and exits with a specific exit code.
+ *
+ * @param args The command arguments array.
+ * @param envp The environment variables array to free if needed.
+ */
 void handle_null_cmd_path(char **args, char **envp)
 {
     if (args && args[0] && ft_strchr(args[0], '/'))
@@ -64,6 +107,18 @@ void handle_null_cmd_path(char **args, char **envp)
 		ft_error_and_exit("minishell", "command not found", 127);
 }
 
+/**
+ * @brief Handles errors related to command redirection syntax.
+ *
+ * This function checks for signal interrupts and syntax errors in the
+ * command arguments related to redirection. It sets the last exit status
+ * in the process data structure accordingly.
+ *
+ * @param data Pointer to the execution data.
+ * @param process_data Pointer to the process data.
+ * @param args The command arguments array.
+ * @return The exit status code based on the error encountered.
+ */
 int handle_redirection_error(t_execute_data *data, t_process_data *process_data,
 	char **args)
 {
