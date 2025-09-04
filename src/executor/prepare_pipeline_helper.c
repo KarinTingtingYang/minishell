@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/09/03 11:30:14 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/03 14:31:27 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/04 10:40:10 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,18 @@
  * @param index The index at which to store the created command.
  * @return 1 on success, 0 on failure.
  */
-static int setup_command(char **expanded_args, t_process_data *data, int index)
+static int	setup_command(char **expanded_args, t_process_data *data, int index)
 {
-    data->cmds[index] = create_command(expanded_args, data->path_dirs, data);
-    free_split(expanded_args);
-    if (data->cmds[index] == NULL)
-    {
-        if (g_signal_received == SIGINT)
-            return (0);
-        ft_error(NULL, "command creation failed");
-        return (0);
-    }
-    return (1);
+	data->cmds[index] = create_command(expanded_args, data->path_dirs, data);
+	free_split(expanded_args);
+	if (data->cmds[index] == NULL)
+	{
+		if (g_signal_received == SIGINT)
+			return (0);
+		ft_error(NULL, "command creation failed");
+		return (0);
+	}
+	return (1);
 }
 
 /**
@@ -49,17 +49,18 @@ static int setup_command(char **expanded_args, t_process_data *data, int index)
  * @param data Pointer to the process data structure for environment context.
  * @return An array of expanded arguments, or NULL on failure.
  */
-static char **expand_command_args(char *cmd_str, t_process_data *data)
+static char	**expand_command_args(char *cmd_str, t_process_data *data)
 {
-    t_token **tokens = parse_line(cmd_str);
-    char **expanded_args;
+	t_token		**tokens;
+	char		**expanded_args;
 
-    if (tokens == NULL)
-        return (NULL);
-    expanded_args = expand_and_split_args(tokens, data->env_list, 
-                                        data->last_exit_status);
-    free_tokens(tokens);
-    return (expanded_args);
+	tokens = parse_line(cmd_str);
+	if (tokens == NULL)
+		return (NULL);
+	expanded_args = expand_and_split_args(tokens, data->env_list,
+			data->last_exit_status);
+	free_tokens(tokens);
+	return (expanded_args);
 }
 
 /**
@@ -73,14 +74,14 @@ static char **expand_command_args(char *cmd_str, t_process_data *data)
  * @param index The index of the command part to process.
  * @return 1 on success, 0 on failure.
  */
-static int build_single_command(char **parts, t_process_data *data, int index)
+static int	build_single_command(char **parts, t_process_data *data, int index)
 {
-    char **expanded_args;
+	char	**expanded_args;
 
-    expanded_args = expand_command_args(parts[index], data);
-    if (expanded_args == NULL)
-        return (0);
-    return (setup_command(expanded_args, data, index));
+	expanded_args = expand_command_args(parts[index], data);
+	if (expanded_args == NULL)
+		return (0);
+	return (setup_command(expanded_args, data, index));
 }
 
 /**
@@ -93,15 +94,15 @@ static int build_single_command(char **parts, t_process_data *data, int index)
  * @param data Pointer to the process data structure.
  * @return 1 on success, 0 on failure.
  */
-static int initialize_pipeline_build(t_process_data *data)
+static int	initialize_pipeline_build(t_process_data *data)
 {
-    data->path_dirs = find_path_dirs(data->env_list);
-    if (data->path_dirs == NULL)
-    {
-        ft_error(NULL, "PATH variable not found");
-        return (0);
-    }
-    return (1);
+	data->path_dirs = find_path_dirs(data->env_list);
+	if (data->path_dirs == NULL)
+	{
+		ft_error(NULL, "PATH variable not found");
+		return (0);
+	}
+	return (1);
 }
 
 /**
@@ -116,23 +117,23 @@ static int initialize_pipeline_build(t_process_data *data)
  * @param data Pointer to the process data structure.
  * @return 1 on success, 0 on failure.
  */
-int build_commands_from_parts(char **parts, int count, t_process_data *data)
+int	build_commands_from_parts(char **parts, int count, t_process_data *data)
 {
-    int index;
+	int	index;
 
-    if (!initialize_pipeline_build(data))
-        return (0);
-    data->in_pipeline = (count > 1);
-    index = 0;
-    while (index < count)
-    {
-        if (!build_single_command(parts, data, index))
-        {
-            free_split(data->path_dirs);
-            return (0);
-        }
-        index++;
-    }
-    free_split(data->path_dirs);
-    return (1);
+	if (!initialize_pipeline_build(data))
+		return (0);
+	data->in_pipeline = (count > 1);
+	index = 0;
+	while (index < count)
+	{
+		if (!build_single_command(parts, data, index))
+		{
+			free_split(data->path_dirs);
+			return (0);
+		}
+		index++;
+	}
+	free_split(data->path_dirs);
+	return (1);
 }

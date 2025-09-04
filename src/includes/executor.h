@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/21 09:39:33 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/09/03 14:56:10 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/04 10:05:21 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,10 @@ typedef struct s_execute_data
 
 // precheck_line.c
 int precheck_line(char *line, t_process_data *process_data);
+
+// precheck_line_helper.c
+int check_redir_error(const char *line, int op_len, int j,
+	t_process_data *process_data);
 
 // path.c
 char *find_full_cmd_path(char *cmd, char **path_dirs);
