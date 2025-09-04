@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 11:30:32 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/03 12:27:38 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/04 09:58:47 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,6 @@ typedef struct s_wait_info
 	int	signal_printed;
 }	t_wait_info;
 
-// int		**prepare_pipe_fds(int cmd_count);
-// int		**create_pipe_fds_between_commands(int cmd_count);
 pid_t	*create_child_processes(int cmd_count, int **pipes);
 int		run_pipeline_core(t_process_data *data, int cmd_count);
 int		fork_all_processes_recursive(t_process_data *data, int i);

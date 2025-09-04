@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/03 12:17:36 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/04 10:05:22 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,11 +71,13 @@ static int	**prepare_pipe_fds(int cmd_count)
 /**
  * @brief Sets up and forks all processes for a command pipeline.
  *
- * This function initializes the necessary data structures for a command pipeline,
- * including pipes and process ID storage, and then recursively forks all child
- * processes. It returns an integer indicating success or failure.
+ * This function initializes the necessary data structures for
+ * a command pipeline, including pipes and process ID storage,
+ * and then recursively forks all child processes.
+ * It returns an integer indicating success or failure.
  *
- * @param data A pointer to the process data structure containing all information.
+ * @param data A pointer to the process data structure containing
+ *             all information.
  * @return 1 on success, 0 if no command is to be run, or -1 on a fatal error.
  */
 static int	setup_and_fork_pipeline(t_process_data *data)
@@ -133,9 +135,9 @@ static int	setup_and_execute_pipeline(t_process_data *data)
 int	run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs,
 							t_env_var *env_list)
 {
-	t_process_data data;
-	int fork_status;
-	int exit_status;
+	t_process_data	data;
+	int				fork_status;
+	int				exit_status;
 
 	data.cmds = cmds;
 	data.cmd_count = cmd_count;

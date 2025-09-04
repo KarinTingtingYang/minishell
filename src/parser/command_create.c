@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/03 15:31:11 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/04 10:03:32 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,8 @@ static int	parse_args_and_redirection(t_command *cmd, char **tokens,
 	original_args = duplicate_split(tokens);
 	if (original_args == NULL)
 		return (-1);
-	cmd->args = handle_redirection(original_args, process_data, (t_execute_data *)cmd);
+	cmd->args = handle_redirection(original_args, process_data,
+			(t_execute_data *)cmd);
 	free_split(original_args);
 	if (cmd->args == NULL)
 		return (-1);

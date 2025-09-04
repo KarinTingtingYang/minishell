@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   execute_prepared_command.c                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/08/30 16:54:16 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/04 08:51:33 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   execute_prepared_command.c                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/30 16:54:16 by tiyang            #+#    #+#             */
+/*   Updated: 2025/09/04 09:46:19 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,8 +85,8 @@ static int fork_and_execute(t_execute_data *data, t_process_data *process_data)
     }
     else if (pid == 0)
         execute_child_process(data, process_data);
-    else
-        return (handle_parent_process(pid, data, process_data));
+	else
+		return (handle_parent_process(pid, data, process_data));
 	return (0); // This line should never be reached
 }
 

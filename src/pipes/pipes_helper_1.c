@@ -6,12 +6,11 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 10:20:17 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/03 12:28:07 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/04 10:08:11 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-
 
 /**
  * @brief Sets up I/O for a child process in a pipeline.
@@ -36,17 +35,17 @@ static void	setup_child_io(t_process_data *data, int i)
 			ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
 	}
 	close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
-	redirect_io(data->cmds[i]->input_file,
-				data->cmds[i]->output_file,
-				data->cmds[i]->output_mode);
+	redirect_io(data->cmds[i]->input_file, data->cmds[i]->output_file,
+		data->cmds[i]->output_mode);
 }
 
 /**
  * @brief Recursively forks processes for a command pipeline.
  *
- * This function iterates through a list of commands, forking a new process for each
- * and setting up their I/O connections to form a pipeline. It manages signal handlers
- * for the child processes and delegates command execution to a helper function.
+ * This function iterates through a list of commands, forking
+ * a new process for each and setting up their I/O connections
+ * to form a pipeline. It manages signal handlers for the child
+ * processes and delegates command execution to a helper function.
  *
  * @param data A pointer to the process data structure.
  * @param i The current index of the command to process.

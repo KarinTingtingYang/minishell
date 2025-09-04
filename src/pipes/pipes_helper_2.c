@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/03 12:01:47 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/03 12:27:52 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/04 10:07:11 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,8 @@ void	execute_child_command(t_command *cmd, t_process_data *data)
 		exit(0);
 	if (is_builtin(cmd->args[0]))
 		exit(run_builtin(cmd->args, data));
-	execute_cmd(cmd->cmd_path,
-				cmd->args,
-				data->path_dirs,
-				data->env_list);
+	execute_cmd(cmd->cmd_path, cmd->args,
+		data->path_dirs, data->env_list);
 	ft_error_and_exit("execve", strerror(errno), EXIT_FAILURE);
 }
 
@@ -46,10 +44,11 @@ void	execute_child_command(t_command *cmd, t_process_data *data)
  * @param info A pointer to the `t_wait_info` struct.
  * @param is_last_child A flag indicating if this is the last child in the list.
  */
-static void	process_child_status(int status, t_wait_info *info, int is_last_child)
+static void	process_child_status(int status, t_wait_info *info,
+										int is_last_child)
 {
 	int	sig;
-	
+
 	if (WIFEXITED(status))
 	{
 		if (is_last_child)
@@ -82,7 +81,8 @@ static void	process_child_status(int status, t_wait_info *info, int is_last_chil
  * @param info A pointer to the `t_wait_info` struct.
  * @return The final exit status of the last command in the pipeline.
  */
-static int	wait_all_children(pid_t *pids, int index, int max, t_wait_info *info)
+static int	wait_all_children(pid_t *pids, int index, int max,
+									t_wait_info *info)
 {
 	int	status;
 	int	is_last_child;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariahudonogova <mariahudonogova@studen    +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/02 01:25:32 by mariahudono      ###   ########.fr       */
+/*   Updated: 2025/09/04 09:58:31 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,6 @@
 
 # define _POSIX_C_SOURCE 200809L
 # define _GNU_SOURCE
-
-// #ifndef WCOREDUMP  // Some systems may not define WCOREDUMP
-// #  define WCOREDUMP(x) 0 // Define it as 0 if not available
-// #endif
 
 # include <signal.h>
 # include <stdint.h>

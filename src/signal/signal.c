@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   signal.c                                           :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/21 12:41:05 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/03 14:20:45 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   signal.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/21 12:41:05 by tiyang            #+#    #+#             */
+/*   Updated: 2025/09/04 10:02:07 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,10 @@
  * Configures SIGINT (Ctrl+C) to use `handle_parent_sigint` and
  * SIGQUIT (Ctrl+\) to be ignored.
  */
-void setup_signal_handlers(void)
+void	setup_signal_handlers(void)
 {
-	struct sigaction sa_int;
-	struct sigaction sa_quit;
+	struct sigaction	sa_int;
+	struct sigaction	sa_quit;
 
 	sa_int.sa_handler = handle_parent_sigint;
 	sigemptyset(&sa_int.sa_mask);
@@ -46,10 +46,10 @@ void setup_signal_handlers(void)
  * *before* execve(). This ensures that the executed command (e.g., `ls`)
  * handles signals with its default behavior, allowing SIGINT to terminate it.
  */
-void reset_child_signal_handlers(void)
+void	reset_child_signal_handlers(void)
 {
-	struct sigaction sa_int_dfl;
-	struct sigaction sa_quit_dfl;
+	struct sigaction	sa_int_dfl;
+	struct sigaction	sa_quit_dfl;
 
 	sa_int_dfl.sa_handler = SIG_DFL;
 	sigemptyset(&sa_int_dfl.sa_mask);
@@ -69,7 +69,7 @@ void reset_child_signal_handlers(void)
 	}
 }
 
-/*
+/**
  * @brief Waits for a specific child process to finish.
  *
  * This function wraps waitpid to wait for the given pid. It handles
@@ -84,7 +84,7 @@ static int	wait_for_child(pid_t pid, int *status)
 	pid_t	wpid;
 
 	wpid = waitpid(pid, status, 0);
-	while (wpid == -1 && errno == EINTR) 
+	while (wpid == -1 && errno == EINTR)
 	{
 		wpid = waitpid(pid, status, 0);
 	}
@@ -104,10 +104,10 @@ static int	wait_for_child(pid_t pid, int *status)
 static int	get_exit_status(int status)
 {
 	if (WIFEXITED(status))
-		return WEXITSTATUS(status);
+		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))
 		return (128 + WTERMSIG(status));
-	return 0;
+	return (0);
 }
 
 /**
