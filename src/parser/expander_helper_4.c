@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander_helper_4.c                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/05 10:39:19 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/03 11:16:26 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   expander_helper_4.c                                :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/05 10:39:19 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/04 10:20:03 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,6 @@ static size_t	calculate_unquoted_length(const char *str)
 	char	quote_char;
 	int		i;
 
-	printf("calculate_unquoted_length receives [%s]\n", str);
 	len = 0;
 	quote_char = 0;
 	i = 0;
@@ -118,7 +117,6 @@ static size_t	calculate_unquoted_length(const char *str)
 			len++;
 		i++;
 	}
-	printf("calculate_unquoted_length returns %zu\n", len);
 	return (len);
 }
 
@@ -144,6 +142,5 @@ char	*remove_quotes_and_join(char *str)
 	if (result == NULL)
 		return (NULL);
 	copy_string_without_quotes(result, str);
-	printf("remove_quotes_and_join returns [%s]\n", result);
 	return (result);
 }

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   prepare_command_execution.c                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/30 16:25:35 by tiyang            #+#    #+#             */
-/*   Updated: 2025/09/03 15:31:36 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   prepare_command_execution.c                        :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/30 16:25:35 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/09/04 10:39:55 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
  * @param data Pointer to `t_execute_data` where tokenized data is stored.
  * @return Returns 0 if the command is empty or invalid, 1 otherwise.
  */
-static int tokenize_and_check(char *line, t_execute_data *data)
+static int	tokenize_and_check(char *line, t_execute_data *data)
 {
 	if (line == NULL || *line == '\0')
 		return (0);
@@ -45,12 +45,14 @@ static int tokenize_and_check(char *line, t_execute_data *data)
  * @return Returns 0 if there was a redirection syntax or file error,
  *         1 otherwise.
  */
-static int handle_redirections(t_execute_data *data, t_process_data *process_data)
+static int	handle_redirections(t_execute_data *data,
+	t_process_data *process_data)
 {
-    data->clean_args = handle_redirection(data->original_args, process_data, data);
-    if (!data->clean_args)
-        return (0);
-    return (1);
+	data->clean_args = handle_redirection(data->original_args,
+			process_data, data);
+	if (!data->clean_args)
+		return (0);
+	return (1);
 }
 
 /**
@@ -60,7 +62,7 @@ static int handle_redirections(t_execute_data *data, t_process_data *process_dat
  * @param data Pointer to `t_execute_data` where command path is stored.
  * @return Returns 127 if the command was not found in PATH, 1 otherwise.
  */
-static int find_command_path(t_env_var *env_list, t_execute_data *data)
+static int	find_command_path(t_env_var *env_list, t_execute_data *data)
 {
 	if (is_builtin(data->clean_args[0]))
 	{
@@ -93,21 +95,23 @@ static int find_command_path(t_env_var *env_list, t_execute_data *data)
  *   `clean_args`.
  * - Extracts input/output file redirection if present.
  * - Resolves the full command path using the PATH environment variable.
- * If any of these steps fail, it cleans up partially allocated resources and returns
+ * If any of these steps fail, 
+ * it cleans up partially allocated resources and returns
  * a specific code to indicate the error or status.
  * @param line The command line input to be processed.
  * @param envp The environment variables (used to extract PATH).
- * @param data Pointer to `t_execute_data` where parsed and prepared data is stored.
+ * @param data Pointer to `t_execute_data` where parsed 
+ * and prepared data is stored.
  * @return Returns:
  *         - 0 if the command is empty or invalid.
  *         - 1 on successful preparation.
  *         - 2 if there is a redirection syntax or file error.
  *         - 127 if the command was not found in PATH.
  */
-int prepare_command_execution(char *line, t_env_var *env_list,
+int	prepare_command_execution(char *line, t_env_var *env_list,
 	t_execute_data *execute_data, t_process_data *process_data)
 {
-	int status;
+	int	status;
 
 	execute_data->heredoc_file = NULL;
 	if (!tokenize_and_check(line, execute_data))

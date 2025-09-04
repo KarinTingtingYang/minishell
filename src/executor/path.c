@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/24 09:34:52 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/09/03 14:42:31 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/04 10:30:53 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,30 +50,30 @@ static char	*combine_cmd_path(const char *path_dir, const char *cmd)
  * @param cmd The command name or path.
  * @param path_dirs An array of directory paths to search, 
  * typically from the PATH environment variable.
- * @return A newly allocated string containing the full path to the command if found,
- *         or NULL if not found or if `cmd` is NULL/empty.
+ * @return A newly allocated string containing the full path 
+ * 		to the command if found, or NULL if not found or if `cmd` is NULL/empty.
  */
-char *find_full_cmd_path(char *cmd, char **path_dirs)
+char	*find_full_cmd_path(char *cmd, char **path_dirs)
 {
-    char *full_cmd_path;
-    int   i;
+	char	*full_cmd_path;
+	int		i;
 
-    if (!cmd || *cmd == '\0')
-        return (NULL);
-    if (ft_strchr(cmd, '/'))
-        return ft_strdup(cmd);
-    i = 0;
-    while (path_dirs && path_dirs[i])
-    {
-        full_cmd_path = combine_cmd_path(path_dirs[i], cmd);
-        if (full_cmd_path == NULL)
-            ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
-        if (access(full_cmd_path, F_OK) == 0)
-            return (full_cmd_path);
-        free(full_cmd_path);
-        i++;
-    }
-    return (NULL);
+	if (!cmd || *cmd == '\0')
+		return (NULL);
+	if (ft_strchr(cmd, '/'))
+		return (ft_strdup(cmd));
+	i = 0;
+	while (path_dirs && path_dirs[i])
+	{
+		full_cmd_path = combine_cmd_path(path_dirs[i], cmd);
+		if (full_cmd_path == NULL)
+			ft_error_and_exit("malloc", strerror(errno), EXIT_FAILURE);
+		if (access(full_cmd_path, F_OK) == 0)
+			return (full_cmd_path);
+		free(full_cmd_path);
+		i++;
+	}
+	return (NULL);
 }
 
 /*
@@ -87,24 +87,24 @@ char *find_full_cmd_path(char *cmd, char **path_dirs)
  * @return An array of directory strings from the PATH variable,
  *         or NULL if PATH is not found or has no value.
  */
-char **find_path_dirs(t_env_var *env_list)
+char	**find_path_dirs(t_env_var *env_list)
 {
-    t_env_var	*current;
-    char		*path_value;
+	t_env_var	*current;
+	char		*path_value;
 
 	current = env_list;
-    while (current)
-    {
-        if (ft_strncmp(current->key, "PATH", 4) == 0 && current->key[4] == '\0')
-        {
-            path_value = current->value;
-            if (path_value == NULL)
-                return (NULL);
-            return ft_split(path_value, ':');
-        }
-        current = current->next;
-    }
-    return (NULL);
+	while (current)
+	{
+		if (ft_strncmp(current->key, "PATH", 4) == 0 && current->key[4] == '\0')
+		{
+			path_value = current->value;
+			if (path_value == NULL)
+				return (NULL);
+			return ft_split(path_value, ':');
+		}
+		current = current->next;
+	}
+	return (NULL);
 }
 
 // ---------- BELOW IS CODE BEFORE CLEAN UP ----------

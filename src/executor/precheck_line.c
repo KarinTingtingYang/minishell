@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/09/01 19:51:29 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/03 14:37:11 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/04 10:32:33 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,17 @@
  * @param q Pointer to the current quote state (0 if not in quotes, otherwise
  *          holds the quote character).
  */
-static void update_quote_state(char c, char *q)
+static void	update_quote_state(char c, char *q)
 {
-    if ((c == '\'' || c == '"') && *q == 0)
-        *q = c;
-    else if (*q && c == *q)
-        *q = 0;
+	if ((c == '\'' || c == '"') && *q == 0)
+		*q = c;
+	else if (*q && c == *q)
+		*q = 0;
 }
 
 /**
- * @brief Determines the length of a redirection operator starting at a given index.
+ * @brief Determines the length of a redirection operator 
+ * starting at a given index.
  *
  * This function checks for single and double redirection operators ('<', '<<',
  * '<<<', '>', '>>') and returns their length.
@@ -40,18 +41,21 @@ static void update_quote_state(char c, char *q)
  * @param i The index to check for a redirection operator.
  * @return The length of the redirection operator (1, 2, or 3).
  */
-static int get_redir_op_len(const char *line, int i)
+static int	get_redir_op_len(const char *line, int i)
 {
-    if (line[i] == '<') {
-        if (line[i + 1] == '<' && line[i + 2] == '<')
-            return 3;
-        if (line[i + 1] == '>' || line[i + 1] == '<')
-            return 2;
-    } else if (line[i] == '>') {
-        if (line[i + 1] == '>')
-            return 2;
-    }
-    return 1;
+	if (line[i] == '<')
+	{
+		if (line[i + 1] == '<' && line[i + 2] == '<')
+			return (3);
+		if (line[i + 1] == '>' || line[i + 1] == '<')
+			return (2);
+	}
+	else if (line[i] == '>')
+	{
+		if (line[i + 1] == '>')
+			return (2);
+	}
+	return (1);
 }
 
 /**
@@ -64,60 +68,18 @@ static int get_redir_op_len(const char *line, int i)
  * @param j The starting index to skip spaces from.
  * @return The index of the next non-whitespace character.
  */
-static int skip_spaces_in_precheck(const char *line, int j)
+static int	skip_spaces_in_precheck(const char *line, int j)
 {
-    while (line[j] == ' ' || line[j] == '\t')
-        j++;
-    return j;
-}
-
-/**
- * @brief Checks for syntax errors after a redirection operator.
- *
- * This function checks if the character following a redirection operator is
- * valid (not end of line, pipe, or another redirection). If an error is found,
- * it sets the appropriate error message and updates the process data status.
- *
- * @param line The command line string.
- * @param op_len The length of the redirection operator.
- * @param j The index of the character to check after skipping spaces.
- * @param process_data Pointer to the process data structure for error handling.
- * @return 1 if no error is found, 0 if a syntax error is detected.
- */
-static int check_redir_error(const char *line, int op_len, int j,
-	t_process_data *process_data)
-{
-    if (line[j] == '\0') {
-        ft_error(NULL, "syntax error near unexpected token `newline'");
-        if (process_data) process_data->last_exit_status = 2;
-        return 0;
-    }
-    if (line[j] == '|') {
-        ft_error(NULL, "syntax error near unexpected token `|'");
-        if (process_data) process_data->last_exit_status = 2;
-        return 0;
-    }
-    if (line[j] == '<') {
-        if (op_len == 3) {
-            ft_error(NULL, "syntax error near unexpected token `newline'");
-        } else {
-            ft_error(NULL, "syntax error near unexpected token `<'");
-        }
-        if (process_data) process_data->last_exit_status = 2;
-        return 0;
-    }
-    if (line[j] == '>') {
-        ft_error(NULL, "syntax error near unexpected token `>'");
-        if (process_data) process_data->last_exit_status = 2;
-        return 0;
-    }
-    return 1;
+	while (line[j] == ' ' || line[j] == '\t')
+		j++;
+	return (j);
 }
 
 /**
  * @brief Performs a precheck on the command line for bad redirections.
  *
- * This function scans the command line for redirection operators ('<', '>', etc.)
+ * This function scans the command line for redirection operators 
+ * ('<', '>', etc.)
  * that are not enclosed in quotes and checks for common syntax errors, such as
  * missing filenames or invalid tokens following the operators.
  *
@@ -125,16 +87,16 @@ static int check_redir_error(const char *line, int op_len, int j,
  * @param process_data Pointer to the process data structure for error handling.
  * @return 1 if no syntax errors are found, 0 if an error is detected.
  */
-int precheck_line(char *line, t_process_data *process_data)
+int	precheck_line(char *line, t_process_data *process_data)
 {
 	int		i;
 	char	q;
-	int 	op_len;
-	int 	j;
+	int		op_len;
+	int		j;
 
 	i = 0;
 	q = 0;
-	if (!line) 
+	if (!line)
 		return (1);
 	while (line[i] != '\0')
 	{
@@ -146,7 +108,7 @@ int precheck_line(char *line, t_process_data *process_data)
 			if (!check_redir_error(line, op_len, j, process_data))
 				return (0);
 			i = j;
-			continue;
+			continue ;
 		}
 		i++;
 	}

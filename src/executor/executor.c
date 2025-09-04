@@ -6,13 +6,13 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/07/04 13:55:56 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/09/03 14:51:04 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/04 10:27:07 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-extern char **environ;
+extern char	**environ;
 
 /**
  * @brief Handles errors from the stat() system call.
@@ -24,10 +24,10 @@ extern char **environ;
  * @param args The command arguments array.
  * @param e The error code from errno.
  */
-int perform_command_checks(char *cmd_path, char **args, char **envp)
+int	perform_command_checks(char *cmd_path, char **args, char **envp)
 {
-    struct stat st;
-    int e;
+	struct stat	st;
+	int			e;
 
 	if (stat(cmd_path, &st) == -1)
 	{
@@ -37,7 +37,7 @@ int perform_command_checks(char *cmd_path, char **args, char **envp)
 	}
 	if (S_ISDIR(st.st_mode))
 	{
-		if (envp) 
+		if (envp)
 			free_split(envp);
 		ft_error_and_exit(args[0], "Is a directory", 126);
 		return (0);
@@ -63,25 +63,25 @@ int perform_command_checks(char *cmd_path, char **args, char **envp)
  * @param path_dirs The array of directories in the PATH environment variable.
  * @param env_list The linked list of environment variables.
  */
-void execute_cmd(char *cmd_path, char **args, char **path_dirs,
+void	execute_cmd(char *cmd_path, char **args, char **path_dirs,
 	t_env_var *env_list)
 {
-    char	**envp;
-    int		e;
+	char	**envp;
+	int		e;
 
-    (void)path_dirs;
-    reset_child_signal_handlers();
-    envp = env_list_to_array(env_list);
-    if (cmd_path == NULL)
-    {
-        handle_null_cmd_path(args, envp);
-        return ;
-    }
-    if (!perform_command_checks(cmd_path, args, envp))
-        return ;
-    execve(cmd_path, args, envp);
-    e = errno;
-    handle_execve_error(envp, args, e);
+	(void)path_dirs;
+	reset_child_signal_handlers();
+	envp = env_list_to_array(env_list);
+	if (cmd_path == NULL)
+	{
+		handle_null_cmd_path(args, envp);
+		return ;
+	}
+	if (!perform_command_checks(cmd_path, args, envp))
+		return ;
+	execve(cmd_path, args, envp);
+	e = errno;
+	handle_execve_error(envp, args, e);
 }
 
 /**
@@ -95,10 +95,10 @@ void execute_cmd(char *cmd_path, char **args, char **path_dirs,
  * @param process_data Pointer to the process data structure.
  * @return The exit status of the command execution.
  */
-int handle_single_command(char *line, t_env_var *env_list,
+int	handle_single_command(char *line, t_env_var *env_list,
 	t_process_data *process_data)
 {
-    t_token		**tokens;
+	t_token		**tokens;
 	char		**args;
 	int			result;
 
@@ -106,7 +106,7 @@ int handle_single_command(char *line, t_env_var *env_list,
 	if (tokens == NULL)
 		return (1);
 	args = expand_and_split_args(tokens, env_list,
-		process_data->last_exit_status);
+			process_data->last_exit_status);
 	free_tokens(tokens);
 	if (args == NULL || args[0] == NULL)
 	{
@@ -130,19 +130,19 @@ int handle_single_command(char *line, t_env_var *env_list,
  * @param process_data Pointer to the process data structure.
  * @return The exit status of the pipeline execution.
  */
-int handle_pipeline_command(char *line,  t_env_var *env_list,
+int	handle_pipeline_command(char *line,  t_env_var *env_list,
 	t_process_data *process_data)
 {
-    char		**parts;
+	char		**parts;
 	t_command	**cmds;
 	char		**path_dirs;
 	int			status;
-    int			count;
+	int			count;
 
 	parts = NULL;
-	count = 0;	
-    cmds = prepare_pipeline_commands(line, &count, &parts, process_data);
-    if (cmds == NULL)
+	count = 0;
+	cmds = prepare_pipeline_commands(line, &count, &parts, process_data);
+	if (cmds == NULL)
 	{
 		if (g_signal_received == SIGINT)
 		{
@@ -152,11 +152,11 @@ int handle_pipeline_command(char *line,  t_env_var *env_list,
 		process_data->last_exit_status = 2;
 		return (2);
 	}
-    path_dirs = find_path_dirs(env_list);
-    status = run_command_pipeline(cmds, count, path_dirs, env_list);
+	path_dirs = find_path_dirs(env_list);
+	status = run_command_pipeline(cmds, count, path_dirs, env_list);
 	cleanup_pipeline_resources(cmds, parts, path_dirs, count);
 	process_data->last_exit_status = status;
-    return (status);
+	return (status);
 }
 
 /**
@@ -170,15 +170,15 @@ int handle_pipeline_command(char *line,  t_env_var *env_list,
  * @param process_data Pointer to the process data structure.
  * @return The exit status of the command execution, or -1 on error.
  */
-int execute_command(char *line, t_env_var *env_list,
+int	execute_command(char *line, t_env_var *env_list,
 	t_process_data *process_data)
 {
-    if (!check_heredoc_limit(line))
-        return (2);
-    if (is_unquoted_pipe_present(line))
-        return handle_pipeline_command(line, env_list, process_data);
-    else
-        return handle_single_command(line, env_list, process_data);
+	if (!check_heredoc_limit(line))
+		return (2);
+	if (is_unquoted_pipe_present(line))
+		return (handle_pipeline_command(line, env_list, process_data));
+	else
+		return (handle_single_command(line, env_list, process_data));
 }
 
 // ---------- BELOW IS CODE BEFORE CLEAN UP ----------
@@ -224,8 +224,6 @@ int execute_command(char *line, t_env_var *env_list,
 
 //     free(cmd_path); // cmd_path is now properly used
 // }
-
-
 // void execute_cmd(char *cmd_path, char **args, char **path_dirs, t_env_var *env_list)
 // {
 // 	char **envp;

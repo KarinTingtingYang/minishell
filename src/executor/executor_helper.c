@@ -5,8 +5,8 @@
 /*                                                     +:+                    */
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
-/*   Created: Invalid date        by               #+#    #+#                 */
-/*   Updated: 2025/09/03 14:55:51 by tiyang        ########   odam.nl         */
+/*   Created: 2025/09/04 10:27:44 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/09/04 10:38:39 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@
  * @param str The string to check.
  * @return 1 if the string is NULL, empty, or only whitespace; 0 otherwise.
  */
-int is_empty_or_whitespace(const char *str)
+int	is_empty_or_whitespace(const char *str)
 {
-    if (!str)
-        return (1);
-    while (*str && (*str == ' ' || *str == '\t'))
-        str++;
-    return (*str == '\0');
+	if (!str)
+		return (1);
+	while (*str && (*str == ' ' || *str == '\t'))
+		str++;
+	return (*str == '\0');
 }
 
 /**
@@ -37,9 +37,9 @@ int is_empty_or_whitespace(const char *str)
  * @param count The number of command strings in the array.
  * @return 1 on successful validation, 0 on syntax error.
  */
-int validate_pipeline_parts(char **parts, int count)
+int	validate_pipeline_parts(char **parts, int count)
 {
-    int i;
+	int	i;
 
 	if (count <= 1)
 		return (1);
@@ -47,13 +47,13 @@ int validate_pipeline_parts(char **parts, int count)
 	while (i < count)
 	{
 		if (is_empty_or_whitespace(parts[i]))
-        {
-            ft_error("", "syntax error near unexpected token `|'");
-            return (0);
-        }
+		{
+			ft_error("", "syntax error near unexpected token `|'");
+			return (0);
+		}
 		i++;
 	}
-    return (1);
+	return (1);
 }
 
 /**
@@ -65,16 +65,15 @@ int validate_pipeline_parts(char **parts, int count)
  * @param args The original array of strings to duplicate.
  * @return A newly allocated array of strings, or NULL on failure.
  */
-char **ft_split_dup(char **args)
+char	**ft_split_dup(char **args)
 {
-	int		count = 0;
+	int		count;
 	char	**dup;
 	int		i;
 
 	if (args == NULL)
 		return (NULL);
-	while (args[count])
-		count++;
+	count = count_command_parts(args);
 	dup = malloc((count + 1) * sizeof(char *));
 	if (dup == NULL)
 		return (NULL);
@@ -103,14 +102,26 @@ char **ft_split_dup(char **args)
  * @param parts The array of command strings.
  * @return The count of command parts in the array.
  */
-int count_command_parts(char **parts)
+int	count_command_parts(char **parts)
 {
-    int count = 0;
-    while (parts[count] != NULL)
-        count++;
-    return (count);
+	int count;
+
+	count = 0;
+	while (parts[count] != NULL)
+		count++;
+	return (count);
 }
 
+/**
+ * @brief Checks if an unquoted pipe character '|' is present in the input line.
+ *
+ * This function iterates through the input line, tracking whether it is
+ * currently inside single or double quotes. It returns 1 if an unquoted
+ * pipe character is found, and 0 otherwise.
+ *
+ * @param line The input command line string to check.
+ * @return 1 if an unquoted pipe is present, 0 otherwise.
+ */
 int	is_unquoted_pipe_present(const char *line)
 {
 	char	quote_char;

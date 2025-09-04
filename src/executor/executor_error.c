@@ -6,7 +6,7 @@
 /*   By: tiyang <tiyang@student.42.fr>                +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/08/30 19:07:14 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/04 09:11:04 by tiyang        ########   odam.nl         */
+/*   Updated: 2025/09/04 10:24:11 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,15 +23,15 @@
  * @param args The command arguments array to free if needed.
  * @param error_code The error code from the failed stat() call.
  */
-void handle_stat_error(char **envp, char **args, int error_code)
+void	handle_stat_error(char **envp, char **args, int error_code)
 {
-    if (envp) 
-        free_split(envp);
-    if (error_code == ENOTDIR)
-        ft_error_and_exit(args[0], "Not a directory", 126);
-    else if (error_code == ENOENT)
-        ft_error_and_exit(args[0], "No such file or directory", 127);
-    ft_error_and_exit(args[0], strerror(error_code), 126);
+	if (envp)
+		free_split(envp);
+	if (error_code == ENOTDIR)
+		ft_error_and_exit(args[0], "Not a directory", 126);
+	else if (error_code == ENOENT)
+		ft_error_and_exit(args[0], "No such file or directory", 127);
+	ft_error_and_exit(args[0], strerror(error_code), 126);
 }
 
 /**
@@ -45,15 +45,15 @@ void handle_stat_error(char **envp, char **args, int error_code)
  * @param args The command arguments array to free if needed.
  * @param error_code The error code from the failed access() call.
  */
-void handle_access_error(char **envp, char **args, int error_code)
+void	handle_access_error(char **envp, char **args, int error_code)
 {
-    if (envp) 
-        free_split(envp);
-    if (error_code == EACCES)
-        ft_error_and_exit(args[0], "Permission denied", 126);
-    else if (error_code == ENOTDIR)
-        ft_error_and_exit(args[0], "Not a directory", 126);
-    ft_error_and_exit(args[0], strerror(error_code), 126);
+	if (envp)
+		free_split(envp);
+	if (error_code == EACCES)
+		ft_error_and_exit(args[0], "Permission denied", 126);
+	else if (error_code == ENOTDIR)
+		ft_error_and_exit(args[0], "Not a directory", 126);
+	ft_error_and_exit(args[0], strerror(error_code), 126);
 }
 
 /**
@@ -67,18 +67,18 @@ void handle_access_error(char **envp, char **args, int error_code)
  * @param args The command arguments array to free if needed.
  * @param error_code The error code from the failed execve() call.
  */
-void handle_execve_error(char **envp, char **args, int error_code)
+void	handle_execve_error(char **envp, char **args, int error_code)
 {
-    free_split(envp);
-    if (error_code == ENOEXEC)
-        ft_error_and_exit(args[0], "Exec format error", 126);
-    else if (error_code == ENOTDIR)
-        ft_error_and_exit(args[0], "Not a directory", 126);
-    else if (error_code == ENOENT)
-        ft_error_and_exit(args[0], "No such file or directory", 127);
-    else if (error_code == EACCES)
-        ft_error_and_exit(args[0], "Permission denied", 126);
-    ft_error_and_exit(args[0], strerror(error_code), 126);
+	free_split(envp);
+	if (error_code == ENOEXEC)
+		ft_error_and_exit(args[0], "Exec format error", 126);
+	else if (error_code == ENOTDIR)
+		ft_error_and_exit(args[0], "Not a directory", 126);
+	else if (error_code == ENOENT)
+		ft_error_and_exit(args[0], "No such file or directory", 127);
+	else if (error_code == EACCES)
+		ft_error_and_exit(args[0], "Permission denied", 126);
+	ft_error_and_exit(args[0], strerror(error_code), 126);
 }
 
 /**
@@ -91,15 +91,15 @@ void handle_execve_error(char **envp, char **args, int error_code)
  * @param args The command arguments array.
  * @param envp The environment variables array to free if needed.
  */
-void handle_null_cmd_path(char **args, char **envp)
+void	handle_null_cmd_path(char **args, char **envp)
 {
-    if (args && args[0] && ft_strchr(args[0], '/'))
-    {
-        if (envp) 
-            free_split(envp);
-        ft_error_and_exit(args[0], "No such file or directory", 127);
-    }
-	if (envp) 
+	if (args && args[0] && ft_strchr(args[0], '/'))
+	{
+		if (envp)
+			free_split(envp);
+		ft_error_and_exit(args[0], "No such file or directory", 127);
+	}
+	if (envp)
 		free_split(envp);
 	if (args && args[0])
 		ft_error_and_exit(args[0], "command not found", 127);
@@ -119,25 +119,25 @@ void handle_null_cmd_path(char **args, char **envp)
  * @param args The command arguments array.
  * @return The exit status code based on the error encountered.
  */
-int handle_redirection_error(t_execute_data *data, t_process_data *process_data,
+int	handle_redirection_error(t_execute_data *data, t_process_data *process_data,
 	char **args)
 {
-	(void)data;
-    if (g_signal_received == SIGINT)
-    {
-        process_data->last_exit_status = 130;
-        return 130;
-    }
+	int	last_arg_index;
 
-    int last_arg_index = 0;
-    while(args[last_arg_index + 1] != NULL) 
-        last_arg_index++;
-        
-    if (is_redirection(args[last_arg_index]))
-    {
-        process_data->last_exit_status = 2;
-        return 2;
-    }
-    process_data->last_exit_status = 1;
-    return 1;
+	(void)data;
+	if (g_signal_received == SIGINT)
+	{
+		process_data->last_exit_status = 130;
+		return (130);
+	}
+	last_arg_index = 0;
+	while (args[last_arg_index + 1] != NULL)
+		last_arg_index++;
+	if (is_redirection(args[last_arg_index]))
+	{
+		process_data->last_exit_status = 2;
+		return (2);
+	}
+	process_data->last_exit_status = 1;
+	return (1);
 }
