@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 13:12:47 by tiyang            #+#    #+#             */
-/*   Updated: 2025/08/30 11:45:53 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/05 13:38:08 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
  * @param out_val A pointer to store the resulting long long value.
  * @return 1 on success, 0 on failure (e.g., non-digit characters, overflow).
  */
-static int	ft_parse_digits_to_llong(const char *str,
+int	ft_parse_digits_to_llong(const char *str,
 										int sign, long long *out_val)
 {
 	long long	result;
@@ -65,7 +65,7 @@ static int	ft_parse_digits_to_llong(const char *str,
  * @param out_val A pointer to store the resulting long long value.
  * @return 1 on success, 0 on failure.
  */
-static int	ft_str_to_llong(const char *str, long long *out_val)
+int	ft_str_to_llong(const char *str, long long *out_val)
 {
 	int	sign;
 

@@ -1,63 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   expander_helper_4.c                                :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/08/05 10:39:19 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/09/04 10:20:03 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   expander_helper_4.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/05 10:39:19 by makhudon          #+#    #+#             */
+/*   Updated: 2025/09/05 14:00:41 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-
-/**
- * @brief Copies new split arguments to a new array.
- * 
- * This function copies the newly split arguments from `split` to
- * `new_final` starting at index `final_count`. It assumes that
- * `new_final` has enough space to hold the copied arguments.
- * @param new_final The destination array to copy new arguments into.
- * @param split The source array containing newly split arguments.
- * @param final_count The starting index in `new_final` to copy into.
- * @param split_count The number of new arguments to copy from `split`.
- */
-void	copy_new_arguments(char **new_final, char **split,
-									int final_count, int split_count)
-{
-	int	j;
-
-	j = 0;
-	while (j < split_count)
-	{
-		new_final[final_count + j] = split[j];
-		j++;
-	}
-}
-
-/**
- * @brief Copies original arguments to a new array.
- * 
- * This function copies the original arguments from `final_args` to
- * `new_final` up to `final_count`. It assumes that `new_final` has
- * enough space to hold the copied arguments.
- * @param new_final The destination array to copy arguments into.
- * @param final_args The source array containing original arguments.
- * @param final_count The number of arguments to copy.
- */
-void	copy_original_arguments(char **new_final,
-										char **final_args, int final_count)
-{
-	int	i;
-
-	i = 0;
-	while (i < final_count)
-	{
-		new_final[i] = final_args[i];
-		i++;
-	}
-}
 
 /**
  * @brief Copies a string from `str` to `result`, omitting quotes.

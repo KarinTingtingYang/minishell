@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor.h                                         :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/21 09:39:33 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/09/04 10:57:40 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
+/*   Updated: 2025/09/05 14:02:56 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,4 +99,8 @@ void		free_commands_recursive(t_command **cmds, int index, int count);
 void		cleanup_pipeline_resources(t_command **cmds, char **parts,
 				char **path_dirs, int count);
 
+// execute_builtin_command.c 
+void		restore_builtin_io(int did_save, int saved_stdin, int saved_stdout);
+int			setup_builtin_io(t_execute_data *data,
+				int *saved_stdin, int *saved_stdout, int *did_save);
 #endif

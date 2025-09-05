@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/04 16:38:58 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/05 13:57:17 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,6 +158,7 @@ char	**expand_and_split_args(t_token **tokens, t_process_data *pdata)
 	char		**split;
 	int			i;
 	const char	*prev_val;
+	char		**tmp;
 
 	final_args = NULL;
 	final_count = 0;
@@ -171,9 +172,10 @@ char	**expand_and_split_args(t_token **tokens, t_process_data *pdata)
 			return (free_split(final_args), NULL);
 		if (pdata->syntax_error)
 			return (free_split(split), free_split(final_args), NULL);
-		final_args = append_split_to_final(final_args, &final_count, split);
-		if (final_args == NULL)
-			return (NULL);
+		tmp = append_split_to_final(final_args, &final_count, split);
+		if (tmp == NULL)
+			return (free_split(final_args), NULL);
+		final_args = tmp;
 		i++;
 	}
 	return (final_args);
