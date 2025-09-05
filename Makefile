@@ -23,6 +23,7 @@ SRCS       = $(SRC_DIR)/main.c \
 			 $(SRC_DIR)/executor/prepare_pipeline_helper.c \
 			 $(SRC_DIR)/executor/execute_prepared_command.c \
 			 $(SRC_DIR)/executor/execute_command_types.c \
+			 $(SRC_DIR)/executor/execute_builtin_command.c \
 			 $(SRC_DIR)/builtins/builtins.c \
 			 $(SRC_DIR)/builtins/builtins_io.c \
 			 $(SRC_DIR)/builtins/cd_pwd.c \

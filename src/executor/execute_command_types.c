@@ -1,47 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   execute_command_types.c                            :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/08/30 19:24:59 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/04 10:34:55 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   execute_command_types.c                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/30 19:24:59 by tiyang            #+#    #+#             */
+/*   Updated: 2025/09/05 12:07:25 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-
-/**
- * @brief Executes a builtin command with proper redirection handling.
- *
- * This function saves the original stdin and stdout file descriptors,
- * applies the necessary redirections for the builtin command, executes
- * the command, and then restores the original file descriptors.
- *
- * @param data Pointer to the execute data structure containing command info.
- * @param process_data Pointer to the global process data structure.
- * @return The exit status of the executed builtin command.
- */
-int	execute_builtin_command(t_execute_data *data, t_process_data *process_data)
-{
-	int	original_stdin;
-	int	original_stdout;
-	int	exit_status;
-
-	original_stdin = dup(STDIN_FILENO);
-	original_stdout = dup(STDOUT_FILENO);
-	if (apply_builtin_redirection(data->input_file,
-			data->output_file, data->output_mode) == -1)
-		exit_status = 1;
-	else
-		exit_status = run_builtin(data->clean_args, process_data);
-	dup2(original_stdin, STDIN_FILENO);
-	dup2(original_stdout, STDOUT_FILENO);
-	close(original_stdin);
-	close(original_stdout);
-	return (exit_status);
-}
 
 /**
  * @brief Executes an external command by finding its full path and running it.
