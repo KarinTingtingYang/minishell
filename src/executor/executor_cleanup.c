@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor_cleanup.c                                 :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/07/24 08:58:09 by makhudon      #+#    #+#                 */
-/*   Updated: 2025/09/04 10:27:30 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor_cleanup.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/24 08:58:09 by makhudon          #+#    #+#             */
+/*   Updated: 2025/09/06 15:04:45 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,14 +76,33 @@ void	free_commands_recursive(t_command **cmds, int index, int count)
  * @param path_dirs The array of directories in the PATH environment variable.
  * @param count The number of commands in the pipeline.
  */
-void	cleanup_pipeline_resources(t_command **cmds, char **parts,
-	char **path_dirs, int count)
+// void	cleanup_pipeline_resources(t_command **cmds, char **parts,
+// 	char **path_dirs, int count)
+// {
+// 	if (path_dirs)
+// 		free_split(path_dirs);
+// 	free_commands_recursive(cmds, 0, count);
+// 	free(cmds);
+// 	free_split(parts);
+// }
+// DEBUG
+void	cleanup_pipeline_resources(t_process_data *data)
 {
-	if (path_dirs)
-		free_split(path_dirs);
-	free_commands_recursive(cmds, 0, count);
-	free(cmds);
-	free_split(parts);
+	if (data->path_dirs)
+		free_split(data->path_dirs);
+	free_commands_recursive(data->cmds, 0, data->cmd_count);
+	free(data->cmds);
+	free_split(data->parts);
+}
+
+void	cleanup_child_pipeline_resources(t_process_data *data)
+{
+	free_commands_recursive(data->cmds, 0, data->cmd_count);
+	free(data->cmds);
+	free_split(data->path_dirs);
+	free(data->pids);
+	free_env(data->env_list);
+	free_split(data->parts);
 }
 
 // ---------- BELOW IS CODE BEFORE CLEAN UP ----------

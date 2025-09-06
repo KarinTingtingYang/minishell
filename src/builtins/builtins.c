@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 09:00:14 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 11:30:39 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/06 15:03:42 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,12 @@ int	run_builtin(char **args, t_process_data *process_data)
 	if (ft_strncmp(args[0], "pwd", 4) == 0)
 		return (run_pwd());
 	if (ft_strncmp(args[0], "exit", 5) == 0)
+		//return (run_exit(args, process_data->last_exit_status));
+		// DEBUG
+	{
+		cleanup_child_pipeline_resources(process_data);
 		return (run_exit(args, process_data->last_exit_status));
+	}
 	if (ft_strncmp(args[0], "env", 4) == 0)
 		return (run_env(process_data->env_list), 0);
 	if (ft_strncmp(args[0], "export", 7) == 0)

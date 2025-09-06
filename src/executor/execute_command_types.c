@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_command_types.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 19:24:59 by tiyang            #+#    #+#             */
-/*   Updated: 2025/09/05 14:04:38 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/06 11:27:57 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,14 @@ int	execute_external_command(t_execute_data *data, t_process_data *process_data,
 
 	path_dirs = find_path_dirs(env_list);
 	data->cmd_path = find_full_cmd_path(data->clean_args[0], path_dirs);
+	if (data->cmd_path == NULL)
+	{
+		ft_error(data->clean_args[0], "command not found");
+		exit_status = 127;
+		process_data->last_exit_status = exit_status;
+		free_split(path_dirs);
+		return (exit_status);
+	}//DEBUG
 	free_split(path_dirs);
 	exit_status = execute_prepared_command(data, process_data);
 	return (exit_status);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   command_create.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 10:49:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/04 10:03:32 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/06 12:38:35 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,17 +90,41 @@ static int	parse_args_and_redirection(t_command *cmd, char **tokens,
 											t_process_data *process_data)
 {
 	char	**original_args;
+	t_execute_data exec_data;
 
 	if (tokens == NULL || tokens[0] == NULL)
 		return (-1);
 	original_args = duplicate_split(tokens);
 	if (original_args == NULL)
 		return (-1);
-	cmd->args = handle_redirection(original_args, process_data,
-			(t_execute_data *)cmd);
+	// cmd->args = handle_redirection(original_args, process_data,
+	// 		(t_execute_data *)cmd);
+	exec_data.input_file = NULL;
+	exec_data.output_file = NULL;
+	exec_data.heredoc_file = NULL;
+	exec_data.output_mode = 0;
+
+	cmd->args = handle_redirection(original_args, process_data, &exec_data);
 	free_split(original_args);
+	
+	// if (cmd->args == NULL)
+	// 	return (-1);
 	if (cmd->args == NULL)
+	{
+		free(exec_data.input_file);
+		free(exec_data.output_file);
+		if (exec_data.heredoc_file)
+		{
+			unlink(exec_data.heredoc_file);
+			free(exec_data.heredoc_file);
+		}
 		return (-1);
+	}
+
+	cmd->input_file = exec_data.input_file;
+	cmd->output_file = exec_data.output_file;
+	cmd->output_mode = exec_data.output_mode;
+	cmd->heredoc_file = exec_data.heredoc_file;
 	if (cmd->args[0] == NULL)
 		return (1);
 	return (0);

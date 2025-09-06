@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execute_prepared_command.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 16:54:16 by tiyang            #+#    #+#             */
-/*   Updated: 2025/09/04 10:43:29 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/06 10:55:45 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,11 @@ static int	handle_parent_process(pid_t pid, t_execute_data *data,
 {
 	int	exit_code;
 
+	(void)data;//DEBUG
 	exit_code = wait_for_child_and_handle_status(pid);
 	setup_signal_handlers();
 	process_data->last_exit_status = exit_code;
-	free_execute_data(data);
+	//free_execute_data(data);//DEBUG
 	return (exit_code);
 }
 

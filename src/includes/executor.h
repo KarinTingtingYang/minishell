@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/05 14:02:56 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/06 15:07:09 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,10 @@ int			handle_redirection_error(t_execute_data *data,
 // executor_cleanup.c
 void		free_execute_data(t_execute_data *data);
 void		free_commands_recursive(t_command **cmds, int index, int count);
-void		cleanup_pipeline_resources(t_command **cmds, char **parts,
-				char **path_dirs, int count);
+// void		cleanup_pipeline_resources(t_command **cmds, char **parts,
+// 				char **path_dirs, int count);
+void		cleanup_pipeline_resources(t_process_data *data);
+void		cleanup_child_pipeline_resources(t_process_data *data);
 
 // execute_builtin_command.c 
 void		restore_builtin_io(int did_save, int saved_stdin, int saved_stdout);

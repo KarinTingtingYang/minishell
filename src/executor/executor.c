@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/05 10:13:07 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/06 15:05:19 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,21 +134,17 @@ int	handle_single_command(char *line, t_env_var *env_list,
  * @param process_data Pointer to the process data structure.
  * @return The exit status of the pipeline execution.
  */
+// DEBUG
 int	handle_pipeline_command(char *line, t_env_var *env_list,
 	t_process_data *process_data)
 {
-	char		**parts;
-	t_command	**cmds;
-	char		**path_dirs;
 	int			status;
-	int			count;
 
-	parts = NULL;
-	count = 0;
-	cmds = prepare_pipeline_commands(line, &count, &parts, process_data);
+	process_data->parts = NULL;
+	process_data->cmds = prepare_pipeline_commands(line, &process_data->cmd_count, &process_data->parts, process_data);
 	if (process_data->syntax_error)
-		return (free_split(parts), process_data->last_exit_status);
-	if (cmds == NULL)
+		return (free_split(process_data->parts), process_data->last_exit_status);
+	if (process_data->cmds == NULL)
 	{
 		if (g_signal_received == SIGINT)
 		{
@@ -158,11 +154,40 @@ int	handle_pipeline_command(char *line, t_env_var *env_list,
 		process_data->last_exit_status = 2;
 		return (2);
 	}
-	path_dirs = find_path_dirs(env_list);
-	status = run_command_pipeline(cmds, count, path_dirs, env_list);
-	cleanup_pipeline_resources(cmds, parts, path_dirs, count);
+	process_data->path_dirs = find_path_dirs(env_list);
+	status = run_command_pipeline(process_data);
+	cleanup_pipeline_resources(process_data);
 	return (process_data->last_exit_status = status, status);
 }
+// int	handle_pipeline_command(char *line, t_env_var *env_list,
+// 	t_process_data *process_data)
+// {
+// 	char		**parts;
+// 	t_command	**cmds;
+// 	char		**path_dirs;
+// 	int			status;
+// 	int			count;
+
+// 	parts = NULL;
+// 	count = 0;
+// 	cmds = prepare_pipeline_commands(line, &count, &parts, process_data);
+// 	if (process_data->syntax_error)
+// 		return (free_split(parts), process_data->last_exit_status);
+// 	if (cmds == NULL)
+// 	{
+// 		if (g_signal_received == SIGINT)
+// 		{
+// 			process_data->last_exit_status = 130;
+// 			return (130);
+// 		}
+// 		process_data->last_exit_status = 2;
+// 		return (2);
+// 	}
+// 	path_dirs = find_path_dirs(env_list);
+// 	status = run_command_pipeline(cmds, count, path_dirs, env_list);
+// 	cleanup_pipeline_resources(cmds, parts, path_dirs, count);
+// 	return (process_data->last_exit_status = status, status);
+// }
 
 /**
  * @brief Executes a command line, handling both single and pipeline commands.

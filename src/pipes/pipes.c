@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/04 10:05:22 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/06 15:08:15 by tiyang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,30 +132,52 @@ static int	setup_and_execute_pipeline(t_process_data *data)
  * @return The exit status of the last command in the pipeline,
  *         or -1 on failure.
  */
-int	run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs,
-							t_env_var *env_list)
+// DEBUG
+int	run_command_pipeline(t_process_data *data)
 {
-	t_process_data	data;
 	int				fork_status;
 	int				exit_status;
 
-	data.cmds = cmds;
-	data.cmd_count = cmd_count;
-	data.path_dirs = path_dirs;
-	data.env_list = env_list;
-	data.last_exit_status = 0;
-	data.in_pipeline = 1;
+	data->last_exit_status = 0;
+	data->in_pipeline = 1;
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
-	fork_status = setup_and_execute_pipeline(&data);
+	fork_status = setup_and_execute_pipeline(data);
 	if (fork_status == -1)
 	{
-		free(data.pids);
-		close_free_pipes_recursively(data.pipes, 0, cmd_count - 1);
+		free(data->pids);
+		close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
 		setup_signal_handlers();
 		return (-1);
 	}
-	exit_status = run_pipeline_core(&data, cmd_count);
+	exit_status = run_pipeline_core(data, data->cmd_count);
 	setup_signal_handlers();
 	return (exit_status);
 }
+// int	run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs,
+// 							t_env_var *env_list)
+// {
+// 	t_process_data	data;
+// 	int				fork_status;
+// 	int				exit_status;
+
+// 	data.cmds = cmds;
+// 	data.cmd_count = cmd_count;
+// 	data.path_dirs = path_dirs;
+// 	data.env_list = env_list;
+// 	data.last_exit_status = 0;
+// 	data.in_pipeline = 1;
+// 	signal(SIGINT, SIG_IGN);
+// 	signal(SIGQUIT, SIG_IGN);
+// 	fork_status = setup_and_execute_pipeline(&data);
+// 	if (fork_status == -1)
+// 	{
+// 		free(data.pids);
+// 		close_free_pipes_recursively(data.pipes, 0, cmd_count - 1);
+// 		setup_signal_handlers();
+// 		return (-1);
+// 	}
+// 	exit_status = run_pipeline_core(&data, cmd_count);
+// 	setup_signal_handlers();
+// 	return (exit_status);
+// }
