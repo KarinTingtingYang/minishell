@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 11:55:08 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/08 10:09:07 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/08 10:36:08 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
  *
  * @param saved_stdin A pointer to the file descriptor for standard input.
  * @param saved_stdout A pointer to the file descriptor for standard output.
- */
+*/
 static void	check_and_handle_dup_error(int *saved_stdin, int *saved_stdout)
 {
 	if (*saved_stdin == -1 || *saved_stdout == -1)

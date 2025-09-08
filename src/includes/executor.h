@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/06 15:07:09 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/08 10:46:16 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,14 @@ int			execute_command(char *line, t_env_var *env_list,
 // execute_command_types.c
 int			execute_builtin_command(t_execute_data *data,
 				t_process_data *process_data);
-int			execute_external_command(t_execute_data *data,
-				t_process_data *process_data, t_env_var *env_list);
-int			handle_redirection_only(t_execute_data *data,
-				t_process_data *process_data);
 int			execute_single_command(char **args, t_env_var *env_list,
 				t_process_data *process_data);
+
+// execute_helper.c
+int			handle_redirection_only(t_execute_data *data,
+				t_process_data *process_data);
+int			execute_external_command(t_execute_data *data,
+				t_process_data *process_data, t_env_var *env_list);
 
 // prepare_command_execution.c
 int			prepare_command_execution(char *line, t_env_var *env_list,
