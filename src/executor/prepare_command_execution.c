@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   prepare_command_execution.c                        :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/08/30 16:25:35 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/04 10:39:55 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   prepare_command_execution.c                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/30 16:25:35 by tiyang            #+#    #+#             */
+/*   Updated: 2025/09/08 11:35:55 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,20 @@
  * @param data Pointer to `t_execute_data` where tokenized data is stored.
  * @return Returns 0 if the command is empty or invalid, 1 otherwise.
  */
-static int	tokenize_and_check(char *line, t_execute_data *data)
+static int	tokenize_and_check(char *line, t_execute_data *data,
+									t_process_data *pd)
 {
 	if (line == NULL || *line == '\0')
 		return (0);
-	data->original_args = tokenize_input(line);
-	if (!data->original_args || !data->original_args[0])
+	data->original_args = tokenize_input(line, pd);
+	if (data->original_args == NULL)
 	{
-		ft_error("", "syntax error (unclosed quote)");
+		return (0);
+	}
+	if (data->original_args[0] == NULL)
+	{
 		free_split(data->original_args);
+		data->original_args = NULL;
 		return (0);
 	}
 	return (1);
@@ -114,7 +119,7 @@ int	prepare_command_execution(char *line, t_env_var *env_list,
 	int	status;
 
 	execute_data->heredoc_file = NULL;
-	if (!tokenize_and_check(line, execute_data))
+	if (!tokenize_and_check(line, execute_data, process_data))
 		return (0);
 	if (!handle_redirections(execute_data, process_data))
 		return (2);

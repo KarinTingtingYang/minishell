@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 08:42:09 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 15:37:37 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/08 11:26:24 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,12 @@ static char	**tokens_to_str_array(t_token **tokens)
  * @param line The input line to tokenize.
  * @return A newly allocated array of strings, or NULL on failure.
  */
-char	**tokenize_input(char *line)
+char	**tokenize_input(char *line, t_process_data *pd)
 {
 	t_token	**tokens;
 	char	**args;
 
-	tokens = parse_line(line);
+	tokens = parse_line(line, pd);
 	if (!tokens)
 	{
 		args = malloc(sizeof(char *));

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   prepare_pipeline_helper.c                          :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/09/03 11:30:14 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/04 12:12:46 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   prepare_pipeline_helper.c                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/03 11:30:14 by tiyang            #+#    #+#             */
+/*   Updated: 2025/09/08 11:25:08 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ static char	**expand_command_args(char *cmd_str, t_process_data *data)
 	t_token		**tokens;
 	char		**expanded_args;
 
-	tokens = parse_line(cmd_str);
+	tokens = parse_line(cmd_str, data);
 	if (tokens == NULL)
 		return (NULL);
 	expanded_args = expand_and_split_args(tokens, data);

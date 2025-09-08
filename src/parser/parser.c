@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
-/*   Updated: 2025/08/30 15:39:15 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/08 11:37:30 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,20 +137,27 @@ static int	fill_tokens_array(const char *s, t_token **tokens, int token_count)
  * @param line The input line to parse.
  * @return A pointer to the array of tokens, or NULL on failure.
  */
-t_token	**parse_line(char *line)
+t_token	**parse_line(char *line, t_process_data *pd)
 {
 	int		token_count;
 	t_token	**tokens;
 
 	if (line == NULL || *line == '\0')
 		return (NULL);
-	if (!quotes_are_closed(line))
+	if (!quotes_are_closed(line, pd))
+	{
+		if (pd)
+			pd->last_exit_status = 2;
 		return (NULL);
+	}
 	token_count = count_tokens(line);
 	tokens = malloc(sizeof(t_token *) * (token_count + 1));
 	if (tokens == NULL)
 		return (NULL);
 	if (fill_tokens_array(line, tokens, token_count) == -1)
+	{
+		free(tokens);
 		return (NULL);
+	}
 	return (tokens);
 }

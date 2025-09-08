@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 11:05:27 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/03 11:13:37 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/08 11:09:50 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
  * @param line The input line to check.
  * @return 1 if all quotes are properly closed, 0 otherwise.
  */
-int	quotes_are_closed(const char *line)
+int	quotes_are_closed(const char *line, t_process_data *pd)
 {
 	char	quote_char;
 
@@ -31,13 +31,15 @@ int	quotes_are_closed(const char *line)
 	{
 		if (quote_char == 0 && (*line == '\'' || *line == '"'))
 			quote_char = *line;
-		else if (*line == quote_char)
+		else if (quote_char && *line == quote_char)
 			quote_char = 0;
 		line++;
 	}
 	if (quote_char != 0)
 	{
 		ft_error("", "syntax error (unclosed quote)");
+		if (pd)
+			pd->last_exit_status = 2;
 		return (0);
 	}
 	return (1);
