@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   export_helper1.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/30 12:25:01 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/06 15:04:03 by tiyang           ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   export_helper1.c                                   :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/30 12:25:01 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/08 09:21:05 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,7 @@ static int	handle_no_assignment_export(const char *arg, t_env_var *env_list)
 	}
 	existing_var = find_env_var((char *)arg, env_list);
 	if (existing_var == NULL)
-		add_env_var(ft_strdup(arg), NULL, env_list);
+		add_env_var(arg, NULL, env_list);//DEBUG
 	return (0);
 }
 
