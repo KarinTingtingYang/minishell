@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   execute_command_types.c                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/30 19:24:59 by tiyang            #+#    #+#             */
-/*   Updated: 2025/09/08 10:39:58 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   execute_command_types.c                            :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/30 19:24:59 by tiyang        #+#    #+#                 */
+/*   Updated: 2025/09/08 12:51:19 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,21 +85,21 @@ static void	cleanup_and_exit(t_execute_data *data,
 int	handle_exit_builtin(t_execute_data *data, t_process_data *process_data,
 								char **args)
 {
-	int	saved_stdin;
-	int	saved_stdout;
-	int	did_save;
-	int	exit_code;
+	int			saved_stdin;
+	int			saved_stdout;
+	int			did_save;
+	int			exit_code;
+	long long	code;
 
 	saved_stdin = -1;
 	saved_stdout = -1;
 	did_save = 0;
 	if (setup_builtin_io(data, &saved_stdin, &saved_stdout, &did_save) != 0)
-	{
 		return (free_execute_data(data), process_data->last_exit_status = 1, 1);
-	}
 	ft_putstr_fd("exit\n", STDOUT_FILENO);
 	exit_code = get_exit_code(data, process_data);
-	if (exit_code == 1)
+	if (data->clean_args[1] && ft_str_to_llong(data->clean_args[1], &code)
+		&& data->clean_args[2])
 	{
 		restore_builtin_io(did_save, saved_stdin, saved_stdout);
 		free_execute_data(data);

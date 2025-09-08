@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/08 10:04:22 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   expander.c                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/08/04 12:13:56 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/08 12:46:09 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,23 +129,52 @@ static void	assign_prev_val_value(char **prev_val, t_token **tokens, int i)
  * @param final_count A pointer to the count of arguments in final_args.
  * @return The updated array of arguments, or NULL on failure.
  */
-static char	**append_expanded_token(t_token *token, t_process_data *pdata,
-											char **final_args, int *final_count)
+// static char	**append_expanded_token(t_token *token, t_process_data *pdata,
+// 											char **final_args, int *final_count)
+// {
+// 	char		**split;
+// 	const char	*prev_val;
+
+// 	assign_prev_val_value((char **)&prev_val, &token, 0);
+// 	split = process_token_for_expansion(token, prev_val, pdata);
+// 	if (split == NULL)
+// 		return (free_split(final_args), NULL);
+// 	if (pdata->syntax_error)
+// 	{
+// 		free_split(split);
+// 		free_split(final_args);
+// 		return (NULL);
+// 	}
+// 	return (append_split_to_final(final_args, final_count, split));
+// }
+static int	append_expanded_token(t_token **tokens, int i,
+									t_process_data *pdata,
+									t_append_info *arg_info)
 {
 	char		**split;
 	const char	*prev_val;
+	char		**new_args;
 
-	assign_prev_val_value((char **)&prev_val, &token, 0);
-	split = process_token_for_expansion(token, prev_val, pdata);
+	assign_prev_val_value((char **)&prev_val, tokens, i);
+	split = process_token_for_expansion(tokens[i], prev_val, pdata);
 	if (split == NULL)
-		return (free_split(final_args), NULL);
+	{
+		free_split(arg_info->array);
+		arg_info->array = NULL;
+		return (-1);
+	}
 	if (pdata->syntax_error)
 	{
 		free_split(split);
-		free_split(final_args);
-		return (NULL);
+		free_split(arg_info->array);
+		arg_info->array = NULL;
+		return (-1);
 	}
-	return (append_split_to_final(final_args, final_count, split));
+	new_args = append_split_to_final(arg_info->array, &arg_info->count, split);
+	if (new_args == NULL)
+		return (-1);
+	arg_info->array = new_args;
+	return (0);
 }
 
 /**
@@ -160,24 +189,41 @@ static char	**append_expanded_token(t_token *token, t_process_data *pdata,
  * @return A pointer to the newly allocated array of argument strings, or NULL
  * on failure.
  */
+// char	**expand_and_split_args(t_token **tokens, t_process_data *pdata)
+// {
+// 	char	**final_args;
+// 	int		final_count;
+// 	int		i;
+// 	char	**tmp;
+
+// 	final_args = NULL;
+// 	final_count = 0;
+// 	i = 0;
+// 	pdata->syntax_error = 0;
+// 	while (tokens[i] != NULL)
+// 	{
+// 		tmp = append_expanded_token(tokens[i], pdata, final_args, &final_count);
+// 		if (tmp == NULL)
+// 			return (NULL);
+// 		final_args = tmp;
+// 		i++;
+// 	}
+// 	return (final_args);
+// }
 char	**expand_and_split_args(t_token **tokens, t_process_data *pdata)
 {
-	char	**final_args;
-	int		final_count;
-	int		i;
-	char	**tmp;
+	t_append_info	arg_info;
+	int				i;
 
-	final_args = NULL;
-	final_count = 0;
+	arg_info.array = NULL;
+	arg_info.count = 0;
 	i = 0;
 	pdata->syntax_error = 0;
 	while (tokens[i] != NULL)
 	{
-		tmp = append_expanded_token(tokens[i], pdata, final_args, &final_count);
-		if (tmp == NULL)
+		if (append_expanded_token(tokens, i, pdata, &arg_info) == -1)
 			return (NULL);
-		final_args = tmp;
 		i++;
 	}
-	return (final_args);
+	return (arg_info.array);
 }
