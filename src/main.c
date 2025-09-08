@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/08 10:47:08 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/08 12:11:18 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,8 +125,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	env_list = init_env(envp);
-	if (!env_list)
-		return (1);
+	bootstrap_env_if_empty(&env_list);
 	process_data.env_list = env_list;
 	process_data.last_exit_status = 0;
 	setup_signal_handlers();
