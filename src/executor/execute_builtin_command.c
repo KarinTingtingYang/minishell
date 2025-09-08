@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 11:55:08 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/05 14:09:38 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/08 10:09:07 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,29 @@ static void	check_and_handle_dup_error(int *saved_stdin, int *saved_stdout)
 	}
 }
 
+/**
+ * @brief Sets up I/O redirection for a built-in command.
+ *
+ * Saves standard I/O file descriptors if redirection is needed.
+ * Applies the new redirections and returns 0 on success, or 1 on failure.
+ *
+ * @param data The execution data with I/O files.
+ * @param saved_stdin A pointer to store the saved standard input
+ *                    file descriptor.
+ * @param saved_stdout A pointer to store the saved standard output
+ *                     file descriptor.
+ * @param did_save A pointer to a flag indicating if the descriptors were saved.
+ * @return 0 on success, 1 on error.
+ */
 int	setup_builtin_io(t_execute_data *data, int *saved_stdin,
 							int *saved_stdout, int *did_save)
 {
-	*saved_stdin  = -1;
+	*saved_stdin = -1;
 	*saved_stdout = -1;
-	*did_save     = 0;
-
+	*did_save = 0;
 	if (data->input_file != NULL || data->output_file != NULL)
 	{
-		*saved_stdin  = dup(STDIN_FILENO);
+		*saved_stdin = dup(STDIN_FILENO);
 		*saved_stdout = dup(STDOUT_FILENO);
 		check_and_handle_dup_error(saved_stdin, saved_stdout);
 		*did_save = 1;
@@ -86,6 +99,20 @@ void	restore_builtin_io(int did_save, int saved_stdin, int saved_stdout)
 	close(saved_stdout);
 }
 
+/**
+ * @brief Executes a built-in shell command with proper I/O redirection.
+ *
+ * This function handles the execution of a built-in command, such
+ * as `cd` or `echo`, by first setting up any necessary input/output
+ * redirection (e.g., redirecting standard output to a file). After
+ * the I/O is set, it executes the built-in command and then restores
+ * the original standard input and output streams.
+ *
+ * @param data A pointer to the execution data structure, which includes
+ * the command's clean arguments and I/O files.
+ * @param process_data A pointer to the overall process data.
+ * @return The exit status of the executed built-in command.
+ */
 int	execute_builtin_command(t_execute_data *data, t_process_data *process_data)
 {
 	int	saved_stdin;

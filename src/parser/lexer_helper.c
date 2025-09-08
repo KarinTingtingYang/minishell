@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_helper.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 10:44:35 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/06 14:11:02 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/08 09:10:37 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ char	**append_str(t_append_info *info, char *line, int start, int end)
 	if (new_arr == NULL)
 	{
 		free(substr);
-		free_split(info->array);//DEBUG
+		free_split(info->array);
 		return (NULL);
 	}
 	new_arr[info->count] = substr;

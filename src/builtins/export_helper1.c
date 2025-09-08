@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export_helper1.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 12:25:01 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/06 15:04:03 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/08 09:06:22 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ static int	store_export_assignment(char *key, char *clean_value,
 	else
 	{
 		add_env_var(key, clean_value, env_list);
-		free(clean_value);// DEBUG
+		free(clean_value);
 	}
 	free(key);
 	return (0);

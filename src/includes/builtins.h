@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 09:01:24 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/05 14:03:29 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/08 10:05:14 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,5 +29,5 @@ int		run_builtin(char **args, t_process_data *process_data);
 int		apply_builtin_redirection(char *input_file, char *output_file,
 			int output_mode);
 int		ft_parse_digits_to_llong(const char *str,
-										int sign, long long *out_val);
+			int sign, long long *out_val);
 #endif

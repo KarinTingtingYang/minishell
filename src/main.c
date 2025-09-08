@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/06 15:09:13 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/08 09:08:39 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,6 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_env_var		*env_list;
 	t_process_data	process_data;
-	//int				exit_status;
 
 	(void)argc;
 	(void)argv;
@@ -132,7 +131,6 @@ int	main(int argc, char **argv, char **envp)
 	process_data.last_exit_status = 0;
 	setup_signal_handlers();
 	if (isatty(STDIN_FILENO))
-		//exit_status = run_interactive_shell(&process_data); //DEBUG
 		process_data.last_exit_status = run_interactive_shell(&process_data);
 	else
 		run_non_interactive_shell(&process_data);

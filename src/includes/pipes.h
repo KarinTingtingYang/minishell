@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 11:30:32 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/06 14:58:49 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/08 10:01:24 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ typedef struct s_process_data
 	int			last_exit_status;
 	int			in_pipeline;
 	int			syntax_error;
-	char		**parts; // DEBUG
+	char		**parts;
 }	t_process_data;
 
 /**
@@ -70,8 +70,6 @@ int		fork_all_processes_recursive(t_process_data *data, int i);
 void	execute_child_command(t_command *cmd, t_process_data *data);
 void	close_free_pipes_recursively(int **pipes, int idx, int max);
 int		create_all_pipes_recursively(int **pipes, int index, int max);
-// int		run_command_pipeline(t_command **cmds, int cmd_count, char **path_dirs,
-// 			t_env_var *env_list);
 int		run_command_pipeline(t_process_data *data);
 
 #endif

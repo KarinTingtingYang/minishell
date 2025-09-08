@@ -6,34 +6,11 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 12:13:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/05 13:57:17 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/08 10:04:22 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-
-/**
- * @brief Handles variable expansion based on the character following '$'.
- * 
- * This function checks if the character after '$' is '{', indicating a
- * braced variable, and calls the appropriate expansion function. If not,
- * it treats it as a simple variable.
- * 
- * @param input The input string containing the variable.
- * @param i The current index in the input string (pointing to '$').
- * @param result Pointer to the result string being built.
- * @param data Pointer to the expansion data containing environment variables
- *             and last exit status.
- * @return The updated index in the input string after processing the variable.
- */
-size_t	handle_variable_expansion(const char *input, size_t i,
-											char **result, t_expand_data *data)
-{
-	if (input[i + 1] == '{')
-		return (expand_braced_variable(input, i, result, data));
-	else
-		return (expand_simple_variable(input, i, result, data));
-}
 
 /**
  * @brief Processes the next segment of the input string for variable expansion.
@@ -139,26 +116,56 @@ static void	assign_prev_val_value(char **prev_val, t_token **tokens, int i)
 }
 
 /**
- * @brief Expands variables in a list of tokens and splits them into arguments.
- * 
- * This function processes each token, expands any variables, and handles
- * whitespace splitting based on the original quotes. It returns a newly
- * allocated array of strings representing the final arguments.
- * 
+ * @brief Processes a single token and appends its expanded
+ *        arguments to a final list.
+ *
+ * This function handles the logic for expanding variables within a single token,
+ * splitting the result, and appending it to the main arguments array. It also
+ * checks for and handles syntax errors.
+ *
+ * @param token The token to process.
+ * @param pdata The process data containing syntax error flags.
+ * @param final_args The current list of final arguments.
+ * @param final_count A pointer to the count of arguments in final_args.
+ * @return The updated array of arguments, or NULL on failure.
+ */
+static char	**append_expanded_token(t_token *token, t_process_data *pdata,
+											char **final_args, int *final_count)
+{
+	char		**split;
+	const char	*prev_val;
+
+	assign_prev_val_value((char **)&prev_val, &token, 0);
+	split = process_token_for_expansion(token, prev_val, pdata);
+	if (split == NULL)
+		return (free_split(final_args), NULL);
+	if (pdata->syntax_error)
+	{
+		free_split(split);
+		free_split(final_args);
+		return (NULL);
+	}
+	return (append_split_to_final(final_args, final_count, split));
+}
+
+/**
+ * @brief Expands variables and splits tokens into final arguments.
+ *
+ * This function iterates through a list of tokens, using a helper function
+ * to expand variables, handle quotes, and build the final array of arguments.
+ * It is now much shorter and easier to read.
+ *
  * @param tokens The array of tokens to process.
- * @param env_list The linked list of environment variables for expansion.
- * @param last_exit_status The last exit status for special variable expansion.
- * @return A pointer to the newly allocated array of argument strings,
- *         or NULL on failure.
+ * @param pdata The process data structure.
+ * @return A pointer to the newly allocated array of argument strings, or NULL
+ * on failure.
  */
 char	**expand_and_split_args(t_token **tokens, t_process_data *pdata)
 {
-	char		**final_args;
-	int			final_count;
-	char		**split;
-	int			i;
-	const char	*prev_val;
-	char		**tmp;
+	char	**final_args;
+	int		final_count;
+	int		i;
+	char	**tmp;
 
 	final_args = NULL;
 	final_count = 0;
@@ -166,15 +173,9 @@ char	**expand_and_split_args(t_token **tokens, t_process_data *pdata)
 	pdata->syntax_error = 0;
 	while (tokens[i] != NULL)
 	{
-		assign_prev_val_value((char **)&prev_val, tokens, i);
-		split = process_token_for_expansion(tokens[i], prev_val, pdata);
-		if (split == NULL)
-			return (free_split(final_args), NULL);
-		if (pdata->syntax_error)
-			return (free_split(split), free_split(final_args), NULL);
-		tmp = append_split_to_final(final_args, &final_count, split);
+		tmp = append_expanded_token(tokens[i], pdata, final_args, &final_count);
 		if (tmp == NULL)
-			return (free_split(final_args), NULL);
+			return (NULL);
 		final_args = tmp;
 		i++;
 	}

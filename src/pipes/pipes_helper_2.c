@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes_helper_2.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tiyang <tiyang@student.42.fr>              +#+  +:+       +#+        */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/03 12:01:47 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/06 15:07:49 by tiyang           ###   ########.fr       */
+/*   Updated: 2025/09/08 09:10:04 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,10 @@
 void	execute_child_command(t_command *cmd, t_process_data *data)
 {
 	int	status;
-	
+
 	if (cmd->args == NULL || cmd->args[0] == NULL)
 		exit(0);
 	if (is_builtin(cmd->args[0]))
-		// exit(run_builtin(cmd->args, data));
-		// DEBUG
 	{
 		status = run_builtin(cmd->args, data);
 		cleanup_child_pipeline_resources(data);
