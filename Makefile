@@ -15,7 +15,8 @@ SRCS       = $(SRC_DIR)/main.c \
 			 $(SRC_DIR)/executor/precheck_line_helper.c \
              $(SRC_DIR)/executor/executor.c \
              $(SRC_DIR)/executor/executor_helper.c \
-             $(SRC_DIR)/executor/executor_cleanup.c \
+             $(SRC_DIR)/executor/executor_cleanup_1.c \
+			 $(SRC_DIR)/executor/executor_cleanup_2.c \
 			 $(SRC_DIR)/executor/executor_error.c \
              $(SRC_DIR)/executor/path.c \
 			 $(SRC_DIR)/executor/prepare_command_execution.c \
@@ -57,6 +58,7 @@ SRCS       = $(SRC_DIR)/main.c \
 			 $(SRC_DIR)/parser/expander_helper_7.c \
              $(SRC_DIR)/utils_1.c \
 			 $(SRC_DIR)/utils_2.c \
+			 $(SRC_DIR)/utils_3.c \
              $(SRC_DIR)/signal/signal.c \
              $(SRC_DIR)/signal/signal_utils.c \
              $(SRC_DIR)/redirection/redirection.c \

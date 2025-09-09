@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/21 09:39:33 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/08 10:46:16 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/09 13:13:24 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,12 @@ typedef struct s_command	t_command;
 
 typedef struct s_env_var	t_env_var;
 
+/**
+ * @brief Struct to hold data for executing a single command.
+ * This struct contains all necessary information for executing
+ * a command, including arguments, file paths, environment,
+ * and redirection details.
+ */
 typedef struct s_execute_data
 {
 	char		**original_args;
@@ -89,19 +95,20 @@ int			is_unquoted_pipe_present(const char *line);
 
 // executor_error.c
 void		handle_stat_error(char **envp, char **args, int error_code);
-void		handle_access_error(char **envp, char **args, int error_code);
 void		handle_execve_error(char **envp, char **args, int error_code);
-void		handle_null_cmd_path(char **args, char **envp);
+void		handle_access_error(char **envp, char **args, int error_code);
 int			handle_redirection_error(t_execute_data *data,
 				t_process_data *process_data, char **args);
 
-// executor_cleanup.c
-void		free_execute_data(t_execute_data *data);
+// executor_cleanup_1.c
 void		free_commands_recursive(t_command **cmds, int index, int count);
-// void		cleanup_pipeline_resources(t_command **cmds, char **parts,
-// 				char **path_dirs, int count);
 void		cleanup_pipeline_resources(t_process_data *data);
+void		free_commands_range(t_command **cmds, int count);
+
+// executor_cleanup_2.c
 void		cleanup_child_pipeline_resources(t_process_data *data);
+void		free_args_env(char **args, char **envp);
+void		handle_null_cmd_path(char **args, char **envp);
 
 // execute_builtin_command.c 
 void		restore_builtin_io(int did_save, int saved_stdin, int saved_stdout);

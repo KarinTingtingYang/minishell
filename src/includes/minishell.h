@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:10:15 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/08 12:11:45 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/09 13:02:31 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,13 @@
 
 extern volatile sig_atomic_t	g_signal_received;
 
+void	free_ptr(void **p);
 void	free_split(char **array);
 void	skip_spaces(const char **s);
 void	ft_error(char *command, char *message);
+void	free_execute_data(t_execute_data *data);
 void	bootstrap_env_if_empty(t_env_var **env_list);
+void	shutdown_shell(t_process_data *process_data);
 void	ft_error_with_arg(char *command, char *arg, char *message);
 void	error_with_backticked_arg(const char *cmd, const char *arg,
 			const char *msg);

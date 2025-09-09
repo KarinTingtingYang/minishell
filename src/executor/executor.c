@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/09 09:35:12 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/09 13:09:58 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,13 @@ static char	*safe_cmd_name(char **args, char *buf, size_t buflen)
 	return (fallback);
 }
 
-static void	free_args_env(char **args, char **envp)
-{
-	if (args)
-		free_split(args);
-	if (envp)
-		free_split(envp);
-}
+// static void	free_args_env(char **args, char **envp)
+// {
+// 	if (args)
+// 		free_split(args);
+// 	if (envp)
+// 		free_split(envp);
+// }
 
 /* -------------------------------------------------------------------------- */
 /*                          Pre-exec validity checks                           */

@@ -6,33 +6,27 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 19:07:14 by tiyang            #+#    #+#             */
-/*   Updated: 2025/09/09 09:36:11 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/09 13:17:27 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
-#include <limits.h> /* PATH_MAX */
-
-/* -------------------------------------------------------------------------- */
-/*                          Internal cleanup utilities                         */
-/* -------------------------------------------------------------------------- */
 
 /**
- * @brief Safely pick a command name for error printing.
- *
- * Copies args[0] into a stack buffer so we can free args/envp before
- * calling ft_error_and_exit(), avoiding using freed pointers.
- *
- * @param args   Argument vector (may be NULL).
- * @param buf    Stack buffer to write into.
- * @param buflen Size of @p buf.
- * @return const char*  Pointer to either @p buf (if args[0] existed) or "minishell".
+ * @brief Safely obtain a printable command name.
+ * 
+ * Returns a writable pointer so it matches ft_error_and_exit(char*,...).
+ * If args[0] exists, a copy is placed in, otherwise a static
+ * fallback "minishell" is returned.
+ * @param args The command arguments array.
+ * @param buf  Buffer to store the command name copy.
+ * @param buflen Size of the buffer.
+ * @return A pointer to the command name string.
  */
 static const char	*safe_cmd_name(char **args, char *buf, size_t buflen)
 {
 	if (args && args[0] && buflen > 0)
 	{
-		/* Use your project's ft_strlcpy if available; fallback to snprintf otherwise */
 		ft_strlcpy(buf, args[0], buflen);
 		return (buf);
 	}
@@ -40,28 +34,14 @@ static const char	*safe_cmd_name(char **args, char *buf, size_t buflen)
 }
 
 /**
- * @brief Free both args and envp if present.
- */
-static void	free_args_env(char **args, char **envp)
-{
-	if (args)
-		free_split(args);
-	if (envp)
-		free_split(envp);
-}
-
-/* -------------------------------------------------------------------------- */
-/*                              Public interfaces                              */
-/* -------------------------------------------------------------------------- */
-
-/**
- * @brief Handles errors related to stat() system call.
+ * @brief Handles errors from stat()/access and directory cases.
+ *        Frees envp/args before exiting via the error helpers.
  *
- * Frees args/envp before exiting. Uses a stack copy of the command name.
- *
- * @param envp The environment variables array to free if needed.
- * @param args The command arguments array to free if needed.
- * @param error_code The error code from the failed stat() call.
+ * @param cmd_path Full command path (must be non-NULL when called).
+ * @param args     argv-style array for the command.
+ * @param envp     envp array created for execve.
+ * @return 1 if command is OK to exec, 0 otherwise (unreachable
+ *         if error exits).
  */
 void	handle_stat_error(char **envp, char **args, int error_code)
 {
@@ -88,8 +68,9 @@ void	handle_stat_error(char **envp, char **args, int error_code)
 void	handle_access_error(char **envp, char **args, int error_code)
 {
 	char		namebuf[PATH_MAX];
-	const char	*name = safe_cmd_name(args, namebuf, sizeof(namebuf));
+	const char	*name;
 
+	name = safe_cmd_name(args, namebuf, sizeof(namebuf));
 	free_args_env(args, envp);
 	if (error_code == EACCES)
 		ft_error_and_exit((char *)name, "Permission denied", 126);
@@ -99,7 +80,7 @@ void	handle_access_error(char **envp, char **args, int error_code)
 }
 
 /**
- * @brief Handles errors related to execve() system call.
+ * @brief Handles errors from execve() system call.
  *
  * Frees args/envp before exiting. Uses a stack copy of the command name.
  *
@@ -125,45 +106,16 @@ void	handle_execve_error(char **envp, char **args, int error_code)
 }
 
 /**
- * @brief Handles the case when the command path is NULL.
+ * @brief Handles redirection errors and sets appropriate exit status.
  *
- * If the user typed a path (contains '/'), report ENOENT. Otherwise,
- * report "command not found". Frees args/envp before exiting.
+ * This function checks for signals and syntax errors related to
+ * redirections in the command arguments. It updates the last exit
+ * status in the process data accordingly.
  *
+ * @param data Pointer to the execution data (not used here).
+ * @param process_data Pointer to the process data structure.
  * @param args The command arguments array.
- * @param envp The environment variables array to free if needed.
- */
-void	handle_null_cmd_path(char **args, char **envp)
-{
-	char		namebuf[PATH_MAX];
-	int			has_slash;
-
-	has_slash = (args && args[0] && ft_strchr(args[0], '/') != NULL);
-	(void)has_slash; /* keep computed before freeing */
-
-	/* Choose printable name before freeing inputs */
-	if (args && args[0])
-		ft_strlcpy(namebuf, args[0], sizeof(namebuf));
-
-	/* Free everything we own before exiting */
-	free_args_env(args, envp);
-
-	if (has_slash)
-		ft_error_and_exit(namebuf, "No such file or directory", 127);
-	/* If no args[0], fall back to "minishell" as the subject */
-	ft_error_and_exit((namebuf[0] ? namebuf : "minishell"),
-		"command not found", 127);
-}
-
-/**
- * @brief Handles errors related to command redirection syntax.
- *
- * Sets the last exit status on syntax/signal errors. No allocations here.
- *
- * @param data Pointer to the execution data.
- * @param process_data Pointer to the process data.
- * @param args The command arguments array.
- * @return The exit status code based on the error encountered.
+ * @return The exit status code to be used by the caller.
  */
 int	handle_redirection_error(t_execute_data *data, t_process_data *process_data,
 	char **args)

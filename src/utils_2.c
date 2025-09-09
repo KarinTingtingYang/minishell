@@ -6,35 +6,11 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 10:15:36 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/08 12:18:50 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/09 12:48:06 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../src/includes/minishell.h"
-
-/**
- * @brief Frees a NULL-terminated array of strings.
- * 
- * This function iterates through the array, freeing each individual
- * string, and then frees the array itself.
- * @param array The NULL-terminated array of strings to free.
- */
-void	free_split(char **array)
-{
-	int	i;
-
-	i = 0;
-	if (array == NULL)
-		return ;
-	while (array[i])
-	{
-		free(array[i]);
-		array[i] = NULL;
-		i++;
-	}
-	free(array);
-	array = NULL;
-}
 
 /**
  * @brief Skips leading spaces and tabs in a string.
@@ -84,6 +60,23 @@ static void	add_first_or_append(t_env_var **head, const char *key,
 		add_env_var(ft_strdup(key), ft_strdup(value), *head);
 	else
 		add_env_var(ft_strdup(key), NULL, *head);
+}
+
+/**
+ * @brief Cleans up resources before exiting the shell.
+ * Frees environment list and clears readline history.
+ * @param process_data Pointer to the process data structure.
+ * @return void
+ */
+void	shutdown_shell(t_process_data *process_data)
+{
+	get_next_line_cleanup();
+	rl_clear_history();
+	if (process_data && process_data->env_list)
+	{
+		free_env(process_data->env_list);
+		process_data->env_list = NULL;
+	}
 }
 
 /**
