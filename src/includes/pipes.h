@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   pipes.h                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/22 11:30:32 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/08 10:01:24 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   pipes.h                                            :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/22 11:30:32 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/09 13:17:28 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,5 +71,14 @@ void	execute_child_command(t_command *cmd, t_process_data *data);
 void	close_free_pipes_recursively(int **pipes, int idx, int max);
 int		create_all_pipes_recursively(int **pipes, int index, int max);
 int		run_command_pipeline(t_process_data *data);
+void	handle_builtin_command(t_command *cmd, t_process_data *data);
+void	handle_path_resolution_error(char *cmd_name, char **envp,
+			t_process_data *data);
+void	handle_stat_error_child(char *cmd_name, char **envp,
+			t_process_data *data, int error_code);
+void	handle_access_error_child(char *cmd_name, char **envp,
+			t_process_data *data, int error_code);
+void	handle_execve_error_child(char *cmd_name, char **envp,
+			t_process_data *data, int error_code);
 
 #endif

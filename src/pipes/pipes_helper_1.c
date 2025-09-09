@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 10:20:17 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/09 12:23:17 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/09 13:23:38 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <string.h>
 
 /* -------------------------------------------------------------------------- */
-/*                         Child I/O and pipe handling                         */
+/*                         Child I/O and pipe handling                        */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -44,14 +44,13 @@ static void	setup_child_io(t_process_data *data, int i)
 		if (dup2(data->pipes[i][1], STDOUT_FILENO) == -1)
 			ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
 	}
-	/* After duplicating, close all inherited pipe fds in the child */
 	close_free_pipes_recursively(data->pipes, 0, max_pipes);
 	redirect_io(data->cmds[i]->input_file, data->cmds[i]->output_file,
 		data->cmds[i]->output_mode);
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              Process forking                                */
+/*                              Process forking                               */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -72,28 +71,27 @@ int	fork_all_processes_recursive(t_process_data *data, int i)
 	data->pids[i] = fork();
 	if (data->pids[i] == -1)
 	{
-		/* Close all pipes and free parent-side resources before exiting */
 		close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
-		/* Also free cmds/parts/path_dirs/pids to avoid "still reachable" */
 		cleanup_pipeline_resources(data);
 		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
 		return (-1);
 	}
 	if (data->pids[i] == 0)
 	{
-		/* Child branch */
 		get_next_line_cleanup();
 		reset_child_signal_handlers();
 		setup_child_io(data, i);
 		execute_child_command(data->cmds[i], data);
-		/* If execute_child_command ever returns, exit with last status */
-		_exit((data->last_exit_status != 0) ? data->last_exit_status : 127);
+		if (data->last_exit_status != 0)
+			exit(data->last_exit_status);
+		else
+			exit(127);
 	}
 	return (fork_all_processes_recursive(data, i + 1));
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              PID allocation                                 */
+/*                              PID allocation                                */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -120,7 +118,7 @@ pid_t	*create_child_processes(int cmd_count, int **pipes)
 }
 
 /* -------------------------------------------------------------------------- */
-/*                          Pipe creation and cleanup                          */
+/*                          Pipe creation and cleanup                         */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -146,19 +144,14 @@ int	create_all_pipes_recursively(int **pipes, int index, int max)
 		return (-1);
 	if (pipe(pipes[index]) == -1)
 	{
-		/* Free the just-allocated slot; no FDs created on failure */
 		free(pipes[index]);
 		pipes[index] = NULL;
-
-		/* Close & free all earlier pipes, then also free the array itself */
 		close_free_pipes_recursively(pipes, 0, index);
-
 		ft_error_and_exit("pipe", strerror(errno), EXIT_FAILURE);
 		return (-1);
 	}
 	if (create_all_pipes_recursively(pipes, index + 1, max) == -1)
 	{
-		/* A deeper failure occurred; free our own slot and bubble up */
 		close(pipes[index][0]);
 		close(pipes[index][1]);
 		free(pipes[index]);
@@ -185,7 +178,6 @@ void	close_free_pipes_recursively(int **pipes, int idx, int max)
 		return ;
 	if (pipes[idx])
 	{
-		/* Close ends if they look valid; ignore close errors */
 		close(pipes[idx][0]);
 		close(pipes[idx][1]);
 		free(pipes[idx]);
