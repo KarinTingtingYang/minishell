@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   utils_3.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/09 12:47:35 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/09 13:03:54 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   utils_3.c                                          :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/09/09 12:47:35 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/09 13:48:39 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ static void	free_execute_arguments(t_execute_data *data)
 void	free_execute_data(t_execute_data *data)
 {
 	if (data == NULL)
-		return ;   
+		return ;
 	free_execute_files_and_paths(data);
 	free_execute_arguments(data);
 }
