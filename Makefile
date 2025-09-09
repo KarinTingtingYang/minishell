@@ -38,6 +38,7 @@ SRCS       = $(SRC_DIR)/main.c \
              $(SRC_DIR)/pipes/pipes.c \
              $(SRC_DIR)/pipes/pipes_helper_1.c \
 			 $(SRC_DIR)/pipes/pipes_helper_2.c \
+			 $(SRC_DIR)/pipes/pipes_helper_3.c \
              $(SRC_DIR)/parser/parser.c \
 			 $(SRC_DIR)/parser/parser_helper_1.c \
 			 $(SRC_DIR)/parser/parser_helper_2.c \

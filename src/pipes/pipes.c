@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   pipes.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/22 10:08:55 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/09 09:34:19 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   pipes.c                                            :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/07/22 10:08:55 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/09 13:16:51 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <signal.h>
 
 /* -------------------------------------------------------------------------- */
-/*                           Pipe allocation helpers                           */
+/*                           Pipe allocation helpers                          */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -32,18 +32,21 @@
 static int	**create_pipe_fds_between_commands(int cmd_count)
 {
 	int	**pipes;
+	int	i;
 
 	if (cmd_count < 2)
 		return (NULL);
 	pipes = (int **)malloc(sizeof(int *) * (cmd_count - 1));
 	if (pipes == NULL)
 		return (NULL);
-	/* Initialize to NULL so cleanup can safely iterate all slots */
-	for (int i = 0; i < cmd_count - 1; ++i)
+	i = 0;
+	while (i < cmd_count - 1)
+	{
 		pipes[i] = NULL;
+		i++;
+	}
 	if (create_all_pipes_recursively(pipes, 0, cmd_count - 1) == -1)
 	{
-		/* Close any pipes that were created and free top-level array */
 		close_free_pipes_recursively(pipes, 0, cmd_count - 1);
 		return (NULL);
 	}
@@ -59,7 +62,7 @@ static int	**prepare_pipe_fds(int cmd_count)
 }
 
 /* -------------------------------------------------------------------------- */
-/*                            Forking / pipeline run                           */
+/*                            Forking / pipeline run                          */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -75,10 +78,8 @@ static int	setup_and_fork_pipeline(t_process_data *data)
 {
 	if (data->cmd_count < 1)
 		return (0);
-
 	data->pipes = NULL;
 	data->pids = NULL;
-
 	if (data->cmd_count > 1)
 	{
 		data->pipes = prepare_pipe_fds(data->cmd_count);
@@ -88,7 +89,6 @@ static int	setup_and_fork_pipeline(t_process_data *data)
 	data->pids = create_child_processes(data->cmd_count, data->pipes);
 	if (data->pids == NULL)
 	{
-		/* Pipes may have been created; caller will close them too */
 		return (-1);
 	}
 	if (fork_all_processes_recursive(data, 0) == -1)
@@ -105,7 +105,7 @@ static int	setup_and_execute_pipeline(t_process_data *data)
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                Public API                                   */
+/*                                Public API                                  */
 /* -------------------------------------------------------------------------- */
 
 /**
@@ -125,25 +125,19 @@ int	run_command_pipeline(t_process_data *data)
 
 	data->last_exit_status = 0;
 	data->in_pipeline = 1;
-
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
-
 	fork_status = setup_and_execute_pipeline(data);
 	if (fork_status == -1)
 	{
-		/* Best-effort cleanup on failure */
 		free(data->pids);
 		data->pids = NULL;
 		close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
 		data->pipes = NULL;
-
 		setup_signal_handlers();
 		return (-1);
 	}
-	/* Success: parent closes pipes & waits within run_pipeline_core */
 	exit_status = run_pipeline_core(data, data->cmd_count);
-
 	setup_signal_handlers();
 	return (exit_status);
 }

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   pipes_helper_2.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/03 12:01:47 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/09 09:36:37 by makhudon         ###   ########.fr       */
+/*                                                        ::::::::            */
+/*   pipes_helper_2.c                                   :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2025/09/03 12:01:47 by makhudon      #+#    #+#                 */
+/*   Updated: 2025/09/09 13:16:23 by tiyang        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,8 @@
 #include <unistd.h>
 
 /* -------------------------------------------------------------------------- */
-/*                         Execute one command in child                        */
+/*                         Execute one command in child                       */
 /* -------------------------------------------------------------------------- */
-
 /**
  * @brief Executes a single command in a child process.
  *
@@ -31,103 +30,58 @@
  *  - On any failure path prior to execve() success, we free envp and
  *    call cleanup_child_pipeline_resources() to avoid still-reachable.
  */
-void	execute_child_command(t_command *cmd, t_process_data *data)
+static void	validate_command_path(char *cmd_path, char *cmd_name,
+							char **envp, t_process_data *data)
 {
-	int			status;
-	char		namebuf[PATH_MAX];
-	char		**envp;
 	struct stat	st;
 	int			e;
 
-	/* Empty command: nothing to do, cleanly exit */
-	if (cmd->args == NULL || cmd->args[0] == NULL)
-	{
-		get_next_line_cleanup();
-		cleanup_child_pipeline_resources(data);
-		_exit(0);
-	}
-
-	/* Builtin path: run and exit with its status */
-	if (is_builtin(cmd->args[0]))
-	{
-		status = run_builtin(cmd->args, data);
-		cleanup_child_pipeline_resources(data);
-		_exit(status);
-	}
-
-	/* External command */
-	get_next_line_cleanup();
-
-	/* Preserve command name safely for error reporting */
-	ft_strlcpy(namebuf, cmd->args[0], sizeof(namebuf));
-
-	/* Prepare environment for execve */
-	envp = env_list_to_array(data->env_list);
-
-	/* If we couldn't resolve a path, mirror shell errors and clean up. */
-	if (cmd->cmd_path == NULL)
-	{
-		int has_slash = (ft_strchr(cmd->args[0], '/') != NULL);
-
-		free_split(envp);
-		cleanup_child_pipeline_resources(data);
-		if (has_slash)
-			ft_error_and_exit(namebuf, "No such file or directory", 127);
-		ft_error_and_exit(namebuf, "command not found", 127);
-	}
-
-	/* Pre-exec checks to provide nice diagnostics before execve */
-	if (stat(cmd->cmd_path, &st) == -1)
+	if (stat(cmd_path, &st) == -1)
 	{
 		e = errno;
-		free_split(envp);
-		cleanup_child_pipeline_resources(data);
-		if (e == ENOTDIR)
-			ft_error_and_exit(namebuf, "Not a directory", 126);
-		else if (e == ENOENT)
-			ft_error_and_exit(namebuf, "No such file or directory", 127);
-		ft_error_and_exit(namebuf, strerror(e), 126);
+		handle_stat_error_child(cmd_name, envp, data, e);
 	}
 	if (S_ISDIR(st.st_mode))
 	{
 		free_split(envp);
 		cleanup_child_pipeline_resources(data);
-		ft_error_and_exit(namebuf, "Is a directory", 126);
+		ft_error_and_exit(cmd_name, "Is a directory", 126);
 	}
-	if (access(cmd->cmd_path, X_OK) == -1)
+	if (access(cmd_path, X_OK) == -1)
 	{
 		e = errno;
-		free_split(envp);
-		cleanup_child_pipeline_resources(data);
-		if (e == EACCES)
-			ft_error_and_exit(namebuf, "Permission denied", 126);
-		else if (e == ENOTDIR)
-			ft_error_and_exit(namebuf, "Not a directory", 126);
-		ft_error_and_exit(namebuf, strerror(e), 126);
+		handle_access_error_child(cmd_name, envp, data, e);
 	}
+}
 
-	/* Exec: on success, never returns */
+void	execute_child_command(t_command *cmd, t_process_data *data)
+{
+	char	namebuf[PATH_MAX];
+	char	**envp;
+	int		e;
+
+	if (cmd->args == NULL || cmd->args[0] == NULL)
+	{
+		get_next_line_cleanup();
+		cleanup_child_pipeline_resources(data);
+		exit(0);
+	}
+	if (is_builtin(cmd->args[0]))
+		handle_builtin_command(cmd, data);
+	get_next_line_cleanup();
+	ft_strlcpy(namebuf, cmd->args[0], sizeof(namebuf));
+	envp = env_list_to_array(data->env_list);
+	if (cmd->cmd_path == NULL)
+		handle_path_resolution_error(namebuf, envp, data);
+	validate_command_path(cmd->cmd_path, namebuf, envp, data);
 	execve(cmd->cmd_path, cmd->args, envp);
-
-	/* Exec failed: capture errno, clean up, then print error and exit */
 	e = errno;
-	free_split(envp);
-	cleanup_child_pipeline_resources(data);
-	if (e == ENOEXEC)
-		ft_error_and_exit(namebuf, "Exec format error", 126);
-	else if (e == ENOTDIR)
-		ft_error_and_exit(namebuf, "Not a directory", 126);
-	else if (e == ENOENT)
-		ft_error_and_exit(namebuf, "No such file or directory", 127);
-	else if (e == EACCES)
-		ft_error_and_exit(namebuf, "Permission denied", 126);
-	ft_error_and_exit(namebuf, strerror(e), 126);
+	handle_execve_error_child(namebuf, envp, data, e);
 }
 
 /* -------------------------------------------------------------------------- */
-/*                         Wait helpers and final status                       */
+/*                         Wait helpers and final status                      */
 /* -------------------------------------------------------------------------- */
-
 /**
  * @brief Processes the exit status of a single child process.
  *
@@ -172,14 +126,13 @@ static int	wait_all_children(t_process_data *data, int index, int max,
 {
 	int	status;
 	int	is_last_child;
+	int	saved;
 
 	if (index >= max)
 		return (info->last_status);
 	if (waitpid(data->pids[index], &status, 0) == -1)
 	{
-		int saved = errno;
-
-		/* Free pids to prevent still-reachable blocks before exiting */
+		saved = errno;
 		free(data->pids);
 		data->pids = NULL;
 		ft_error_and_exit("waitpid", strerror(saved), EXIT_FAILURE);
@@ -190,9 +143,8 @@ static int	wait_all_children(t_process_data *data, int index, int max,
 }
 
 /* -------------------------------------------------------------------------- */
-/*                         Pipeline run / parent side                          */
+/*                         Pipeline run / parent side                         */
 /* -------------------------------------------------------------------------- */
-
 /**
  * @brief Executes the core logic of a command pipeline (parent side).
  *
@@ -205,15 +157,10 @@ int	run_pipeline_core(t_process_data *data, int cmd_count)
 
 	wait_state.last_status = 0;
 	wait_state.signal_printed = 0;
-
-	/* Parent: no longer needs pipe FDs */
 	close_free_pipes_recursively(data->pipes, 0, cmd_count - 1);
-
 	exit_status = wait_all_children(data, 0, cmd_count, &wait_state);
 	data->last_exit_status = exit_status;
-
 	free(data->pids);
 	data->pids = NULL;
-
 	return (exit_status);
 }
