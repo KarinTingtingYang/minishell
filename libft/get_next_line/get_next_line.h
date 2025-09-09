@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   get_next_line.h                                    :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/05/05 15:56:50 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/05/13 12:29:01 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/05 15:56:50 by tiyang            #+#    #+#             */
+/*   Updated: 2025/09/09 09:39:34 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ char	*gnl_ft_strjoin(char *s1, char const *s2);
 char	*gnl_ft_substr(char const *s, unsigned int start, size_t len);
 char	*extract_line_and_update_storage(char **storage);
 char	*get_next_line(int fd);
+void	get_next_line_cleanup(void);
 
 #endif
 //cc -Wall -Wextra -Werror -D BUFFER_SIZE=? <file name>.c

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   get_next_line.c                                    :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/05/05 15:56:46 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/08/14 10:23:47 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/05 15:56:46 by tiyang            #+#    #+#             */
+/*   Updated: 2025/09/09 09:39:10 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,11 @@ char	*get_next_line(int fd)
 	if (!storage || *storage == '\0')
 		return (free(storage), storage = NULL, NULL);
 	return (extract_line_and_update_storage(&storage));
+}
+
+void	get_next_line_cleanup(void)
+{
+	get_next_line(-2);
 }
 
 /* // TESTING: txt files

@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:09:59 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/08 12:11:18 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/09 09:36:50 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,35 +14,54 @@
 
 volatile sig_atomic_t	g_signal_received = 0;
 
-/**
-*@brief Runs the non-interactive shell mode, reading commands
-        from standard input.
-*@param process_data Pointer to the process data structure.
-*/
-static void	run_non_interactive_shell(t_process_data *process_data)
-{
-	char	*line;
-	char	*newline_char;
+/* -------------------------------------------------------------------------- */
+/*                               Local utilities                               */
+/* -------------------------------------------------------------------------- */
 
-	line = get_next_line(STDIN_FILENO);
-	while ((line != NULL))
+static void	shutdown_shell(t_process_data *process_data)
+{
+	/* Best-effort cleanup; safe to call multiple times */
+	get_next_line_cleanup();
+	rl_clear_history();
+	if (process_data && process_data->env_list)
 	{
-		newline_char = ft_strchr(line, '\n');
-		if (newline_char)
-			*newline_char = '\0';
-		if (*line)
-			execute_command(line, process_data->env_list, process_data);
-		free(line);
-		line = get_next_line(STDIN_FILENO);
+		free_env(process_data->env_list);
+		process_data->env_list = NULL;
 	}
 }
 
+/* -------------------------------------------------------------------------- */
+/*                          Non-interactive execution                          */
+/* -------------------------------------------------------------------------- */
+
 /**
-*@brief Handles signal interrupts during input reading.
-*@param process_data Pointer to the process data structure.
-*@param input The input line to process.
-*@return 1 if a SIGINT was handled, 0 otherwise.
-*/
+ * @brief Runs the non-interactive shell mode, reading commands from stdin.
+ *        Ensures each line buffer is freed and no allocations leak.
+ */
+static void	run_non_interactive_shell(t_process_data *process_data)
+{
+	char	*line;
+	char	*nl;
+
+	while ((line = get_next_line(STDIN_FILENO)) != NULL)
+	{
+		nl = ft_strchr(line, '\n');
+		if (nl)
+			*nl = '\0';
+		if (*line)
+			(void)execute_command(line, process_data->env_list, process_data);
+		free(line);
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+/*                            Interactive helpers                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * @brief Handles signal interrupts during input reading.
+ * @return 1 if a SIGINT was handled (and input freed), 0 otherwise.
+ */
 static int	handle_signal_interrupt(t_process_data *process_data, char *input)
 {
 	if (g_signal_received == SIGINT)
@@ -57,11 +76,9 @@ static int	handle_signal_interrupt(t_process_data *process_data, char *input)
 }
 
 /**
-*@brief Processes a single line of shell input.
-*@param input The input line to process.
-*@param process_data Pointer to the process data structure.
-*@return 1 if the command was processed, 0 otherwise.
-*/
+ * @brief Processes a single line of shell input.
+ *        Adds to history only after quick syntax precheck.
+ */
 static int	process_shell_input(char *input, t_process_data *process_data)
 {
 	const char	*line_ptr;
@@ -81,11 +98,10 @@ static int	process_shell_input(char *input, t_process_data *process_data)
 	return (1);
 }
 
-/**
-*@brief Runs the interactive shell loop.
-*@param process_data Pointer to the process data structure.
-*@return Exit status of the shell.
-*/
+/* -------------------------------------------------------------------------- */
+/*                              Interactive loop                               */
+/* -------------------------------------------------------------------------- */
+
 static int	run_interactive_shell(t_process_data *process_data)
 {
 	char	*input;
@@ -104,36 +120,36 @@ static int	run_interactive_shell(t_process_data *process_data)
 		if (handle_signal_interrupt(process_data, input))
 			continue ;
 		if (*input && g_signal_received != SIGINT)
-			process_shell_input(input, process_data);
+			(void)process_shell_input(input, process_data);
 		free(input);
 	}
 	return (process_data->last_exit_status);
 }
 
-/**
-*@brief Main entry point for the minishell program.
-*@param argc Argument count.
-*@param argv Argument vector.
-*@param envp Environment variables.
-*@return Exit status of the shell.
-*/
+/* -------------------------------------------------------------------------- */
+/*                                   main                                      */
+/* -------------------------------------------------------------------------- */
+
 int	main(int argc, char **argv, char **envp)
 {
-	t_env_var		*env_list;
 	t_process_data	process_data;
 
 	(void)argc;
 	(void)argv;
-	env_list = init_env(envp);
-	bootstrap_env_if_empty(&env_list);
-	process_data.env_list = env_list;
+	process_data.env_list = init_env(envp);
+	bootstrap_env_if_empty(&process_data.env_list);
 	process_data.last_exit_status = 0;
+
+	/* Ensure GNL internal buffers are reclaimed on any exit path */
+	atexit(get_next_line_cleanup);
 	setup_signal_handlers();
+
 	if (isatty(STDIN_FILENO))
 		process_data.last_exit_status = run_interactive_shell(&process_data);
 	else
 		run_non_interactive_shell(&process_data);
-	rl_clear_history();
-	free_env(env_list);
+
+	/* Unified shutdown to avoid leaks / still-reachable blocks */
+	shutdown_shell(&process_data);
 	return (process_data.last_exit_status);
 }

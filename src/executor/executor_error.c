@@ -1,23 +1,63 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   executor_error.c                                   :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: tiyang <tiyang@student.42.fr>                +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2025/08/30 19:07:14 by tiyang        #+#    #+#                 */
-/*   Updated: 2025/09/04 10:24:11 by tiyang        ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   executor_error.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/30 19:07:14 by tiyang            #+#    #+#             */
+/*   Updated: 2025/09/09 09:36:11 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+#include <limits.h> /* PATH_MAX */
+
+/* -------------------------------------------------------------------------- */
+/*                          Internal cleanup utilities                         */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * @brief Safely pick a command name for error printing.
+ *
+ * Copies args[0] into a stack buffer so we can free args/envp before
+ * calling ft_error_and_exit(), avoiding using freed pointers.
+ *
+ * @param args   Argument vector (may be NULL).
+ * @param buf    Stack buffer to write into.
+ * @param buflen Size of @p buf.
+ * @return const char*  Pointer to either @p buf (if args[0] existed) or "minishell".
+ */
+static const char	*safe_cmd_name(char **args, char *buf, size_t buflen)
+{
+	if (args && args[0] && buflen > 0)
+	{
+		/* Use your project's ft_strlcpy if available; fallback to snprintf otherwise */
+		ft_strlcpy(buf, args[0], buflen);
+		return (buf);
+	}
+	return ("minishell");
+}
+
+/**
+ * @brief Free both args and envp if present.
+ */
+static void	free_args_env(char **args, char **envp)
+{
+	if (args)
+		free_split(args);
+	if (envp)
+		free_split(envp);
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Public interfaces                              */
+/* -------------------------------------------------------------------------- */
 
 /**
  * @brief Handles errors related to stat() system call.
  *
- * This function checks the error code from a failed stat() call and
- * prints an appropriate error message before exiting with a specific
- * exit code.
+ * Frees args/envp before exiting. Uses a stack copy of the command name.
  *
  * @param envp The environment variables array to free if needed.
  * @param args The command arguments array to free if needed.
@@ -25,21 +65,21 @@
  */
 void	handle_stat_error(char **envp, char **args, int error_code)
 {
-	if (envp)
-		free_split(envp);
+	char		namebuf[PATH_MAX];
+	const char	*name = safe_cmd_name(args, namebuf, sizeof(namebuf));
+
+	free_args_env(args, envp);
 	if (error_code == ENOTDIR)
-		ft_error_and_exit(args[0], "Not a directory", 126);
+		ft_error_and_exit((char *)name, "Not a directory", 126);
 	else if (error_code == ENOENT)
-		ft_error_and_exit(args[0], "No such file or directory", 127);
-	ft_error_and_exit(args[0], strerror(error_code), 126);
+		ft_error_and_exit((char *)name, "No such file or directory", 127);
+	ft_error_and_exit((char *)name, strerror(error_code), 126);
 }
 
 /**
  * @brief Handles errors related to access() system call.
  *
- * This function checks the error code from a failed access() call and
- * prints an appropriate error message before exiting with a specific
- * exit code.
+ * Frees args/envp before exiting. Uses a stack copy of the command name.
  *
  * @param envp The environment variables array to free if needed.
  * @param args The command arguments array to free if needed.
@@ -47,21 +87,21 @@ void	handle_stat_error(char **envp, char **args, int error_code)
  */
 void	handle_access_error(char **envp, char **args, int error_code)
 {
-	if (envp)
-		free_split(envp);
+	char		namebuf[PATH_MAX];
+	const char	*name = safe_cmd_name(args, namebuf, sizeof(namebuf));
+
+	free_args_env(args, envp);
 	if (error_code == EACCES)
-		ft_error_and_exit(args[0], "Permission denied", 126);
+		ft_error_and_exit((char *)name, "Permission denied", 126);
 	else if (error_code == ENOTDIR)
-		ft_error_and_exit(args[0], "Not a directory", 126);
-	ft_error_and_exit(args[0], strerror(error_code), 126);
+		ft_error_and_exit((char *)name, "Not a directory", 126);
+	ft_error_and_exit((char *)name, strerror(error_code), 126);
 }
 
 /**
  * @brief Handles errors related to execve() system call.
  *
- * This function checks the error code from a failed execve() call and
- * prints an appropriate error message before exiting with a specific
- * exit code.
+ * Frees args/envp before exiting. Uses a stack copy of the command name.
  *
  * @param envp The environment variables array to free if needed.
  * @param args The command arguments array to free if needed.
@@ -69,50 +109,56 @@ void	handle_access_error(char **envp, char **args, int error_code)
  */
 void	handle_execve_error(char **envp, char **args, int error_code)
 {
-	free_split(envp);
+	char		namebuf[PATH_MAX];
+	const char	*name = safe_cmd_name(args, namebuf, sizeof(namebuf));
+
+	free_args_env(args, envp);
 	if (error_code == ENOEXEC)
-		ft_error_and_exit(args[0], "Exec format error", 126);
+		ft_error_and_exit((char *)name, "Exec format error", 126);
 	else if (error_code == ENOTDIR)
-		ft_error_and_exit(args[0], "Not a directory", 126);
+		ft_error_and_exit((char *)name, "Not a directory", 126);
 	else if (error_code == ENOENT)
-		ft_error_and_exit(args[0], "No such file or directory", 127);
+		ft_error_and_exit((char *)name, "No such file or directory", 127);
 	else if (error_code == EACCES)
-		ft_error_and_exit(args[0], "Permission denied", 126);
-	ft_error_and_exit(args[0], strerror(error_code), 126);
+		ft_error_and_exit((char *)name, "Permission denied", 126);
+	ft_error_and_exit((char *)name, strerror(error_code), 126);
 }
 
 /**
  * @brief Handles the case when the command path is NULL.
  *
- * This function checks if the command contains a '/' character to determine
- * if it was specified with a path. It then prints an appropriate error message
- * and exits with a specific exit code.
+ * If the user typed a path (contains '/'), report ENOENT. Otherwise,
+ * report "command not found". Frees args/envp before exiting.
  *
  * @param args The command arguments array.
  * @param envp The environment variables array to free if needed.
  */
 void	handle_null_cmd_path(char **args, char **envp)
 {
-	if (args && args[0] && ft_strchr(args[0], '/'))
-	{
-		if (envp)
-			free_split(envp);
-		ft_error_and_exit(args[0], "No such file or directory", 127);
-	}
-	if (envp)
-		free_split(envp);
+	char		namebuf[PATH_MAX];
+	int			has_slash;
+
+	has_slash = (args && args[0] && ft_strchr(args[0], '/') != NULL);
+	(void)has_slash; /* keep computed before freeing */
+
+	/* Choose printable name before freeing inputs */
 	if (args && args[0])
-		ft_error_and_exit(args[0], "command not found", 127);
-	else
-		ft_error_and_exit("minishell", "command not found", 127);
+		ft_strlcpy(namebuf, args[0], sizeof(namebuf));
+
+	/* Free everything we own before exiting */
+	free_args_env(args, envp);
+
+	if (has_slash)
+		ft_error_and_exit(namebuf, "No such file or directory", 127);
+	/* If no args[0], fall back to "minishell" as the subject */
+	ft_error_and_exit((namebuf[0] ? namebuf : "minishell"),
+		"command not found", 127);
 }
 
 /**
  * @brief Handles errors related to command redirection syntax.
  *
- * This function checks for signal interrupts and syntax errors in the
- * command arguments related to redirection. It sets the last exit status
- * in the process data structure accordingly.
+ * Sets the last exit status on syntax/signal errors. No allocations here.
  *
  * @param data Pointer to the execution data.
  * @param process_data Pointer to the process data.
@@ -131,9 +177,9 @@ int	handle_redirection_error(t_execute_data *data, t_process_data *process_data,
 		return (130);
 	}
 	last_arg_index = 0;
-	while (args[last_arg_index + 1] != NULL)
+	while (args && args[last_arg_index + 1] != NULL)
 		last_arg_index++;
-	if (is_redirection(args[last_arg_index]))
+	if (args && is_redirection(args[last_arg_index]))
 	{
 		process_data->last_exit_status = 2;
 		return (2);

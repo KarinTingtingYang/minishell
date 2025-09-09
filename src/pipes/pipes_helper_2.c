@@ -6,49 +6,132 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/03 12:01:47 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/08 09:10:04 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/09 09:36:37 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+#include <errno.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <unistd.h>
+
+/* -------------------------------------------------------------------------- */
+/*                         Execute one command in child                        */
+/* -------------------------------------------------------------------------- */
 
 /**
  * @brief Executes a single command in a child process.
  *
- * This function checks if the command is a builtin and runs it. If not, it
- * executes an external command. The function exits the child process after
- * completion, handling any execution errors.
- *
- * @param cmd The command to execute.
- * @param data A pointer to the process data structure.
+ * Memory-safety notes:
+ *  - For builtins: free all child-owned pipeline resources before _exit().
+ *  - For external commands: we copy args[0] to a stack buffer (namebuf)
+ *    so we can free pipeline resources + envp before printing errors.
+ *  - On any failure path prior to execve() success, we free envp and
+ *    call cleanup_child_pipeline_resources() to avoid still-reachable.
  */
 void	execute_child_command(t_command *cmd, t_process_data *data)
 {
-	int	status;
+	int			status;
+	char		namebuf[PATH_MAX];
+	char		**envp;
+	struct stat	st;
+	int			e;
 
+	/* Empty command: nothing to do, cleanly exit */
 	if (cmd->args == NULL || cmd->args[0] == NULL)
-		exit(0);
+	{
+		get_next_line_cleanup();
+		cleanup_child_pipeline_resources(data);
+		_exit(0);
+	}
+
+	/* Builtin path: run and exit with its status */
 	if (is_builtin(cmd->args[0]))
 	{
 		status = run_builtin(cmd->args, data);
 		cleanup_child_pipeline_resources(data);
-		exit(status);
+		_exit(status);
 	}
-	execute_cmd(cmd->cmd_path, cmd->args,
-		data->path_dirs, data->env_list);
-	ft_error_and_exit("execve", strerror(errno), EXIT_FAILURE);
+
+	/* External command */
+	get_next_line_cleanup();
+
+	/* Preserve command name safely for error reporting */
+	ft_strlcpy(namebuf, cmd->args[0], sizeof(namebuf));
+
+	/* Prepare environment for execve */
+	envp = env_list_to_array(data->env_list);
+
+	/* If we couldn't resolve a path, mirror shell errors and clean up. */
+	if (cmd->cmd_path == NULL)
+	{
+		int has_slash = (ft_strchr(cmd->args[0], '/') != NULL);
+
+		free_split(envp);
+		cleanup_child_pipeline_resources(data);
+		if (has_slash)
+			ft_error_and_exit(namebuf, "No such file or directory", 127);
+		ft_error_and_exit(namebuf, "command not found", 127);
+	}
+
+	/* Pre-exec checks to provide nice diagnostics before execve */
+	if (stat(cmd->cmd_path, &st) == -1)
+	{
+		e = errno;
+		free_split(envp);
+		cleanup_child_pipeline_resources(data);
+		if (e == ENOTDIR)
+			ft_error_and_exit(namebuf, "Not a directory", 126);
+		else if (e == ENOENT)
+			ft_error_and_exit(namebuf, "No such file or directory", 127);
+		ft_error_and_exit(namebuf, strerror(e), 126);
+	}
+	if (S_ISDIR(st.st_mode))
+	{
+		free_split(envp);
+		cleanup_child_pipeline_resources(data);
+		ft_error_and_exit(namebuf, "Is a directory", 126);
+	}
+	if (access(cmd->cmd_path, X_OK) == -1)
+	{
+		e = errno;
+		free_split(envp);
+		cleanup_child_pipeline_resources(data);
+		if (e == EACCES)
+			ft_error_and_exit(namebuf, "Permission denied", 126);
+		else if (e == ENOTDIR)
+			ft_error_and_exit(namebuf, "Not a directory", 126);
+		ft_error_and_exit(namebuf, strerror(e), 126);
+	}
+
+	/* Exec: on success, never returns */
+	execve(cmd->cmd_path, cmd->args, envp);
+
+	/* Exec failed: capture errno, clean up, then print error and exit */
+	e = errno;
+	free_split(envp);
+	cleanup_child_pipeline_resources(data);
+	if (e == ENOEXEC)
+		ft_error_and_exit(namebuf, "Exec format error", 126);
+	else if (e == ENOTDIR)
+		ft_error_and_exit(namebuf, "Not a directory", 126);
+	else if (e == ENOENT)
+		ft_error_and_exit(namebuf, "No such file or directory", 127);
+	else if (e == EACCES)
+		ft_error_and_exit(namebuf, "Permission denied", 126);
+	ft_error_and_exit(namebuf, strerror(e), 126);
 }
+
+/* -------------------------------------------------------------------------- */
+/*                         Wait helpers and final status                       */
+/* -------------------------------------------------------------------------- */
 
 /**
  * @brief Processes the exit status of a single child process.
  *
- * This function checks if a child process exited normally or was terminated
- * by a signal, updating the `last_status` and `signal_printed` flag
- * in the provided struct.
- *
- * @param status The exit status of the child process.
- * @param info A pointer to the `t_wait_info` struct.
- * @param is_last_child A flag indicating if this is the last child in the list.
+ * Updates last_status only for the last child in the pipeline.
  */
 static void	process_child_status(int status, t_wait_info *info,
 										int is_last_child)
@@ -75,19 +158,16 @@ static void	process_child_status(int status, t_wait_info *info,
 }
 
 /**
- * @brief Waits for all child processes to complete.
+ * @brief Recursively waits for all children. On waitpid error, frees pids
+ *        and exits with an error to avoid still-reachable memory.
  *
- * This function recursively waits for each process in the `pids` array,
- * from the starting `index` to the `max` count. It processes each child's
- * exit status to determine the final return value.
- *
- * @param pids An array of process IDs.
- * @param index The current index in the `pids` array.
- * @param max The total number of processes to wait for.
- * @param info A pointer to the `t_wait_info` struct.
- * @return The final exit status of the last command in the pipeline.
+ * @param data  Process data (to free pids on fatal error).
+ * @param index Current index in the pids array.
+ * @param max   Total number of children.
+ * @param info  Aggregate wait state.
+ * @return Final status of the last child on success (does not return on error).
  */
-static int	wait_all_children(pid_t *pids, int index, int max,
+static int	wait_all_children(t_process_data *data, int index, int max,
 									t_wait_info *info)
 {
 	int	status;
@@ -95,25 +175,28 @@ static int	wait_all_children(pid_t *pids, int index, int max,
 
 	if (index >= max)
 		return (info->last_status);
-	if (waitpid(pids[index], &status, 0) == -1)
+	if (waitpid(data->pids[index], &status, 0) == -1)
 	{
-		ft_error_and_exit("waitpid", strerror(errno), EXIT_FAILURE);
-		return (wait_all_children(pids, index + 1, max, info));
+		int saved = errno;
+
+		/* Free pids to prevent still-reachable blocks before exiting */
+		free(data->pids);
+		data->pids = NULL;
+		ft_error_and_exit("waitpid", strerror(saved), EXIT_FAILURE);
 	}
 	is_last_child = (index == max - 1);
 	process_child_status(status, info, is_last_child);
-	return (wait_all_children(pids, index + 1, max, info));
+	return (wait_all_children(data, index + 1, max, info));
 }
 
+/* -------------------------------------------------------------------------- */
+/*                         Pipeline run / parent side                          */
+/* -------------------------------------------------------------------------- */
+
 /**
- * @brief Executes the core logic of a command pipeline.
+ * @brief Executes the core logic of a command pipeline (parent side).
  *
- * This function handles closing pipes, waiting for all child processes,
- * and freeing allocated resources. It is called by `run_command_pipeline`.
- *
- * @param data The `t_process_data` struct containing pipeline information.
- * @param cmd_count The number of commands in the pipeline.
- * @return The exit status of the last command in the pipeline.
+ * Closes all pipes, waits for children, updates last status, and frees pids.
  */
 int	run_pipeline_core(t_process_data *data, int cmd_count)
 {
@@ -122,9 +205,15 @@ int	run_pipeline_core(t_process_data *data, int cmd_count)
 
 	wait_state.last_status = 0;
 	wait_state.signal_printed = 0;
+
+	/* Parent: no longer needs pipe FDs */
 	close_free_pipes_recursively(data->pipes, 0, cmd_count - 1);
-	exit_status = wait_all_children(data->pids, 0, cmd_count, &wait_state);
+
+	exit_status = wait_all_children(data, 0, cmd_count, &wait_state);
 	data->last_exit_status = exit_status;
+
 	free(data->pids);
+	data->pids = NULL;
+
 	return (exit_status);
 }

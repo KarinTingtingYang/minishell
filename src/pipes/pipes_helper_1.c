@@ -6,24 +6,34 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/24 10:20:17 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/04 10:08:11 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/09 09:34:35 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
+#include "../../libft/get_next_line/get_next_line.h"
+#include <errno.h>
+#include <string.h>
+
+/* -------------------------------------------------------------------------- */
+/*                         Child I/O and pipe handling                         */
+/* -------------------------------------------------------------------------- */
 
 /**
  * @brief Sets up I/O for a child process in a pipeline.
  *
- * This function handles pipe duplication and redirection, ensuring the child's
- * stdin and stdout are correctly wired to the pipeline. It also closes all
- * unnecessary pipe file descriptors to prevent resource leaks.
+ * Duplicates the correct pipe ends to STDIN/STDOUT, then closes and frees
+ * all pipe FDs to avoid descriptor leaks in the child. Finally applies any
+ * command-level redirections.
  *
  * @param data A pointer to the process data structure.
  * @param i The index of the current command in the pipeline.
  */
 static void	setup_child_io(t_process_data *data, int i)
 {
+	int	max_pipes;
+
+	max_pipes = data->cmd_count - 1;
 	if (i > 0)
 	{
 		if (dup2(data->pipes[i - 1][0], STDIN_FILENO) == -1)
@@ -34,22 +44,26 @@ static void	setup_child_io(t_process_data *data, int i)
 		if (dup2(data->pipes[i][1], STDOUT_FILENO) == -1)
 			ft_error_and_exit("dup2", strerror(errno), EXIT_FAILURE);
 	}
-	close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
+	/* After duplicating, close all inherited pipe fds in the child */
+	close_free_pipes_recursively(data->pipes, 0, max_pipes);
 	redirect_io(data->cmds[i]->input_file, data->cmds[i]->output_file,
 		data->cmds[i]->output_mode);
 }
 
+/* -------------------------------------------------------------------------- */
+/*                              Process forking                                */
+/* -------------------------------------------------------------------------- */
+
 /**
  * @brief Recursively forks processes for a command pipeline.
  *
- * This function iterates through a list of commands, forking
- * a new process for each and setting up their I/O connections
- * to form a pipeline. It manages signal handlers for the child
- * processes and delegates command execution to a helper function.
+ * For each command, fork a child, reset child signals, set up I/O, and
+ * execute the command. On fork error, closes all pipes and frees parent
+ * resources before exiting to avoid "still reachable" leaks.
  *
  * @param data A pointer to the process data structure.
  * @param i The current index of the command to process.
- * @return 0 on success, -1 on failure.
+ * @return 0 on success, -1 on failure (unreachable if we exit on error).
  */
 int	fork_all_processes_recursive(t_process_data *data, int i)
 {
@@ -58,25 +72,35 @@ int	fork_all_processes_recursive(t_process_data *data, int i)
 	data->pids[i] = fork();
 	if (data->pids[i] == -1)
 	{
+		/* Close all pipes and free parent-side resources before exiting */
+		close_free_pipes_recursively(data->pipes, 0, data->cmd_count - 1);
+		/* Also free cmds/parts/path_dirs/pids to avoid "still reachable" */
+		cleanup_pipeline_resources(data);
 		ft_error_and_exit("fork", strerror(errno), EXIT_FAILURE);
 		return (-1);
 	}
 	if (data->pids[i] == 0)
 	{
+		/* Child branch */
+		get_next_line_cleanup();
 		reset_child_signal_handlers();
 		setup_child_io(data, i);
 		execute_child_command(data->cmds[i], data);
+		/* If execute_child_command ever returns, exit with last status */
+		_exit((data->last_exit_status != 0) ? data->last_exit_status : 127);
 	}
 	return (fork_all_processes_recursive(data, i + 1));
 }
 
+/* -------------------------------------------------------------------------- */
+/*                              PID allocation                                 */
+/* -------------------------------------------------------------------------- */
+
 /**
  * @brief Creates an array to hold child process IDs.
  *
- * This function allocates memory for an array of `pid_t` to store
- * the process IDs of child processes created for each command in
- * the pipeline. If allocation fails, it cleans up any allocated
- * pipe file descriptors.
+ * On allocation failure, closes and frees all existing pipes to avoid leaks.
+ *
  * @param cmd_count The number of commands in the pipeline.
  * @param pipes     A 2D array of pipe file descriptors to clean up on failure.
  * @return A pointer to an array of `pid_t` on success, or NULL on failure.
@@ -88,39 +112,57 @@ pid_t	*create_child_processes(int cmd_count, int **pipes)
 	child_processes = malloc(sizeof(pid_t) * cmd_count);
 	if (child_processes == NULL)
 	{
-		close_free_pipes_recursively(pipes, 0, cmd_count - 1);
+		if (pipes)
+			close_free_pipes_recursively(pipes, 0, cmd_count - 1);
 		return (NULL);
 	}
 	return (child_processes);
 }
 
+/* -------------------------------------------------------------------------- */
+/*                          Pipe creation and cleanup                          */
+/* -------------------------------------------------------------------------- */
+
 /**
- * @brief Creates pipe file descriptors for inter-process communication.
+ * @brief Recursively create @p max pipes: indices [0, max).
  *
- * This function allocates memory for an array of pipes and initializes
- * each pipe using the `pipe` system call. It uses recursion to create
- * each pipe from the current index to the maximum number of pipes.
- * If any allocation or pipe creation fails, it cleans up by freeing
- * already created pipes.
- * @param cmd_count  The number of commands in the pipeline.
- * @return A pointer to a 2D array of pipe file descriptors on success,
- *         or NULL if allocation or pipe creation fails.
+ * On error at any level:
+ *  - If malloc fails for the current @p index, return -1 (caller should clean).
+ *  - If pipe() fails, free the just-allocated slot, close & free all
+ *    previously created pipes [0, index), then exit with an error AFTER
+ *    cleanup to avoid "still reachable" reports.
+ *
+ * @param pipes  Preallocated array of int[2] pointers of length @p max.
+ * @param index  Current pipe index being created.
+ * @param max    Total number of pipes to create (usually cmd_count - 1).
+ * @return 0 on success, -1 on (recoverable) allocation error.
  */
 int	create_all_pipes_recursively(int **pipes, int index, int max)
 {
 	if (index >= max)
 		return (0);
-	pipes[index] = malloc(sizeof(int) * 2);
+	pipes[index] = (int *)malloc(sizeof(int) * 2);
 	if (pipes[index] == NULL)
 		return (-1);
 	if (pipe(pipes[index]) == -1)
 	{
+		/* Free the just-allocated slot; no FDs created on failure */
+		free(pipes[index]);
+		pipes[index] = NULL;
+
+		/* Close & free all earlier pipes, then also free the array itself */
+		close_free_pipes_recursively(pipes, 0, index);
+
 		ft_error_and_exit("pipe", strerror(errno), EXIT_FAILURE);
 		return (-1);
 	}
 	if (create_all_pipes_recursively(pipes, index + 1, max) == -1)
 	{
+		/* A deeper failure occurred; free our own slot and bubble up */
+		close(pipes[index][0]);
+		close(pipes[index][1]);
 		free(pipes[index]);
+		pipes[index] = NULL;
 		return (-1);
 	}
 	return (0);
@@ -129,21 +171,29 @@ int	create_all_pipes_recursively(int **pipes, int index, int max)
 /**
  * @brief Recursively closes and frees all pipe file descriptors.
  *
- * This function iterates through the array of pipes, closing both
- * ends of each pipe and freeing the allocated memory. It uses recursion
- * to process each pipe from the current index to the maximum.
+ * Closes both ends of each pipe at indices [idx, max) and frees the
+ * per-pipe buffers. On the final unwind (idx == 0) also frees the
+ * top-level @p pipes array pointer.
+ *
  * @param pipes  A 2D array of pipe file descriptors.
  * @param idx    The current index in the pipes array.
- * @param max    The total number of pipes.
+ * @param max    The total number of pipes (exclusive upper bound).
  */
 void	close_free_pipes_recursively(int **pipes, int idx, int max)
 {
 	if (pipes == NULL || idx >= max)
 		return ;
-	close(pipes[idx][0]);
-	close(pipes[idx][1]);
-	free(pipes[idx]);
+	if (pipes[idx])
+	{
+		/* Close ends if they look valid; ignore close errors */
+		close(pipes[idx][0]);
+		close(pipes[idx][1]);
+		free(pipes[idx]);
+		pipes[idx] = NULL;
+	}
 	close_free_pipes_recursively(pipes, idx + 1, max);
 	if (idx == 0)
+	{
 		free(pipes);
+	}
 }
