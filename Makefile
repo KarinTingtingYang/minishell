@@ -14,7 +14,8 @@ SRCS       = $(SRC_DIR)/main.c \
 			 $(SRC_DIR)/executor/precheck_line.c \
 			 $(SRC_DIR)/executor/precheck_line_helper.c \
              $(SRC_DIR)/executor/executor.c \
-             $(SRC_DIR)/executor/executor_helper.c \
+             $(SRC_DIR)/executor/executor_helper_1.c \
+			 $(SRC_DIR)/executor/executor_helper_2.c \
              $(SRC_DIR)/executor/executor_cleanup_1.c \
 			 $(SRC_DIR)/executor/executor_cleanup_2.c \
 			 $(SRC_DIR)/executor/executor_error.c \

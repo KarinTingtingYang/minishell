@@ -6,7 +6,7 @@
 /*   By: makhudon <makhudon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 13:55:56 by makhudon          #+#    #+#             */
-/*   Updated: 2025/09/09 13:09:58 by makhudon         ###   ########.fr       */
+/*   Updated: 2025/09/09 13:40:52 by makhudon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,17 @@
 #include <limits.h>
 #include <errno.h>
 
-/* -------------------------------------------------------------------------- */
-/*                               Local utilities                               */
-/* -------------------------------------------------------------------------- */
-
 /**
- * @brief Safely obtain a printable command name.
+ * @brief Safely retrieves the command name from args for error messages.
  *
- * Returns a writable pointer so it matches ft_error_and_exit(char*,...).
- * If args[0] exists, a copy is placed in @p buf; otherwise a static
- * fallback "minishell" is returned.
+ * This function copies the first argument (command name) into a provided
+ * buffer if available, ensuring it is null-terminated. If args is NULL or
+ * empty, it returns a fallback string "minishell".
+ *
+ * @param args The argument list (argv-style).
+ * @param buf The buffer to copy the command name into.
+ * @param buflen The size of the buffer.
+ * @return A pointer to the command name in buf, or "minishell" if unavailable.
  */
 static char	*safe_cmd_name(char **args, char *buf, size_t buflen)
 {
@@ -37,18 +38,6 @@ static char	*safe_cmd_name(char **args, char *buf, size_t buflen)
 	return (fallback);
 }
 
-// static void	free_args_env(char **args, char **envp)
-// {
-// 	if (args)
-// 		free_split(args);
-// 	if (envp)
-// 		free_split(envp);
-// }
-
-/* -------------------------------------------------------------------------- */
-/*                          Pre-exec validity checks                           */
-/* -------------------------------------------------------------------------- */
-
 /**
  * @brief Handles errors from stat()/access and directory cases.
  *        Frees envp/args before exiting via the error helpers.
@@ -56,24 +45,23 @@ static char	*safe_cmd_name(char **args, char *buf, size_t buflen)
  * @param cmd_path Full command path (must be non-NULL when called).
  * @param args     argv-style array for the command.
  * @param envp     envp array created for execve.
- * @return 1 if command is OK to exec, 0 otherwise (unreachable if error exits).
  */
 int	perform_command_checks(char *cmd_path, char **args, char **envp)
 {
 	struct stat	st;
 	int			e;
+	char		namebuf[PATH_MAX];
+	char		*name;
 
 	if (stat(cmd_path, &st) == -1)
 	{
 		e = errno;
-		handle_stat_error(envp, args, e); /* frees envp/args + exits */
+		handle_stat_error(envp, args, e);
 		return (0);
 	}
 	if (S_ISDIR(st.st_mode))
 	{
-		char	namebuf[PATH_MAX];
-		char	*name = safe_cmd_name(args, namebuf, sizeof(namebuf));
-
+		name = safe_cmd_name(args, namebuf, sizeof(namebuf));
 		free_args_env(args, envp);
 		ft_error_and_exit(name, "Is a directory", 126);
 		return (0);
@@ -81,92 +69,55 @@ int	perform_command_checks(char *cmd_path, char **args, char **envp)
 	if (access(cmd_path, X_OK) == -1)
 	{
 		e = errno;
-		handle_access_error(envp, args, e); /* frees envp/args + exits */
+		handle_access_error(envp, args, e);
 		return (0);
 	}
 	return (1);
 }
 
-/* -------------------------------------------------------------------------- */
-/*                               Exec wrapper                                  */
-/* -------------------------------------------------------------------------- */
+/**
+ * @brief Handles cleanup and exit status for a null command pipeline.
+ *
+ * This function is called when `prepare_pipeline_commands` returns NULL,
+ * indicating a syntax error, an empty pipeline, or an interruption. It
+ * frees the token parts and returns the correct exit status.
+ *
+ * @param process_data The process data structure.
+ * @return The appropriate exit status (130 for SIGINT, 2 for errors).
+ */
+static int	handle_null_pipeline_error(t_process_data *process_data)
+{
+	if (process_data->parts)
+	{
+		free_split(process_data->parts);
+		process_data->parts = NULL;
+	}
+	if (g_signal_received == SIGINT)
+	{
+		process_data->last_exit_status = 130;
+		return (130);
+	}
+	process_data->last_exit_status = 2;
+	return (2);
+}
 
 /**
- * @brief Executes a command via execve() after checks. On any failure,
- *        prints a proper diagnostic and exits. Ensures envp/args are freed
- *        inside the error handlers.
+ * @brief Orchestrates the parsing, validation, and execution of
+ *        a command pipeline.
+ *
+ * @param line The input line containing the command(s) and pipes.
+ * @param env_list The list of environment variables.
+ * @param process_data The structure containing all process-related data.
+ * @return The final exit status of the pipeline.
  */
-void	execute_cmd(char *cmd_path, char **args, char **path_dirs,
-	t_env_var *env_list)
-{
-	char	**envp;
-	int		e;
-
-	(void)path_dirs;
-	reset_child_signal_handlers();
-	envp = env_list_to_array(env_list);
-	if (cmd_path == NULL)
-	{
-		/* Frees envp/args and exits. */
-		handle_null_cmd_path(args, envp);
-		return ;
-	}
-	if (!perform_command_checks(cmd_path, args, envp))
-		return ;
-	execve(cmd_path, args, envp);
-
-	/* execve failed: capture errno, then free envp/args and exit */
-	e = errno;
-	handle_execve_error(envp, args, e);
-}
-
-/* -------------------------------------------------------------------------- */
-/*                        Single command (no pipeline)                         */
-/* -------------------------------------------------------------------------- */
-
-int	handle_single_command(char *line, t_env_var *env_list,
-								t_process_data *process_data)
-{
-	t_token	**tokens;
-	char	**args;
-	int		result;
-	int		prev;
-
-	tokens = parse_line(line, process_data);
-	if (tokens == NULL)
-	{
-		if (process_data != NULL)
-			return (process_data->last_exit_status);
-		return (0);
-	}
-	args = expand_and_split_args(tokens, process_data);
-	free_tokens(tokens);
-	if (process_data && process_data->syntax_error)
-		return (free_split(args), process_data->last_exit_status);
-	if (args == NULL || args[0] == NULL)
-	{
-		prev = 0;
-		if (process_data)
-			prev = process_data->last_exit_status;
-		return (free_split(args), prev);
-	}
-	result = execute_single_command(args, env_list, process_data);
-	return (free_split(args), result);
-}
-
-/* -------------------------------------------------------------------------- */
-/*                                 Pipeline                                    */
-/* -------------------------------------------------------------------------- */
-
 int	handle_pipeline_command(char *line, t_env_var *env_list,
-	t_process_data *process_data)
+									t_process_data *process_data)
 {
 	int	status;
 
 	process_data->parts = NULL;
 	process_data->cmds = prepare_pipeline_commands(
 			line, &process_data->cmd_count, &process_data->parts, process_data);
-
 	if (process_data->syntax_error)
 	{
 		free_split(process_data->parts);
@@ -175,19 +126,7 @@ int	handle_pipeline_command(char *line, t_env_var *env_list,
 	}
 	if (process_data->cmds == NULL)
 	{
-		/* Nothing to run (parse error, empty pipeline, or interrupted). */
-		if (process_data->parts)
-		{
-			free_split(process_data->parts);
-			process_data->parts = NULL;
-		}
-		if (g_signal_received == SIGINT)
-		{
-			process_data->last_exit_status = 130;
-			return (130);
-		}
-		process_data->last_exit_status = 2;
-		return (2);
+		return (handle_null_pipeline_error(process_data));
 	}
 	process_data->path_dirs = find_path_dirs(env_list);
 	status = run_command_pipeline(process_data);
@@ -196,10 +135,20 @@ int	handle_pipeline_command(char *line, t_env_var *env_list,
 	return (status);
 }
 
-/* -------------------------------------------------------------------------- */
-/*                             Entry point dispatcher                          */
-/* -------------------------------------------------------------------------- */
-
+/**
+ * @brief Executes a command line, handling both single commands and pipelines.
+ *
+ * This function checks for heredoc limits, determines if the command line
+ * contains unquoted pipes, and delegates to the appropriate handler for
+ * single commands or pipelines. It returns the exit status of the executed
+ * command(s).
+ *
+ * @param line The command line to execute.
+ * @param env_list The linked list of environment variables.
+ * @param process_data Pointer to the process data structure.
+ * @return The exit status of the executed command(s),
+ *         or 2 on heredoc limit error.
+ */
 int	execute_command(char *line, t_env_var *env_list,
 	t_process_data *process_data)
 {
