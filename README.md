@@ -4,7 +4,7 @@ As beautiful as a shell! This project is a custom implementation of a minimalist
 
 ## 👥 Authors
 * **tiyang** (karintingtingyang)
-* **makhudon**
+* **makhudon** (MariiaKhud)
 
 ## ✨ Features
 
